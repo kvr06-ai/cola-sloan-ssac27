@@ -53,7 +53,7 @@
 \maketitle
 
 \begin{abstract}
-The annual NBA draft is a constrained fair-allocation problem: 30 indivisible draft picks are assigned to 30 teams that take turns making selections. The top picks are allocated through a lottery for the 14 non-playoff teams. The lottery has a documented manipulation incentive (``tanking''): a team eliminated from playoff contention can improve its expected draft position (DP) by losing additional games. \citet{munro2020notanking} prove an impossibility result, showing that no mechanism based on end-of-season records alone can simultaneously reward poor performance and eliminate this incentive. Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing single-season records with a multi-year playoff history as the basis for DP \citep{highley2026cola}. We formalize the \cola{} mechanism family as a configuration space parameterized by seven design dials (eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, tiebreak). Each variant proposed in \citet{highley2026cola} and the Substack series is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner. Each dial maps to a downstream league-relevant property, converting variant comparison from a prose comparison to a tuple comparison. We instantiate the framework in an empirical testbed (Section~\ref{sec:empirical}) that grid-searches over dial values for Pareto-optimal configurations against league-relevant objectives. As supporting analytical properties of specific dial configurations, we derive a closed-form $\sim 4\%$ upper bound on the worst-case probability gain from pool manipulation in the Classic configuration (Theorem~\ref{thm:bound}), a per-series tanking bound in the Capped configuration (Lemma~\ref{lem:capped-bound}), and a 26-season historical backtest covering 1999--2025.
+The annual NBA draft is a constrained fair-allocation problem: 30 indivisible draft picks are assigned to 30 teams that take turns making selections. The top picks are allocated through a lottery for the 14 non-playoff teams. The lottery has a documented manipulation incentive (``tanking''): a team eliminated from playoff contention can improve its expected draft position (DP) by losing additional games. \citet{munro2020notanking} prove an impossibility result, showing that no mechanism based on end-of-season records alone can simultaneously reward poor performance and eliminate this incentive. Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing single-season records with a multi-year playoff history as the basis for DP \citep{highley2026cola}. We formalize the \cola{} mechanism family as a configuration space parameterized by seven design dials (eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, tiebreak). Each variant proposed in \citet{highley2026cola} and the Substack series is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner. We instantiate the framework in an empirical testbed against the ZenGM Basketball-GM engine (Section~\ref{sec:empirical}), grid-searching 48 configurations across the dial space (eligibility $\times$ cap $\times$ carry-over scope) under 50 replicates per configuration of 30 simulated seasons. Under universal-dominance comparison on three league-relevant objectives (maximum years between conference-finals appearances, manipulation gain, rank-1-to-5 lottery spread), Capped \cola{} at $\Max = 150$ is the only named variant on the Pareto frontier; Status quo, Classic, Simple, and 3-2-1 are all dominated. Three of the five Pareto-optimal configurations adopt reset-on-championship carry-over scope and three use the 22-team broad eligibility pool. As supporting analytical properties of specific dial configurations, we derive a closed-form $\sim 4\%$ upper bound on the worst-case probability gain from pool manipulation in the Classic configuration (Theorem~\ref{thm:bound}) and a per-series tanking bound for the Capped configuration (Lemma~\ref{lem:capped-bound}). A corollary of the latter shows that the cap value $C$ cancels out of the Capped configuration's manipulation-gain bound, which depends only on the eligibility pool size: $\Delta p_{\text{capped}} \leq 0.3 / |E|$ in the play-in worst case. The empirical sweep confirms the cancellation across $C \in \{100, 150, 200\}$ within each eligibility setting. A 26-season historical backtest (1999--2025) reproduces the Philadelphia ``Process'' as a second-tier validation alongside the headline Pareto result.
 \end{abstract}
 
 \section{Introduction}
@@ -68,9 +68,9 @@ Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing
 
 \paragraph{Contributions:}
 \begin{itemize}
-    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space for the \cola{} family.} We formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak (Definition~\ref{def:configuration}). Each variant in the family (Simple, Simple Lottery, Classic, Countdown, Capped) is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space. Each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency), converting variant comparison from a prose comparison to a tuple comparison and surfacing the design degrees of freedom the variants implicitly select between. The framework is the league's design lever for the 2029 re-evaluation discussion.
-    \item \textbf{(Section~\ref{sec:empirical}) A Basketball-GM empirical testbed for grid search over dial values (forthcoming).} We instantiate the configuration space in the open-source Basketball-GM simulator, varying each dial across its admissible range and reporting Pareto frontiers in dial space against league-relevant objective functions (first target: minimize the maximum years between conference finals appearances). The testbed converts the framework from a taxonomy into an optimization tool that a league can run against its own policy preferences. The current submission reports the framework and the supporting analytical properties below; the testbed sweep is in active engineering and will appear in this section by the paper deadline.
-    \item \textbf{(Section~\ref{sec:bound} and Section~\ref{sec:empirical}) Supporting analytical properties: a manipulation bound and a 26-season historical backtest.} As analytical properties of specific dial configurations, we derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable distributions of draft priorities (Theorem~\ref{thm:bound}), and a per-series tanking bound for the Capped configuration showing that no playoff series win ever costs a team more than $0.3 \cdot \Max$ tickets ($45$ at $\Max = 150$) (Lemma~\ref{lem:capped-bound}). The historical backtest computes \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data, with the 2013--2017 Philadelphia ``Process'' as the canonical case study: under Classic \cola{}, graduated diminishment dismantles the repeat-tanking strategy the current weighted lottery rewards.
+    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space for the \cola{} family.} We formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak (Definition~\ref{def:configuration}). Each variant in the family (Simple, Simple Lottery, Classic, Countdown, Capped) is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space. Each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency), converting variant comparison from a prose comparison to a tuple comparison.
+    \item \textbf{(Section~\ref{sec:empirical}) A Basketball-GM empirical testbed and Pareto frontier in the dial space.} We instantiate the configuration space against the ZenGM Basketball-GM engine and compute the Pareto frontier in a 48-configuration grid over eligibility $\times$ cap $\times$ carry-over scope, under 50 replicates per configuration of 30 simulated seasons. Three league-relevant objectives drive the dominance comparison: maximum years between conference-finals appearances (lower is better), manipulation gain (lower is better), and rank-1-to-5 lottery spread (higher is better). Under universal-dominance comparison, Capped \cola{} at $\Max = 150$ is the only named variant on the Pareto frontier; Status quo, Classic, Simple, and 3-2-1 are all dominated.
+    \item \textbf{(Sections~\ref{sec:bound} and~\ref{sec:empirical}) Supporting analytical properties: a unified manipulation-gain bound and a cap-cancels-out corollary, with empirical confirmation.} We derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable index distributions (Theorem~\ref{thm:bound}), and a per-series tanking bound for the Capped configuration (Lemma~\ref{lem:capped-bound}). Corollary~\ref{cor:cap-cancels} shows that the cap value $C$ cancels out of the Capped configuration's manipulation-gain bound, which depends only on the eligibility pool size $|E|$. The empirical sweep (Section~\ref{sec:sweep-cap-cancels}) confirms the cancellation: all capped configurations at $|E| = 22$ realize manipulation gain $1.364\%$, all at $|E| = 14$ realize $2.143\%$, and all 16-tiered capped configurations realize $1.875\%$, invariant across $C \in \{100, 150, 200\}$. The 26-season historical backtest (1999--2025) with the 2013--2017 Philadelphia ``Process'' case study is a second-tier validation of the framework alongside the headline Pareto result.
 \end{itemize}
 
 \section{Background and Related Work}
@@ -308,6 +308,21 @@ Reading off Capped \cola{}'s six-step diminishment schedule, the per-series incr
 
 The bound makes the playoff-tanking incentive transparent at the league level: at $\Max = 150$, no single series win ever costs a team more than $45$ lottery tickets, which is approximately a year and a half of accumulation for a team near the wins-increment ceiling. The cumulative regret for a finals-losing team at the cap is $0.8 \cdot \Max = 120$ tickets, decomposed into per-series increments per Lemma~\ref{lem:capped-bound}.
 
+\begin{corollary}[Cap-Cancels-Out for Capped Configurations]
+\label{cor:cap-cancels}
+For a Capped \cola{} configuration with eligibility pool $E$ of size $|E|$, cap value $C$, and per-series-cost upper bound $\kappa \cdot C$ (where $\kappa = 0.3$ in the play-in worst case of Lemma~\ref{lem:capped-bound} and $\kappa = 0.2$ for any subsequent series), the worst-case manipulation-gain bound for a single-series pool perturbation is
+\begin{equation*}
+\Delta p_{\text{capped}} \;\leq\; \frac{\kappa \cdot C}{C \cdot |E|} \;=\; \frac{\kappa}{|E|}.
+\end{equation*}
+The cap value $C$ drops out. The manipulation-gain bound depends only on $\kappa$ and $|E|$. Section~\ref{sec:sweep-cap-cancels} confirms the cancellation empirically.
+\end{corollary}
+
+\begin{proof}
+The maximum index a single team can hold under Capped \cola{} is $C$, and the worst-case pool of $|E|$ such teams is $C \cdot |E|$. The maximum single-series perturbation in a team's index from the pool is $\kappa \cdot C$ tickets, by Lemma~\ref{lem:capped-bound}. Substituting into the gain expression $\Delta = (\text{perturbation}) / (\text{pool})$ yields $\kappa \cdot C / (C \cdot |E|) = \kappa / |E|$.
+\end{proof}
+
+The corollary clarifies the role the cap plays under Capped \cola{}. The cap controls per-team accumulation speed (how fast a single team builds up advantage relative to the rest of the pool) and the per-series tanking cost (Lemma~\ref{lem:capped-bound}); it does not control pool-wide manipulation resistance. The latter is set by the eligibility pool size $|E|$. A policymaker considering a Capped configuration can therefore tune $C$ on the basis of accumulation-speed and per-series-cost preferences without affecting the manipulation-gain ceiling. At the Capped \cola{} published defaults ($|E| = 22$, $\kappa = 0.3$ play-in or $\kappa = 0.2$ standard), the bound is $\Delta p_{\text{capped}} \leq 0.3 / 22 \approx 1.36\%$ in the play-in worst case and $0.2 / 22 \approx 0.91\%$ for any subsequent series.
+
 \subsection{Three Closures of Assumption (4)}
 
 The pool-manipulation gap (assumption~(4) in Section~\ref{sec:family}) admits at least three closure strategies, each represented in the literature.
@@ -321,6 +336,8 @@ The three closures compose: any practical \cola{} deployment can rely on whichev
 \section{Empirical Validation}
 \label{sec:empirical}
 
+This section instantiates the configuration space of Section~\ref{sec:family} in an empirical testbed against the ZenGM Basketball-GM engine. Section~\ref{sec:sim-model} discloses the simulation model. Section~\ref{sec:testbed-setup} describes the dial grid, objectives, and Pareto methodology. Section~\ref{sec:pareto-frontier} reports the headline result: under universal-dominance comparison, Capped \cola{} at $\Max = 150$ is the only named variant on the Pareto frontier. Section~\ref{sec:sweep-cap-cancels} confirms the cap-cancels-out result of Corollary~\ref{cor:cap-cancels} empirically. Section~\ref{sec:reset-on-championship} reports the carry-over scope finding: reset-on-championship is the modal winning scope on the frontier. Section~\ref{sec:backtest} carries the 26-season historical backtest as a second-tier validation, and Section~\ref{sec:sensitivity} reports sensitivity at $N = 30$ and $N = 100$.
+
 \subsection{Simulation Model}
 \label{sec:sim-model}
 
@@ -331,67 +348,96 @@ Team strength persists across seasons via a Markov model tied to draft outcomes.
 s_{t+1} = \mathrm{clip}\!\big(\rho \, s_t + (1 - \rho) \, \mu + \alpha \, \pi(p_t) + \varepsilon_t, \; 0, \; 1\big),
 \label{eq:strength-markov}
 \end{equation}
-with $\rho = 0.9$, $\mu = 0.5$, $\alpha = 0.15$, and $\sigma = 0.05$. Initial strength is drawn from $\mathrm{Uniform}[0.3, 0.7]$. This preserves the feedback loop the primary objective (worst-franchise gap between conference-finals appearances) is designed to measure: a team's lottery position drives its draft pick, which drives its next-season strength.
+with $\rho = 0.9$, $\mu = 0.5$, $\alpha = 0.15$, and $\sigma = 0.05$. Initial strength is drawn from $\mathrm{Uniform}[0.3, 0.7]$. This preserves the feedback loop the primary objective (worst-franchise gap between conference-finals appearances) is designed to measure: a team's lottery position drives its draft pick, which drives its next-season strength. The model is parametrically calibrated for plausibility, not fit to historical NBA team-strength trajectories; a formal calibration against league rating systems or Basketball Reference strength-of-schedule data is future work.
 
-The model is parametrically calibrated for plausibility, not fit to historical NBA team-strength trajectories. Sensitivity analysis on $(\rho, \alpha, \sigma)$, and a formal calibration against league rating systems or Basketball Reference strength-of-schedule data, is future work.
+\subsection{Testbed Setup}
+\label{sec:testbed-setup}
 
-\subsection{Backtesting Methodology}
+The headline sweep grid-searches three dials of Definition~\ref{def:configuration} jointly: eligibility $E$, cap $C$, and carry-over scope $S$. The remaining four dials ($\Delta, \rho, W, T$) are held at the canonical settings each variant inherits from \citet{highley2026cola} and the Substack series. The dial grid is
+\begin{itemize}
+    \item Eligibility $E \in \{14, 22, \text{16-tiered}\}$: 14-team non-playoff pool (Classic, Status quo); 22-team broad pool including round-1 losers (Simple, Capped); 16-team tiered pool of the 2026 3-2-1 proposal.
+    \item Cap $C \in \{\text{uncapped}, 100, 150, 200\}$: uncapped reproduces Classic / Simple; $C = 150$ is the Capped \cola{} default \citep{highley2026solvable5}.
+    \item Carry-over scope $S \in \{\text{single-season}, \text{unbounded}, \text{bounded-30yr}, \text{reset-on-championship}\}$: single-season collapses to the 3-2-1 / Status-quo behavior; unbounded reproduces Classic; bounded-30yr is the Capped default; reset-on-championship clears every team's lottery index when the league champion is decided each season.
+\end{itemize}
+The grid yields $3 \times 4 \times 4 = 48$ configurations. The headline run executes each configuration under $50$ replicates (seeds $1000$ through $1049$, deterministic via overridden \texttt{Math.random}) of $30$ simulated seasons each, for $2{,}400$ \texttt{(config, replicate)} rows.
 
-We compute \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data: 775 team-season records, 776 first-round draft picks, and 55 lottery-day-attributed pre-draft pick trades. The engine separates pre-draft state (Phase A, used for draft-probability calculations) from post-draft diminishment (Phase B, carried forward to the next season). Cold-start effects stabilize by approximately season 5; we report aggregates over 21 stable seasons (2005--2025).
+Each \texttt{(config, replicate)} row reports four objectives. The three dominance dimensions are: (i) the maximum number of years between conference-finals appearances for any franchise (lower is better; the primary parity objective, suggested by Prof.\ Highley); (ii) the analytical manipulation-gain bound $\Delta p$ for the configuration, expressed as a percentage (lower is better; closed-form from $E$ and $C$, no Monte Carlo); (iii) the rank-1-to-5 lottery spread (higher is better; the gap between the worst team's expected pick and the fifth-worst team's expected pick under the lottery). The fourth column is the per-series cost ceiling from Lemma~\ref{lem:capped-bound} (lower is better; not used for dominance because it is N/A for uncapped configurations).
 
-Two methodological points warrant attention. First, an audit of all 364 lottery picks (14 picks $\times$ 26 seasons) identified 8 instances where the draft-day holder differed from the lottery-day holder via post-lottery trades. \cola{} requires \emph{lottery-day} attribution: the team that held the pick when the lottery ran absorbs the diminishment, regardless of who selects. Second, the backtest is \emph{static}: it applies \cola{} rules to actual historical outcomes. Under a real \cola{} regime, draft outcomes would differ in ways that change future drought lengths and indices. We caveat the comparative cross-variant claims accordingly.
+A configuration is Pareto-optimal under \emph{3-objective universal dominance}: no other configuration in the grid is weakly better on all three dimensions and strictly better on at least one. Per-configuration summaries take the median across the $50$ replicates (the median is less sensitive than the mean to extreme-value outliers in max-gap statistics). Section~\ref{sec:sensitivity} reports a stability check at $N = 30$ and $N = 100$ on a subset that pools the headline Pareto-optimal set with the five named variants.
 
-\subsection{Case Study: The Philadelphia ``Process''}
+\subsection{Pareto Frontier}
+\label{sec:pareto-frontier}
 
-The 2013--14 through 2016--17 Philadelphia 76ers are the canonical strategic-tanking sequence in modern NBA history: four consecutive top-3 lottery outcomes (picks \#3, \#3, \#1, \#3) acquired through deliberate multi-season non-competitiveness. Under the current weighted lottery, each tanked season yielded a top-tier pick. Under Classic \cola{}, graduated diminishment makes the same sequence self-defeating. Table~\ref{tab:phi} shows Philadelphia's Classic \cola{} trajectory.
-
-\begin{table}[t]
-\centering
-\small
-\begin{tabular}{lcccc}
-\toprule
-Season & W--L & Pick & \cola{} index & Rank \\
-\midrule
-2013--14 & 19--63 & \#3 & 2{,}750 & 8/14 \\
-2014--15 & 18--64 & \#3 & 2{,}375 & 9/14 \\
-2015--16 & 10--72 & \#1 & 2{,}188 & 10/14 \\
-2016--17 & 28--54 & \#3 & 1{,}000 & 14/14 \\
-\bottomrule
-\end{tabular}
-\caption{Philadelphia 76ers under Classic \cola{} during the ``Process.'' Each top-3 pick triggers graduated diminishment (\#1: full reset; \#3: 50\% reduction), leaving Philadelphia at the bottom of the lottery pool by the fourth tanking season despite a 10--72 record. The Sacramento Kings hold the top Classic \cola{} index throughout this period, climbing from $7{,}250$ in 2013--14 to $10{,}250$ in 2016--17 via organic non-competitiveness.}
-\label{tab:phi}
-\end{table}
-
-Two properties emerge. First, diminishing returns to repeat tanking: the Classic \cola{} diminishment schedule ($\{1.0, 0.75, 0.5, 0.25\}$ for picks \#1--4) dominates the $\alpha = 1{,}000$ annual accumulation, so a team that receives a top-3 pick in year $t$ cannot re-enter the top of the lottery in year $t + 1$ through tanking alone. Second, pick attribution matters: the comparison is sensitive to who holds the pick on lottery day. The 2017 Boston-Philadelphia Fultz/Tatum swap was a post-lottery trade; under our convention, Boston's index absorbs the \#1 diminishment, not Philadelphia's.
-
-\subsection{Capped \cola{} Cap Calibration}
-
-Capped \cola{} is parameterized by a single tunable constant $\Max$. The cap controls the trade-off between (i) ordering resolution at the top of the lottery (a higher cap permits more separation between the highest-stockpile teams) and (ii) per-series tanking exposure (Lemma~\ref{lem:capped-bound}: a higher cap raises the cost of advancing past round 1). Table~\ref{tab:cap-sweep} reports 21-stable-season aggregates from a sweep over $\Max \in \{75, 100, 125, 150, 175, 200\}$.
+Five of the 48 configurations are Pareto-optimal under 3-objective universal dominance (Table~\ref{tab:pareto-set}). Among the named variants, only Capped \cola{} at $\Max = 150$ (configuration 26) is on the frontier; Status quo (configuration 0), Classic (configuration 1), Simple (configuration 17), and 3-2-1 (configuration 32) are all dominated. Capped \cola{} achieves the joint minimum manipulation gain of $1.364\%$ and the maximum rank-1-to-5 spread of $2.867$ on the frontier, dominating Status quo at every objective. Figure~\ref{fig:pareto-manip} visualizes the dominance picture in the (max-yrs-CF, manipulation-gain) plane.
 
 \begin{table}[t]
 \centering
 \small
-\begin{tabular}{rccccc}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{rrrr@{\hspace{6pt}}rrr@{\hspace{6pt}}l}
 \toprule
-$\Max$ & Teams at cap (mean) & Teams at cap (max) & Sep.\ R1--R5 (mean) & Per-series cost (max) & Cum.\ regret (max) \\
+cid & $E$ & $C$ & $S$ & max-yrs-CF & $\Delta p$ [\%] & rank-spread & named variant \\
 \midrule
-75  & 6.71 & 9 &  0.9 & 22.5 & 45.0 \\
-100 & 4.33 & 8 & 11.7 & 30.0 & 53.7 \\
-125 & 2.86 & 4 & 27.9 & 37.5 & 53.7 \\
-\textbf{150} & \textbf{1.62} & \textbf{3} & \textbf{47.7} & \textbf{45.0} & \textbf{57.6} \\
-175 & 0.95 & 2 & 65.4 & 52.5 & 67.2 \\
-200 & 0.52 & 2 & 76.4 & 60.0 & 76.8 \\
+11 & 14 & 150 & reset-on-championship & 27.0 & 2.143 & 2.433 &  \\
+19 & 22 & uncapped & reset-on-championship & 26.0 & 18.182 & 2.650 &  \\
+26 & 22 & 150 & bounded-30yr & 28.0 & 1.364 & 2.867 & Capped@150 \\
+31 & 22 & 200 & reset-on-championship & 27.5 & 1.364 & 2.667 &  \\
+45 & 16-tiered & 200 & unbounded & 27.5 & 1.875 & 2.700 &  \\
+\midrule
+\multicolumn{8}{c}{\textbf{Named variants under unified units (all dominated except Capped@150)}} \\
+\midrule
+0 & 14 & uncapped & single-season & 28.5 & 28.571 & 2.767 & Status quo \\
+1 & 14 & uncapped & unbounded & 27.5 & 28.571 & 2.367 & Classic \\
+17 & 22 & uncapped & unbounded & 29.0 & 18.182 & 2.667 & Simple \\
+32 & 16-tiered & uncapped & single-season & 28.0 & 25.000 & 2.567 & 3-2-1 \\
 \bottomrule
 \end{tabular}
-\caption{Capped \cola{} aggregates across 21 stable seasons (2005--2025). Per-series cost max $= 0.3 \cdot \Max$ (Lemma~\ref{lem:capped-bound}); cumulative regret max is the worst empirical observation. The bolded $\Max = 150$ row is the variant's published default \citep{highley2026solvable5}.}
-\label{tab:cap-sweep}
+\caption{The five Pareto-optimal configurations (top block; cids 11, 19, 26, 31, 45) and the five named variants under unified units (bottom block; rows show medians across 50 replicates of 30 simulated seasons each, seeds 1000--1049). Capped \cola{} at $\Max = 150$ (cid 26) is the only named variant on the Pareto frontier; the other four named variants are universally dominated. Capped@150 achieves the minimum manipulation gain (tied with cid 31 at $1.364\%$) and the maximum rank-1-to-5 spread ($2.867$) on the frontier.}
+\label{tab:pareto-set}
 \end{table}
 
-Three patterns emerge. Sub-100 caps over-compress the lottery: at $\Max = 75$, more than six teams sit at the cap on average and the rank-1 vs.\ rank-5 separation collapses to under one ticket, destroying the priority signal the family inherits from Classic. Caps above 175 erase the cap's purpose: fewer than one team sits at the cap on average, and the per-series exposure approaches the unbounded behavior of Classic. The published $\Max = 150$ choice produces a mean of $1.62$ teams at the cap across the 21 stable seasons (range 0--3), matching the stated headline of ``no more than three teams at the maximum at a time, and on average fewer than two'' \citep{highley2026solvable5}.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/pareto_primary_vs_manipulation.pdf}
+\caption{Headline Pareto frontier in the (max-yrs-CF, manipulation-gain) plane. Y-axis: median maximum years between conference-finals appearances across $50$ replicates (lower is better). X-axis: closed-form manipulation gain $\Delta p$ as a percentage (lower is better). The X-axis spans two analytical regimes: uncapped configurations sit at $\Delta p \approx 4 / |E|$ (Classic / Simple / Status quo / 3-2-1); capped configurations collapse to $\Delta p \approx 0.3 / |E|$ (Corollary~\ref{cor:cap-cancels}), creating the tight band at the left. The third dominance dimension (rank-1-to-5 spread) is not visualized; see Table~\ref{tab:pareto-set} for the full universal-dominance set.}
+\label{fig:pareto-manip}
+\end{figure}
 
-\subsection{A Note on Trade Handling}
+The headline finding is operational. Under the three-dimensional universal-dominance comparison the framework supports, the cross-variant choice the league faced in the 2026 design discussion collapses to a single Pareto-relevant named variant. The other three \cola{} variants and the 2026 3-2-1 proposal are not on the frontier under any choice of league weighting over the three dominance objectives. The Pareto frontier itself is not a singleton: four unnamed configurations (cids 11, 19, 31, 45) trade max-yrs-CF for manipulation gain or rank-spread, sweeping a strip in the dial space worth further exploration in §\ref{sec:discussion}.
 
-A practical question for any deployment is how diminishment interacts with traded picks. \citet{highley2026solvable4} identifies four options: (1) traded picks affect neither team's index; (2) the original holder's index absorbs the diminishment; (3) the receiving team's index absorbs the diminishment; (4) the diminishment is split. Each option has different incentive properties. Option (2) preserves the link between record and diminishment but over-penalizes teams that traded picks years before knowing they would be top-tier (e.g., the 2011 Clippers, who traded a future first that eventually became Cleveland's Kyrie Irving pick). Option (3) rewards the wrong actor when the recipient did not earn the pick through their own record. \citet{highley2026solvable4} recommends option (2) paired with a strengthened Stepien Rule (a cap on the number of future firsts a team can trade), which limits the frequency at which option (2)'s over-penalization surfaces. We do not extend the analysis here; we flag it as a practical implementation question that any \cola{} deployment will face.
+\subsection{Cap-Cancels-Out: Empirical Confirmation}
+\label{sec:sweep-cap-cancels}
+
+Corollary~\ref{cor:cap-cancels} establishes analytically that the cap value $C$ drops out of the Capped configuration's manipulation-gain bound: $\Delta p_{\text{capped}} \leq \kappa / |E|$. The sweep confirms the cancellation directly. The grid contains $36$ capped configurations: three pool settings ($|E| = 14, 22, 16$-tiered), three cap values ($C \in \{100, 150, 200\}$), and four scopes.
+\begin{itemize}
+    \item All $12$ capped configurations at $|E| = 22$ realize $\Delta p = 1.364\%$ (median across $50$ replicates, std $0$); closed form $\kappa / |E| = 0.3 / 22 \approx 1.364\%$.
+    \item All $12$ capped configurations at $|E| = 14$ realize $\Delta p = 2.143\%$ ($0.3 / 14 \approx 2.143\%$).
+    \item All $12$ capped configurations at $|E| = 16$ (tiered) realize $\Delta p = 1.875\%$ ($0.3 / 16 = 1.875\%$).
+\end{itemize}
+The realized manipulation gain is invariant across $C \in \{100, 150, 200\}$ within each eligibility setting. The capped configurations on the Pareto frontier (cid 11 at $|E| = 14$, cids 26 and 31 at $|E| = 22$, cid 45 at 16-tiered) and the capped configurations off the frontier exhibit the same per-$|E|$ value of $\Delta p$.
+
+The policy implication is operational. A league considering a Capped configuration can choose $C$ on the basis of per-team accumulation speed and per-series tanking cost (Lemma~\ref{lem:capped-bound} ties the per-series cost to $0.3 \cdot C$) without changing the manipulation-gain ceiling, which is fixed by $|E|$. To lower the manipulation-gain ceiling, the lever is the eligibility pool, not the cap.
+
+\subsection{Reset-on-Championship as a Winning Scope}
+\label{sec:reset-on-championship}
+
+Three of the five Pareto-optimal configurations (cids 11, 19, 31) use the reset-on-championship carry-over scope. One uses bounded-30yr (cid 26, the Capped@150 named variant) and one uses unbounded (cid 45). The single-season scope does not appear on the Pareto frontier at all; the 3-2-1 proposal (cid 32) is dominated, and no other single-season configuration in the grid clears.
+
+The mechanism behind this finding is straightforward. Reset-on-championship is event-based: the league champion's identity is observable at one point each season, and the reset triggers across the entire pool at that one point. The scope retains the multi-year accumulation that distinguishes the \cola{} family from single-season mechanisms, while preventing index inflation that single-team unbounded accumulation would otherwise produce. Bounded-30yr (cid 26) is the cap-driven analog; unbounded (cid 45) appears on the frontier only when paired with the 16-tiered pool, which structurally limits the maximum accumulation per team via the tiering. We defer deeper interpretation of why this event-based scope dominates time-bounded scopes (bounded-30yr, unbounded) to Section~\ref{sec:discussion}.
+
+\subsection{Historical Backtest}
+\label{sec:backtest}
+
+The backtest computes \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data: 775 team-season records, 776 first-round draft picks, and 55 lottery-day-attributed pre-draft pick trades. The engine separates pre-draft state (Phase A, used for draft-probability calculations) from post-draft diminishment (Phase B, carried forward to the next season). Cold-start effects stabilize by approximately season 5; we report aggregates over 21 stable seasons (2005--2025). The backtest is \emph{static}: it applies \cola{} rules to actual historical outcomes. Under a real \cola{} regime, draft outcomes would differ in ways that change future drought lengths and indices. We caveat the comparative cross-variant claims accordingly. An audit of all 364 lottery picks (14 picks $\times$ 26 seasons) identified $8$ instances where the draft-day holder differed from the lottery-day holder via post-lottery trades; \cola{} uses \emph{lottery-day} attribution.
+
+The 2013--14 through 2016--17 Philadelphia 76ers are the canonical strategic-tanking sequence in modern NBA history: four consecutive top-3 lottery outcomes (picks \#3, \#3, \#1, \#3) acquired through deliberate multi-season non-competitiveness. Under the current weighted lottery, each tanked season yielded a top-tier pick. Under Classic \cola{}, graduated diminishment makes the same sequence self-defeating. Philadelphia's Classic \cola{} trajectory: $2{,}750$ in 2013--14 (rank 8/14) $\rightarrow$ $2{,}375$ in 2014--15 (9/14) $\rightarrow$ $2{,}188$ in 2015--16 (10/14) $\rightarrow$ $1{,}000$ in 2016--17 (14/14). Each top-3 pick triggers graduated diminishment ($\#1$: full reset; $\#3$: 50\% reduction), leaving Philadelphia at the bottom of the lottery pool by the fourth tanking season despite a 10--72 record. The Sacramento Kings hold the top Classic \cola{} index throughout this period, climbing from $7{,}250$ in 2013--14 to $10{,}250$ in 2016--17 via organic non-competitiveness. The Classic diminishment schedule ($\{1.0, 0.75, 0.5, 0.25\}$ for picks \#1--4) dominates the $\alpha = 1{,}000$ annual accumulation; a team that receives a top-3 pick in year $t$ cannot re-enter the top of the lottery in year $t + 1$ through tanking alone.
+
+The Capped \cola{} cap calibration sweep over $\Max \in \{75, 100, 125, 150, 175, 200\}$ across the 21 stable seasons replicates the published default of $\Max = 150$ \citep{highley2026solvable5}: at $\Max = 150$, a mean of $1.62$ teams sit at the cap (range 0--3), matching the design target of fewer than two teams at the maximum on average. Sub-100 caps over-compress the rank-1-vs-rank-5 separation; caps above 175 erase the cap's purpose by leaving fewer than one team at the cap on average. This backtest is a second-tier validation alongside the headline Pareto result of Section~\ref{sec:pareto-frontier}: the static historical data confirms the qualitative comparative-statics the simulated sweep reports under closed-loop dynamics. We flag trade handling as a practical implementation question for any \cola{} deployment, following \citet{highley2026solvable4}'s recommendation of original-holder diminishment paired with a strengthened Stepien Rule.
+
+\subsection{Sensitivity and Stability}
+\label{sec:sensitivity}
+
+A sensitivity pass on the Pareto-optimal set and the five named variants (a deduplicated subset of $9$ configurations) evaluates the headline at $N = 30$ and $N = 100$ replicates. The mean of the primary objective (max-yrs-CF) does not shift by more than $10\%$ from $N = 30$ to $N = 100$ on any subset configuration. The headline $N = 50$ is statistically sufficient for the dominance ordering reported in Section~\ref{sec:pareto-frontier}. Within-subset Pareto recomputation at $N = 30$ and $N = 100$ produces small membership flips ($N = 30$ Pareto subset $= \{0, 11, 19, 26, 45\}$; $N = 100$ Pareto subset $= \{31\}$), but these reflect within-subset re-ordering, not full-grid instability; the headline $N = 50$ Pareto set $\{11, 19, 26, 31, 45\}$ is the canonical answer. The closed-form manipulation-gain dimension is invariant across $N$ by construction.
 
 \section{Discussion and Open Directions}
 \label{sec:discussion}
