@@ -321,6 +321,20 @@ The three closures compose: any practical \cola{} deployment can rely on whichev
 \section{Empirical Validation}
 \label{sec:empirical}
 
+\subsection{Simulation Model}
+\label{sec:sim-model}
+
+The ZenGM Basketball-GM engine implements all five \cola{} variants and the standard NBA lottery; we use it as the canonical reference implementation. ZenGM's browser-coupled \texttt{createLeague()} path does not port cleanly to Node, so the testbed bypasses it and synthesizes regular-season game outcomes: strength-weighted win records and a single-elimination playoff bracket. The real ZenGM lottery code is unchanged: lottery draws use \texttt{draft.genOrder} and per-team \texttt{cola} updates from \texttt{cola.ts}.
+
+Team strength persists across seasons via a Markov model tied to draft outcomes. Let $s_t \in [0, 1]$ denote a team's strength in season $t$, $\rho$ the persistence parameter, $\mu$ the long-run parity mean, $\alpha$ the per-draft impact, $\sigma$ the annual shock standard deviation, $\varepsilon_t \sim \mathcal{N}(0, \sigma^2)$ a Normal shock, and $\pi(p) = \max(0, (16 - p) / 15)$ the value of a draft pick at position $p$ (pick 1 contributes full $\alpha$, pick 15 contributes zero, picks 16 and later contribute zero). The transition is
+\begin{equation}
+s_{t+1} = \mathrm{clip}\!\big(\rho \, s_t + (1 - \rho) \, \mu + \alpha \, \pi(p_t) + \varepsilon_t, \; 0, \; 1\big),
+\label{eq:strength-markov}
+\end{equation}
+with $\rho = 0.9$, $\mu = 0.5$, $\alpha = 0.15$, and $\sigma = 0.05$. Initial strength is drawn from $\mathrm{Uniform}[0.3, 0.7]$. This preserves the feedback loop the primary objective (worst-franchise gap between conference-finals appearances) is designed to measure: a team's lottery position drives its draft pick, which drives its next-season strength.
+
+The model is parametrically calibrated for plausibility, not fit to historical NBA team-strength trajectories. Sensitivity analysis on $(\rho, \alpha, \sigma)$, and a formal calibration against league rating systems or Basketball Reference strength-of-schedule data, is future work.
+
 \subsection{Backtesting Methodology}
 
 We compute \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data: 775 team-season records, 776 first-round draft picks, and 55 lottery-day-attributed pre-draft pick trades. The engine separates pre-draft state (Phase A, used for draft-probability calculations) from post-draft diminishment (Phase B, carried forward to the next season). Cold-start effects stabilize by approximately season 5; we report aggregates over 21 stable seasons (2005--2025).
