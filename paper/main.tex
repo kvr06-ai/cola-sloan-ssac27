@@ -53,7 +53,7 @@
 \maketitle
 
 \begin{abstract}
-The annual NBA draft is a constrained fair-allocation problem: 30 indivisible draft picks are assigned to 30 teams that take turns making selections. The top picks are allocated through a lottery for the 14 non-playoff teams. The lottery has a documented manipulation incentive (``tanking''): a team eliminated from playoff contention can improve its expected draft position by losing additional games. \citet{munro2020notanking} prove an impossibility result, showing that no mechanism based on end-of-season records alone can simultaneously reward poor performance and eliminate this incentive. Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing single-season records with a multi-year playoff history as the basis for draft priority \citep{highley2026cola}. The incentive-compatibility argument for \cola{} relies on five assumptions, four of which hold by construction; the fifth (that pool-manipulation gains are negligible) is supported by simulation in the original paper but lacks a closed-form bound. We make four contributions. First, we derive an analytic upper bound of approximately $4\%$ on the worst-case probability gain from pool manipulation under reasonable distributions of teams' draft priorities. Second, we present the \cola{} family as five variants on a shared scaffold. Third, we prove an analytic per-series bound on tanking exposure in the \emph{Capped \cola{}} variant. Fourth, we analyze \cola{} according to the axiomatic draft-rule literature \citep{coreno2022axiomatic}.
+The annual NBA draft is a constrained fair-allocation problem: 30 indivisible draft picks are assigned to 30 teams that take turns making selections. The top picks are allocated through a lottery for the 14 non-playoff teams. The lottery has a documented manipulation incentive (``tanking''): a team eliminated from playoff contention can improve its expected draft position (DP) by losing additional games. \citet{munro2020notanking} prove an impossibility result, showing that no mechanism based on end-of-season records alone can simultaneously reward poor performance and eliminate this incentive. Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing single-season records with a multi-year playoff history as the basis for DP \citep{highley2026cola}. We formalize the \cola{} mechanism family as a configuration space parameterized by seven design dials (eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, tiebreak). Each variant proposed in \citet{highley2026cola} and the Substack series is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner. Each dial maps to a downstream league-relevant property, converting variant comparison from a prose comparison to a tuple comparison. We instantiate the framework in an empirical testbed (Section~\ref{sec:empirical}) that grid-searches over dial values for Pareto-optimal configurations against league-relevant objectives. As supporting analytical properties of specific dial configurations, we derive a closed-form $\sim 4\%$ upper bound on the worst-case probability gain from pool manipulation in the Classic configuration (Theorem~\ref{thm:bound}), a per-series tanking bound in the Capped configuration (Lemma~\ref{lem:capped-bound}), and a 26-season historical backtest covering 1999--2025.
 \end{abstract}
 
 \section{Introduction}
@@ -68,9 +68,9 @@ Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing
 
 \paragraph{Contributions:}
 \begin{itemize}
-    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space:} we formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak. Each variant in the family is a point in this space; each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency). The framing converts variant comparison from a prose comparison to a tuple comparison and surfaces the design degrees of freedom the variants implicitly select between. The NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space and supplies a non-\cola{} comparison baseline.
-    \item \textbf{(Section~\ref{sec:bound}) Analytic bounds on two manipulation channels:} we derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable distributions of draft priorities (Theorem~\ref{thm:bound}); the bound contains the simulation-observed extremes of \citet{highley2026cola}. For the Capped variant of \citet{highley2026solvable5}, we prove a per-series tanking bound (Lemma~\ref{lem:capped-bound}): under cap $\Max$, no playoff series win ever costs a team more than $0.3 \cdot \Max$ tickets ($45$ at $\Max = 150$).
-    \item \textbf{(Section~\ref{sec:empirical}) A 26-season historical backtest:} we compute \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data. The 2013--2017 Philadelphia ``Process'' is the canonical case study: under Classic \cola{}, graduated diminishment dismantles the repeat-tanking strategy the current weighted lottery rewards. Cap calibration and cross-variant divergence (including the 3-2-1 baseline) are the cross-cutting headline results.
+    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space for the \cola{} family.} We formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak (Definition~\ref{def:configuration}). Each variant in the family (Simple, Simple Lottery, Classic, Countdown, Capped) is a point in this space, and the NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space. Each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency), converting variant comparison from a prose comparison to a tuple comparison and surfacing the design degrees of freedom the variants implicitly select between. The framework is the league's design lever for the 2029 re-evaluation discussion.
+    \item \textbf{(Section~\ref{sec:empirical}) A Basketball-GM empirical testbed for grid search over dial values (forthcoming).} We instantiate the configuration space in the open-source Basketball-GM simulator, varying each dial across its admissible range and reporting Pareto frontiers in dial space against league-relevant objective functions (first target: minimize the maximum years between conference finals appearances). The testbed converts the framework from a taxonomy into an optimization tool that a league can run against its own policy preferences. The current submission reports the framework and the supporting analytical properties below; the testbed sweep is in active engineering and will appear in this section by the paper deadline.
+    \item \textbf{(Section~\ref{sec:bound} and Section~\ref{sec:empirical}) Supporting analytical properties: a manipulation bound and a 26-season historical backtest.} As analytical properties of specific dial configurations, we derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable distributions of draft priorities (Theorem~\ref{thm:bound}), and a per-series tanking bound for the Capped configuration showing that no playoff series win ever costs a team more than $0.3 \cdot \Max$ tickets ($45$ at $\Max = 150$) (Lemma~\ref{lem:capped-bound}). The historical backtest computes \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data, with the 2013--2017 Philadelphia ``Process'' as the canonical case study: under Classic \cola{}, graduated diminishment dismantles the repeat-tanking strategy the current weighted lottery rewards.
 \end{itemize}
 
 \section{Background and Related Work}
@@ -92,60 +92,112 @@ A second impossibility addresses preference misreporting (a team claiming to wan
 
 Three reform proposals are the immediate context for \cola{}. The \emph{uniform lottery} (equal odds for all non-playoff teams) is the only mechanism satisfying Munro-Banchio's NTC; it abandons differential reward and the league has not adopted it. The \emph{wheel} (a pre-committed rotation of draft positions across teams, attributed informally to Mike Zarren) eliminates tanking by decoupling record from draft odds, at the cost of removing the rebuilding mechanism for weak teams. The 2026 \emph{3-2-1 lottery} \citep{highley2026threetwoone} expands the lottery to 16 teams across four tiers ($2{:}3{:}2{:}1$ balls per tier from the worst-record tier down) and includes the play-in losers; structurally it is a uniform lottery with adjustments for the play-in and a reduction for the bottom three teams, accepting the Munro-Banchio tradeoff. \cola{} takes a different route: instead of flattening single-season odds, it shifts the priority basis from single-season records to multi-year playoff history, an axis neither Munro-Banchio nor 3-2-1 considers.
 
-\section{The COLA Mechanism Family}
+\section{The COLA Mechanism Family: A Configuration Space}
 \label{sec:family}
 
-\subsection{Common Framework}
+\cola{} is a family of mechanisms parameterized by seven design dials. Each NBA lottery reform proposal under recent discussion (the status quo weighted lottery, the 2026 ``3-2-1'' proposal, and each \cola{} variant proposed in \citet{highley2026cola} and the Substack series) corresponds to a specific choice of values for those seven dials. The framework is the league's design lever: a policymaker who wants to move a downstream property (anti-tanking strength, weak-team rebuild horizon, broadcast complexity, multi-year predictability) is moving one or more dials. We organize the section in four parts: the lottery index as the family's unified state variable (Section~\ref{sec:cola-index}), the seven dials that complete the configuration (Section~\ref{sec:seven-dials}), the variant map populating the dials for each proposal under consideration (Section~\ref{sec:variant-map}), and the mapping from dials to league-relevant properties (Section~\ref{sec:dial-properties}). Incentive compatibility for the family is closed by five assumptions \citep{highley2026cola}, summarized in Section~\ref{sec:cola-ic}.
 
-Every \cola{} variant maintains a per-team integer-valued state across seasons and uses that state to determine draft priority in the current season. We refer to this state as the \emph{lottery index} and write $L_i^{(t)}$ for team $i$ at the end of season $t$. Depending on the variant, draft priority may be carried over through drought length or a stockpile of lottery tickets, both manifestations of the lottery index.
+\subsection{Lottery Index}
+\label{sec:cola-index}
+
+Every \cola{} variant maintains a per-team, integer-valued state across seasons and uses that state to determine draft priority (DP) in the current season. We refer to this state as the \emph{lottery index} and write $L_i^{(t)}$ for team $i$ at the end of season $t$. Depending on the variant, $L_i^{(t)}$ may track drought length (consecutive seasons without a playoff series win or top-3 pick) or a stockpile of lottery tickets; both are manifestations of the same index.
 
 \begin{definition}[Lottery Index]
 \label{def:index}
-For each team $i$ and season $t$, the lottery index $L_i^{(t)} \in \mathbb{Z}_{\geq 0}$ is determined by an initial value $L_i^{(0)}$, a per-season \emph{increment} $\Delta_i^{(t)}$ (variant-specific), and a per-season \emph{diminishment} $\rho_i^{(t)} \in [0, 1]$ that scales the index down based on playoff and draft outcomes:
-\begin{equation*}
+For each team $i$ and season $t$, the lottery index $L_i^{(t)} \in \mathbb{Z}_{\geq 0}$ is determined by an initial value $L_i^{(0)}$, a per-season \emph{increment} $\Delta_i^{(t)}$ (variant-specific, depending on team performance and eligibility), and a per-season \emph{diminishment} $\rho_i^{(t)} \in [0, 1]$ that scales the index down based on playoff and draft outcomes:
+\begin{equation}
+\label{eq:index-update}
 L_i^{(t+1)} = \left(L_i^{(t)} + \Delta_i^{(t)}\right) \cdot \left(1 - \rho_i^{(t)}\right).
-\end{equation*}
-The \emph{pool} in season $t$ is $P^{(t)} = \sum_{i \in E^{(t)}} L_i^{(t)}$, where $E^{(t)}$ is the set of teams eligible for the lottery.
+\end{equation}
+The \emph{pool} in season $t$ is $P^{(t)} = \sum_{i \in E^{(t)}} L_i^{(t)}$, where $E^{(t)} \subseteq \{1, \ldots, 30\}$ is the set of teams eligible for the lottery in that season.
 \end{definition}
 
-The three components (the eligibility set $E^{(t)}$, the increment $\Delta_i^{(t)}$, and the diminishment $\rho_i^{(t)}$) are three of seven dials that distinguish the variants. The remaining four (lottery weighting $W$, cap $C$ on $L_i^{(t)}$, carry-over scope $S$, and tiebreak $T$) are implicit in the variant definitions below and surface explicitly in Table~\ref{tab:variants}; Section~\ref{sec:discussion} maps each dial to a league-relevant property.
+The three components of the update (the eligibility set $E^{(t)}$, the increment $\Delta_i^{(t)}$, and the diminishment $\rho_i^{(t)}$) are three of the seven dials that distinguish the variants. For a non-playoff team, the increment is positive (the team accumulates priority); for a team that wins a playoff series or a top draft pick, the diminishment is positive (the team consumes some or all of its accumulated priority). Section~\ref{sec:seven-dials} formalizes these three components together with four additional dials that complete the parameterization; Section~\ref{sec:variant-map} maps each variant onto its 7-tuple in the resulting configuration space.
 
-\subsection{Five Variants}
+\subsection{Seven Dials}
+\label{sec:seven-dials}
 
-The variants below trade off explainability, robustness, and per-series tanking exposure differently. Table~\ref{tab:variants} gives a summary of the comparison.
+Definition~\ref{def:index} identifies three dials that determine a variant's dynamics: the eligibility set $E^{(t)}$, the increment $\Delta_i^{(t)}$, and the diminishment $\rho_i^{(t)}$. Four additional dials, implicit in the prose definitions of the original paper \citep{highley2026cola} and the Substack series but not yet formalized as design degrees of freedom, complete the configuration: how draft positions are assigned given the index vector, whether the index is bounded above, how long the index persists across seasons, and how identical indices are resolved. We promote these to first-class components of a unified configuration.
 
-\paragraph{Simple \cola{}} eliminates the lottery: eligibility is the 22 teams with zero playoff series wins (14 non-playoff teams + 8 first-round losers). Teams are ranked by drought (consecutive seasons with neither a playoff series win nor top-3 lottery pick), with ties broken by most regular-season wins. Draft picks are assigned deterministically.
+\begin{definition}[\cola{} Configuration]
+\label{def:configuration}
+A \cola{} \emph{configuration} is a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying:
+\begin{enumerate}
+    \item \textbf{Eligibility} $E^{(t)} \subseteq \{1, \ldots, 30\}$: a season-$t$ predicate selecting the teams that participate in the lottery (per Definition~\ref{def:index}).
+    \item \textbf{Increment} $\Delta_i^{(t)} \in \mathbb{Z}_{\geq 0}$: a non-negative integer added to the index of each eligible team, determined by season-$t$ state (per Definition~\ref{def:index}).
+    \item \textbf{Diminishment} $\rho_i^{(t)} \in [0, 1]$: the fraction of the index removed after team $i$'s playoff or draft outcome (per Definition~\ref{def:index}).
+    \item \textbf{Lottery weighting} $W$: a rule mapping the index vector $L^{(t)}|_{E^{(t)}}$ to a distribution over assignments of teams to draft positions $\{1, 2, \ldots, |E^{(t)}|\}$. The rule may be deterministic (e.g., assign by index rank) or random (e.g., draw pick 1 with probability $L_i / P$, then draw pick 2 from the remainder).
+    \item \textbf{Cap} $C \in \mathbb{Z}_{>0} \cup \{\infty\}$: an upper bound on $L_i^{(t)}$, enforced as $L_i^{(t)} \leftarrow \min(L_i^{(t)}, C)$ after each increment. $C = \infty$ denotes no explicit cap.
+    \item \textbf{Carry-over scope} $S$: the temporal persistence rule, one of \emph{single-season} (recompute $L_i^{(t)}$ from season-$t$ state alone, no cross-season memory), \emph{unbounded multi-year} (accumulate without limit), \emph{bounded multi-year} (accumulate up to $C$), or \emph{reset-on-event} (clear the index when a specified event occurs).
+    \item \textbf{Tiebreak} $T$: a total ordering on $E^{(t)}$ that resolves cases where $L_i^{(t)} = L_j^{(t)}$ for two or more eligible teams.
+\end{enumerate}
+A \cola{} \emph{variant} is a specification of all seven dials.
+\end{definition}
 
-\paragraph{Simple Lottery \cola{}} shares Simple's drought state and 22-team pool. Pre-2019 NBA lottery odds (25.0\% down to 0.5\% across the worst 14 teams) are applied to the top 14 by drought; the remaining 8 receive picks 15--22 deterministically.
+Definition~\ref{def:index} expresses the dynamics of $L^{(t)}$ in terms of dials 1--3; dials 4--7 govern how those dynamics translate into draft positions ($W$), constrain the index's range ($C$) and temporal scope ($S$), and resolve ties ($T$). The four additional dials are not novel mechanisms: each variant in \citet{highley2026cola} and the Substack series specifies a choice for each of them. Formalizing the four implicit choices as typed dials enables two operations: cross-variant comparison via a single configuration object, and dial-by-dial analysis of how each value affects each downstream property. Section~\ref{sec:variant-map} populates the configuration for each variant. Section~\ref{sec:dial-properties} maps the dials to the league-relevant properties that drive the adoption decision.
 
-\paragraph{Classic \cola{}} is the variant developed in detail by \citet{highley2026cola}, and it is the variant our manipulation bound directly analyzes. The eligibility set is the 14 non-playoff teams. Each non-playoff team receives an increment of $\alpha = 1{,}000$ tickets per season; playoff teams receive zero increment. Diminishment is graduated: in the playoff channel, champion $\rho = 1.0$, finals $0.75$, conference finals $0.5$, second round $0.25$, first round $0$; in the draft channel, pick \#1 $\rho = 1.0$, \#2 $0.75$, \#3 $0.5$, \#4 $0.25$, \#5 and below $0$. The lottery for picks 1--4 is weighted by lottery index ($p_i = L_i / P$); picks 5--14 are assigned by reverse standings.
+\subsection{Variant Map}
+\label{sec:variant-map}
 
-\paragraph{Countdown \cola{}} ranks teams by \emph{McCarty number} $M_i = d_i \cdot w_i$ (drought $\times$ regular-season wins). The same 22-team pool as Simple \cola{} is dealt with in 5-team \emph{elimination pools}; draft picks are assigned bottom-up via ticket allocation $(2, 3, 4, 5, 6)$ within each pool. Teams with lower priority have more tickets, and the selected team picks last. A new team is added to the pool, and the process is repeated for the next pick. The mechanism guarantees that no team falls more than four spots below its priority rank.
+Table~\ref{tab:variant-map} populates each of the seven dials for the six variants under consideration: the five \cola{} variants and the NBA's 2026 ``3-2-1'' proposal, included as a degenerate configuration (Section~\ref{sec:cola-tank321}). Each row is a dial; each column is a variant. Cell values follow the verbatim specifications in \citet{highley2026cola}, the Substack series \citep{highley2026solvable1,highley2026solvable3,highley2026solvable5}, and Highley's reaction post on the 3-2-1 proposal \citep{highley2026threetwoone}.
 
-\paragraph{Capped \cola{}} \citep{highley2026solvable5} introduces a stockpile cap at $\Max$ (default $150$). The increment is $\Delta_i^{(t)} = w_i^{(t)}$ for any team finishing the regular season outside the top 6 of either conference; eligibility excludes (i) teams that won a top-5 lottery pick last season and (ii) teams that won a playoff series this season or last. Diminishment uses a six-step playoff schedule (champion $1.0$, runner-up $0.8$, conference finals $0.6$, second round $0.4$, first round $0.2$, play-in winner losing round 1 $0.1$, play-in loser $0$) and a five-step draft schedule (\#1 $1.0$, \#2 $0.8$, \#3 $0.6$, \#4 $0.4$, \#5 $0.2$). The cap smooths the diminishment cliffs of drought length-based versions of \cola{} and bounds the per-series tanking incentive (Lemma~\ref{lem:capped-bound}).
-
-\begin{table}[t]
+\begin{table}[h]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{lllll}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}c >{\raggedright\arraybackslash}p{0.13\linewidth} >{\raggedright\arraybackslash}p{0.13\linewidth} >{\raggedright\arraybackslash}p{0.13\linewidth} >{\raggedright\arraybackslash}p{0.13\linewidth} >{\raggedright\arraybackslash}p{0.13\linewidth} >{\raggedright\arraybackslash}p{0.13\linewidth}@{}}
 \toprule
-\textbf{Variant} & \textbf{Pool} & \textbf{Increment} & \textbf{Diminishment} & \textbf{Lottery} \\
+\textbf{Dial} & \textbf{Simple} & \textbf{Simple Lottery} & \textbf{Classic} & \textbf{Countdown} & \textbf{Capped} & \textbf{3-2-1} \\
 \midrule
-Simple & 22: sw $= 0$ & drought $+1$ & reset on snapped drought & deterministic by drought \\
-Simple Lottery & 22: sw $= 0$ & drought $+1$ & reset on snapped drought & pre-2019 NBA odds (top 14), then by drought \\
-Classic & 14: non-playoff & $+1000$ if non-playoffs & graduated, 4 levels & top-4 raffle by index, then by standings \\
-Countdown & 22: sw $= 0$ & drought $+1$ & reset on snapped drought & rank by drought $\times$ wins; nested elimination pools \\
-Capped & exclusion-rule & $+w_i^{(t)}$ if play-in or below & graduated, 6/5 levels & top-5 raffle by index, then by index \\
+$E$ & 22 (non-playoff + R1 losers) & 22 (same) & 14 (non-playoff) & 22 (same) & exclusion pool & tiered 16 \\
+$\Delta$ & drought $+1$ & drought $+1$ & $\alpha = 1{,}000$ & McCarty $d \cdot w$ & wins $w$ (play-in \& below) & none \\
+$\rho$ & reset on series win & reset on series win & 5-step, two channels & reset on advancement & 6-step + 5-step, two channels & none \\
+$W$ & deterministic by drought & pre-2019 odds top-14, deterministic rest & $L_i / P$ for picks 1--4, rank for 5--14 & nested-pool MC, tickets $(6,5,4,3,2)$ & $L_i / P$ for picks 1--5, rank for 6+ & tiered balls $(2/3/2/1)$ \\
+$C$ & $\infty$ & $\infty$ & $\infty$ & $\infty$ & $\Max = 150$ & n/a \\
+$S$ & reset-on-event & reset-on-event & unbounded multi-year & reset-on-event & bounded multi-year & single-season \\
+$T$ & most wins & subsumed by $W$ & subsumed by $W$ & subsumed by $W$ & most wins (at cap) & subsumed by $W$ \\
 \bottomrule
 \end{tabular}
-\caption{The \cola{} family. ``sw $= 0$'' is shorthand for ``zero playoff series wins this season.'' Capped \cola{}'s exclusion-rule pool removes teams that won a top-5 lottery pick last season or a playoff series this/last season. Each variant occupies a distinct point of the design space; the manipulation bound (Theorem~\ref{thm:bound}) is established for Classic and the per-series bound (Lemma~\ref{lem:capped-bound}) for Capped.}
-\label{tab:variants}
+\caption{The seven dials, evaluated for each variant. Dial labels: $E$ eligibility, $\Delta$ increment, $\rho$ diminishment, $W$ lottery weighting, $C$ cap, $S$ carry-over scope, $T$ tiebreak (per Definition~\ref{def:configuration}). The 3-2-1 proposal sits at a degenerate corner: $\Delta$, $\rho$, $C$ are vacuous and $S$ is single-season, leaving only $E$ and $W$ as active dials.}
+\label{tab:variant-map}
 \end{table}
 
-\subsection{Incentive Compatibility}
+The variants trade off explainability, anti-tanking strength, and per-series tanking exposure differently. Simple \cola{} \citep{highley2026solvable3} eliminates the lottery in favor of a deterministic ordering on drought, with eligibility extended to first-round losers; Simple Lottery \cola{} \citep{highley2026solvable3} layers the pre-2019 NBA weighted odds on top of Simple's drought ordering. Classic \cola{} is the original variant of \citet{highley2026cola} and the variant our manipulation bound (Section~\ref{sec:bound}) directly analyzes. Countdown \cola{} \citep{highley2026solvable3} uses the McCarty number (drought $\times$ wins) and a nested-pool Monte Carlo draw that guarantees no team falls more than four spots below its priority rank. Capped \cola{} \citep{highley2026solvable5}, introduced in response to the NBA's reported reluctance to adopt a flexible lottery line, adds a wins-based increment, a stockpile cap ($\Max = 150$), and a six-step playoff diminishment schedule; the cap bounds the per-series tanking incentive (Lemma~\ref{lem:capped-bound}). The 2026 NBA ``3-2-1'' proposal \citep{highley2026threetwoone} sits at a degenerate corner: dials $\Delta$, $\rho$, and $C$ are vacuous, $S$ collapses to single-season, and only $E$ (a tiered 16-team pool) and $W$ (a tiered ball allocation) carry the proposal's design. The collapse is the proposal's defining structural feature, not an incidental implementation choice; Section~\ref{sec:cola-tank321} elaborates.
 
-\citet{highley2026cola} establish IC for Classic \cola{} under five assumptions:
+\subsection{Dial-to-Property Mapping}
+\label{sec:dial-properties}
+
+The configuration space of Definition~\ref{def:configuration} reduces a variant comparison to a tuple comparison. The comparison is informative only when each dial corresponds to a downstream property of the resulting mechanism. Four properties dominate the league-side adoption discussion: anti-tanking strength (how much within-season manipulation is foreclosed), weak-team rebuild help (how reliably the worst teams accumulate priority), complexity (how legible the mechanism is to fans and media), and predictability (how forecastable a multi-year team trajectory is for general managers and owners). Table~\ref{tab:dial-properties} summarizes the mapping.
+
+\begin{table}[h]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}c >{\raggedright\arraybackslash}p{0.19\linewidth} >{\raggedright\arraybackslash}p{0.19\linewidth} >{\raggedright\arraybackslash}p{0.19\linewidth} >{\raggedright\arraybackslash}p{0.19\linewidth}@{}}
+\toprule
+\textbf{Dial} & \textbf{Anti-tanking strength} & \textbf{Weak-team rebuild help} & \textbf{Complexity} & \textbf{Predictability} \\
+\midrule
+$E$       & Sets the pool $P$ in Theorem~\ref{thm:bound}; narrower pools admit larger gain     & Determines which weak teams accumulate priority    & High if simple count, low if exclusion-rule         & Stable if record-based; less so if exclusion-rule \\
+$\Delta$  & Bounds the per-season marginal-decision gain                                       & Flat $\alpha$ rewards uniformly; $w$-based rewards within-season effort & High if flat, lower if formulaic                    & High if record-based                              \\
+$\rho$    & Cliff size at each round transition; controls repeat-tanking returns               & Restores priority to teams missing the playoffs again after success & Medium                                              & Medium                                            \\
+$W$       & Spread across rank positions; decouples position from index in part                & Tilts allocation toward worst-record teams         & High if deterministic, low if Monte Carlo            & High if deterministic, lower if random            \\
+$C$       & Bounds $p_{\max}$ and the per-series cost (Lemma~\ref{lem:capped-bound})           & Low cap compresses the priority signal             & Medium                                              & High once known                                   \\
+$S$       & Escapes the \citet{munro2020notanking} impossibility via multi-year scope          & Multi-year scope rewards persistent weakness       & Medium                                              & Lower under multi-year scopes (legal/contracting) \\
+$T$       & Edge case for $W$-deterministic variants                                           & n/a                                                & High if simple                                      & High                                              \\
+\bottomrule
+\end{tabular}
+\caption{Dial-to-property mapping. Cell entries describe the form the dial's influence takes; the dials and the variants of Table~\ref{tab:variant-map} together specify how to move from one league-relevant property to another by altering one or more dial values.}
+\label{tab:dial-properties}
+\end{table}
+
+The mapping logic is direct. Three dials ($E$, $\Delta$, $C$) bound the manipulator's pool share $p_{\max}$ and the size of any pool perturbation: a larger eligible set yields a larger total pool $P$, the increment $\Delta$ bounds the per-team per-season accumulation, and the cap $C$ bounds the index outright. Two dials ($\rho$, $S$) govern multi-year accumulation: the diminishment schedule determines how quickly an index decays after success, and the carry-over scope determines whether accumulation persists at all (the dial whose non-single-season value escapes the \citet{munro2020notanking} impossibility). The remaining two dials ($W$, $T$) translate the index dynamics into draft positions: $W$ determines whether the high-index team gets pick 1 deterministically or in expectation, and $T$ resolves cases where the index is silent. Anti-tanking strength and weak-team rebuild help load on $E, \Delta, \rho, C, S$; complexity loads on $E, W$ (the fan- and media-visible dials) and on $S$ (the league-counsel-visible dial); predictability loads on $\rho, S$ (the multi-year forecasting dials). A league that finds Classic too unbounded can move $C$ to a finite value (the Capped move). A league that finds multi-year scopes administratively heavy can move $S$ to single-season (the 3-2-1 move). The framework's value to a policymaker is that the choice among variants becomes a choice among dial settings, not among monoliths.
+
+\subsection{Incentive Compatibility}
+\label{sec:cola-ic}
+
+\citet{highley2026cola} establish incentive compatibility (IC) for Classic \cola{} under five assumptions:
 \begin{enumerate}
     \item \textbf{Playoff primacy:} the value to a team of advancing in the playoffs exceeds the value of any plausible draft-pick gain.
     \item \textbf{Playoff advancement:} within the playoffs, advancing further is preferred to losing earlier, controlling for opponent strength.
@@ -153,7 +205,12 @@ Capped & exclusion-rule & $+w_i^{(t)}$ if play-in or below & graduated, 6/5 leve
     \item \textbf{Pool manipulation negligible:} no team can meaningfully shift its expected draft position by manipulating which other teams are in or out of the lottery pool.
     \item \textbf{No traded-pick protections:} pick trades do not interact with diminishment in a way that creates manipulation incentives.
 \end{enumerate}
-Assumptions (1)--(3) and (5) hold by construction or follow from straightforward arguments. Assumption (4) is supported by \citet{highley2026cola} via a $1{,}000$-season simulation, observing a maximum probability gain of approximately $3\%$. Section~\ref{sec:bound} converts this empirical observation into a closed-form analytic bound.
+Assumptions (1)--(3) and (5) hold by construction or follow from straightforward arguments. Assumption (4) is supported by \citet{highley2026cola} via a $1{,}000$-season simulation, observing a maximum probability gain of approximately $3\%$. Section~\ref{sec:bound} converts this empirical observation into a closed-form analytic bound for the Classic configuration.
+
+\subsection{The 3-2-1 Proposal as a Degenerate Configuration}
+\label{sec:cola-tank321}
+
+The NBA's 2026 reform proposal (``3-2-1''), slated for an owners' vote at the end of May 2026, expands the lottery to sixteen teams across four tiers and assigns ball counts of two, three, two, and one per tier respectively. In the configuration of Definition~\ref{def:configuration}: dials $\Delta$, $\rho$, and $C$ are vacuous; the carry-over scope $S$ is single-season; the eligibility set $E$ is the tiered 16-team pool; the lottery weighting $W$ is the tiered ball allocation; and the tiebreak $T$ is subsumed by the random draw. Three dials ($E$, $W$, $S$) carry the proposal's design. In \citet{highley2026threetwoone}'s framing, the mechanism is ``essentially the uniform lottery but with an adjustment for the play-in and a punishment for the bottom 3 teams.'' By assigning the worst three teams fewer balls than the middle seven, the proposal does not satisfy the premise of the Munro-Banchio counterexample (that worse teams have strictly better odds), and sidesteps the impossibility at the cost of abandoning the rationale for differential odds in the first place. \cola{} takes the opposite route: instead of flattening single-season odds, it shifts the priority basis from single-season records to multi-year playoff history through dial $S$ in modes other than single-season.
 
 \section{Pool Manipulation Bound}
 \label{sec:bound}
@@ -342,8 +399,6 @@ Each dial of Section~\ref{sec:family} matters more to some audiences than others
 \emph{General managers and owners} care most about $\Delta$ (increment) and $\rho$ (diminishment). A multi-year rebuild requires a forecastable trajectory: Classic's flat $\Delta = \alpha$ and graduated $\rho$ are the most tractable. Capped's wins-based $\Delta$ and six-step $\rho$ add complexity but remain forecastable. Countdown's $\Delta = d \cdot w$ multiplies two factors that move in opposite directions for a rebuilding team and produces noisier multi-year forecasts.
 
 \emph{League counsel} cares most about $S$ (carry-over scope). Multi-year scopes introduce questions that single-season scopes (3-2-1, the legacy lottery) avoid: how does mid-season team relocation, ownership change, or league realignment interact with carry-over priority? Reporting requirements and ambiguity both grow with $S$. The NBA's apparent preference for single-season-scope mechanisms in 3-2-1 is consistent with $S$ being the dial under the most external pressure.
-
-The framework's value to a policymaker is that the choice among variants becomes a choice among dial settings, not among monoliths. A league that finds Classic too unbounded can adopt Capped (a bounded multi-year scope). A league that finds multi-year accounting administratively heavy can adopt Simple Lottery (which retains the priority idea while resetting on each playoff series win). Each variant is a Pareto point on the dial space; the actual choice depends on which dial the league most wants to move and how far.
 
 \newpage
 
