@@ -237,7 +237,7 @@ Before manipulation, $p_i = L_i / P$. After the swap, the new pool is $P' = P - 
 
 When $\Delta \ll P$ (typically $\Delta / P \approx 4\%$ in our backtest), the gain factors into the manipulator's pool share ($p_i$) and the fractional pool change ($\Delta / P$). Both have structural ceilings, which we exploit below.
 
-\paragraph{Indexing convention.} The bound uses $L_i = T_i \cdot \alpha$, where $T_i$ is team $i$'s consecutive non-playoff seasons. For Classic \cola{}, this is exact for any team starting from a stockpile reset (championship or top-5 lottery pick) and is the steady-state attractor under the diminishment schedule. A general bound handling ticket inheritance under the full dynamics appears in the broader paper.
+\paragraph{Indexing convention.} The bound uses $L_i = T_i \cdot \alpha$, where $T_i$ is team $i$'s consecutive non-playoff seasons. For Classic \cola{}, this is exact for any team starting from a stockpile reset (championship or top-5 lottery pick) and is the steady-state attractor under the diminishment schedule. A general bound handling ticket inheritance under the full diminishment dynamics is future work.
 
 \subsection{Conditioned Upper Bound}
 
