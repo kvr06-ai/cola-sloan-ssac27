@@ -68,9 +68,9 @@ Carry-Over Lottery Allocation (\cola{}) sidesteps the impossibility by replacing
 
 \paragraph{Contributions:}
 \begin{itemize}
-    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space.} We formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak. Each variant in the family is a point in this space; each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency). The framing converts variant comparison from a prose comparison to a tuple comparison and surfaces the design degrees of freedom the variants implicitly select between. The NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space and supplies a non-\cola{} comparison baseline.
-    \item \textbf{(Section~\ref{sec:bound}) Analytic bounds on two manipulation channels.} We derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable distributions of draft priorities (Theorem~\ref{thm:bound}); the bound contains the simulation-observed extremes of \citet{highley2026cola}. For the Capped variant of \citet{highley2026solvable5}, we prove a per-series tanking bound (Lemma~\ref{lem:capped-bound}): under cap $\Max$, no playoff series win ever costs a team more than $0.3 \cdot \Max$ tickets ($45$ at $\Max = 150$).
-    \item \textbf{(Section~\ref{sec:empirical}) A 26-season historical backtest.} We compute \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data. The 2013--2017 Philadelphia ``Process'' is the canonical case study: under Classic \cola{}, graduated diminishment dismantles the repeat-tanking strategy the current weighted lottery rewards. Cap calibration and cross-variant divergence (including the 3-2-1 baseline) are the cross-cutting headline results.
+    \item \textbf{(Section~\ref{sec:family}) A seven-dial configuration space:} we formalize the \cola{} mechanism family as a 7-tuple $(E, \Delta, \rho, W, C, S, T)$ specifying eligibility, increment, diminishment, lottery weighting, cap, carry-over scope, and tiebreak. Each variant in the family is a point in this space; each dial maps to a downstream league-relevant property (incentive compatibility, manipulation gain, per-series cost, transparency). The framing converts variant comparison from a prose comparison to a tuple comparison and surfaces the design degrees of freedom the variants implicitly select between. The NBA's 2026 ``3-2-1'' proposal sits at a degenerate corner of the same space and supplies a non-\cola{} comparison baseline.
+    \item \textbf{(Section~\ref{sec:bound}) Analytic bounds on two manipulation channels:} we derive a closed-form upper bound of approximately $4\%$ on the maximum probability gain from pool manipulation under reasonable distributions of draft priorities (Theorem~\ref{thm:bound}); the bound contains the simulation-observed extremes of \citet{highley2026cola}. For the Capped variant of \citet{highley2026solvable5}, we prove a per-series tanking bound (Lemma~\ref{lem:capped-bound}): under cap $\Max$, no playoff series win ever costs a team more than $0.3 \cdot \Max$ tickets ($45$ at $\Max = 150$).
+    \item \textbf{(Section~\ref{sec:empirical}) A 26-season historical backtest:} we compute \cola{} state for every team across 26 NBA seasons (1999--2025) using verified Basketball Reference data. The 2013--2017 Philadelphia ``Process'' is the canonical case study: under Classic \cola{}, graduated diminishment dismantles the repeat-tanking strategy the current weighted lottery rewards. Cap calibration and cross-variant divergence (including the 3-2-1 baseline) are the cross-cutting headline results.
 \end{itemize}
 
 \section{Background and Related Work}
@@ -97,7 +97,7 @@ Three reform proposals are the immediate context for \cola{}. The \emph{uniform 
 
 \subsection{Common Framework}
 
-Every \cola{} variant maintains a per-team integer-valued state across seasons and uses that state to determine draft priority in the current season. We refer to this state as the \emph{lottery index} and write $L_i^{(t)}$ for team $i$ at the end of season $t$. Depending on the variant, draft priority may be carried over through drought length or a stockpile of lottery tickets. These may be other manifestations of the lottery index.
+Every \cola{} variant maintains a per-team integer-valued state across seasons and uses that state to determine draft priority in the current season. We refer to this state as the \emph{lottery index} and write $L_i^{(t)}$ for team $i$ at the end of season $t$. Depending on the variant, draft priority may be carried over through drought length or a stockpile of lottery tickets, both manifestations of the lottery index.
 
 \begin{definition}[Lottery Index]
 \label{def:index}
@@ -108,7 +108,7 @@ L_i^{(t+1)} = \left(L_i^{(t)} + \Delta_i^{(t)}\right) \cdot \left(1 - \rho_i^{(t
 The \emph{pool} in season $t$ is $P^{(t)} = \sum_{i \in E^{(t)}} L_i^{(t)}$, where $E^{(t)}$ is the set of teams eligible for the lottery.
 \end{definition}
 
-The three components (the eligibility set $E^{(t)}$, the increment $\Delta_i^{(t)}$, and the diminishment $\rho_i^{(t)}$) are the primary levers that distinguish the variants.
+The three components (the eligibility set $E^{(t)}$, the increment $\Delta_i^{(t)}$, and the diminishment $\rho_i^{(t)}$) are three of seven dials that distinguish the variants. The remaining four (lottery weighting $W$, cap $C$ on $L_i^{(t)}$, carry-over scope $S$, and tiebreak $T$) are implicit in the variant definitions below and surface explicitly in Table~\ref{tab:variants}; Section~\ref{sec:discussion} maps each dial to a league-relevant property.
 
 \subsection{Five Variants}
 
@@ -153,7 +153,7 @@ Capped & exclusion-rule & $+w_i^{(t)}$ if play-in or below & graduated, 6/5 leve
     \item \textbf{Pool manipulation negligible:} no team can meaningfully shift its expected draft position by manipulating which other teams are in or out of the lottery pool.
     \item \textbf{No traded-pick protections:} pick trades do not interact with diminishment in a way that creates manipulation incentives.
 \end{enumerate}
-Assumptions (1)--(3) and (5) hold by construction or follow from straightforward arguments. Assumption (4) is supporteded by \citet{highley2026cola} via a $1{,}000$-season simulation, observing a maximum probability gain of approximately $3\%$. Section~\ref{sec:bound} converts this empirical observation into a closed-form analytic bound.
+Assumptions (1)--(3) and (5) hold by construction or follow from straightforward arguments. Assumption (4) is supported by \citet{highley2026cola} via a $1{,}000$-season simulation, observing a maximum probability gain of approximately $3\%$. Section~\ref{sec:bound} converts this empirical observation into a closed-form analytic bound.
 
 \section{Pool Manipulation Bound}
 \label{sec:bound}
@@ -272,7 +272,7 @@ Two methodological points warrant attention. First, an audit of all 364 lottery 
 
 \subsection{Case Study: The Philadelphia ``Process''}
 
-The 2013--14 through 2016--17 Philadelphia 76ers represent the canonical strategic-tanking sequence in modern NBA history: four consecutive top-3 lottery outcomes (picks \#3, \#3, \#1, \#3) acquired through deliberate multi-season non-competitiveness. Under the current weighted lottery, each tanked season yielded a top-tier pick. Under Classic \cola{}, graduated diminishment makes the same sequence self-defeating. Table~\ref{tab:phi} shows Philadelphia's Classic \cola{} trajectory.
+The 2013--14 through 2016--17 Philadelphia 76ers are the canonical strategic-tanking sequence in modern NBA history: four consecutive top-3 lottery outcomes (picks \#3, \#3, \#1, \#3) acquired through deliberate multi-season non-competitiveness. Under the current weighted lottery, each tanked season yielded a top-tier pick. Under Classic \cola{}, graduated diminishment makes the same sequence self-defeating. Table~\ref{tab:phi} shows Philadelphia's Classic \cola{} trajectory.
 
 \begin{table}[t]
 \centering
@@ -335,7 +335,7 @@ The choice between 3-2-1 and \cola{} is the choice between two answers to the Mu
 
 \subsection{Dial-Space Adoption Tradeoffs}
 
-Section~\ref{sec:family} maps each of the seven dials to a downstream property. The adoption discussion has three audiences, each weighting the dials differently.
+Each dial of Section~\ref{sec:family} matters more to some audiences than others. Three audience groups frame the adoption tradeoffs differently.
 
 \emph{Fans and media} care most about $E$ (eligibility) and $W$ (lottery weighting). The current 14-team weighted lottery fits a 30-second broadcast graphic; Capped's exclusion-rule pool and Countdown's nested Monte Carlo do not. Variants that simplify the eligibility rule (Simple, Classic) are easiest at this layer.
 
@@ -345,11 +345,13 @@ Section~\ref{sec:family} maps each of the seven dials to a downstream property. 
 
 The framework's value to a policymaker is that the choice among variants becomes a choice among dial settings, not among monoliths. A league that finds Classic too unbounded can adopt Capped (a bounded multi-year scope). A league that finds multi-year accounting administratively heavy can adopt Simple Lottery (which retains the priority idea while resetting on each playoff series win). Each variant is a Pareto point on the dial space; the actual choice depends on which dial the league most wants to move and how far.
 
-\paragraph{Open directions.} Three follow-on questions extend this work.
+\newpage
+
+\paragraph{Open directions:} three follow-on questions extend this work.
 \begin{itemize}
-    \item \emph{Tighter manipulation bound.} The structural anti-correlation in Definition~\ref{def:anticorr} is a calibrated assumption rather than a formally derived consequence of the mechanism. A stationarity argument that bounds $T_{\text{boundary}}$ as a function of league parameters (number of teams, season length, playoff structure) would close assumption (4) entirely.
-    \item \emph{Pick-value gap.} Combining the probability bound (this paper) with a separate bound on the pick-value gap $d_k - d_{k+1}$, derived from the distribution of draft-eligible prospect quality, would close the manipulation incentive in absolute terms, not just in probability.
-    \item \emph{Axiomatic embedding.} The lift from \citet{coreno2022axiomatic}'s axioms (RP, EF1, SP) to multi-period priority mechanisms remains open. Section~\ref{sec:fairdiv} flags the question; a formal verification would embed \cola{} in the assignment-mechanism literature and clarify which one-period impossibilities transfer to multi-period settings.
+    \item \emph{Tighter manipulation bound:} the structural anti-correlation in Definition~\ref{def:anticorr} is a calibrated assumption rather than a formally derived consequence of the mechanism. A stationarity argument that bounds $T_{\text{boundary}}$ as a function of league parameters (number of teams, season length, playoff structure) would close assumption (4) entirely.
+    \item \emph{Pick-value gap:} combining the probability bound (this paper) with a separate bound on the pick-value gap $d_k - d_{k+1}$, derived from the distribution of draft-eligible prospect quality, would close the manipulation incentive in absolute terms, not just in probability.
+    \item \emph{Axiomatic embedding:} the lift from \citet{coreno2022axiomatic}'s axioms (RP, EF1, SP) to multi-period priority mechanisms remains open. Section~\ref{sec:fairdiv} flags the question; a formal verification would embed \cola{} in the assignment-mechanism literature and clarify which one-period impossibilities transfer to multi-period settings.
 \end{itemize}
 
 A reproducibility artifact accompanies this paper: an interactive backtester implementing all five \cola{} variants plus the 3-2-1 proposal across 26 NBA seasons, with locked-seed Monte Carlo for Countdown \cola{} probabilities \citep{rajan2026explorer}.
