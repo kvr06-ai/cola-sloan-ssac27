@@ -15,3 +15,16 @@ paper/*.fdb_latexmk
 # Editor files
 *.swp
 *~
+
+# Basketball-GM testbed: internal reports + simulation artifacts (not for distribution)
+testbed/*.html
+testbed/*.pdf
+# Engine fork (its own ~1GB git repo + node_modules) and transient run outputs.
+# The harness SCRIPTS under testbed/harness/ are tracked; the fork and runs are not.
+testbed/harness/zengm-fork/
+testbed/harness/runs/
+testbed/harness/**/node_modules/
+# Legacy pre-migration paths (kept so anything created earlier stays ignored).
+testbed/zengm-fork/
+testbed/node_modules/
+testbed/runs/

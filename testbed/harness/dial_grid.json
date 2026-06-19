@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "purpose": "48-configuration sweep over the COLA dial space, anchored to Highley's guidance: 'minimize max years between conference finals appearances'. See paper/sections/03-cola-family.tex Definition 2 for the seven-dial schema.",
+    "primary_objective": "maxYearsBetweenConferenceFinals",
+    "secondary_objectives": [
+      "manipulationGainUpperBound",
+      "perSeriesCost",
+      "rankOneToFiveSpread"
+    ],
+    "engine": "zengm (Basketball-GM) draftType='cola'",
+    "seasons_per_config": 30,
+    "sensitivity_checks": [50, 100],
+    "total_configurations": 48,
+    "configurations_formula": "|E| * |C| * |S| = 3 * 4 * 4 = 48"
+  },
+  "dials": {
+    "E": [14, 22, "16-tiered"],
+    "C": [null, 100, 150, 200],
+    "S": ["single-season", "unbounded", "bounded-30yr", "reset-on-championship"]
+  },
+  "fixed_at_classic_cola_defaults": {
+    "delta": 1000,
+    "rho": "playoff-success-step",
+    "W": "uniform",
+    "T": "coin-flip"
+  },
+  "dial_semantics": {
+    "E": {
+      "14": "14 non-playoff teams (Classic COLA eligibility)",
+      "22": "22 teams: 14 non-playoff + 8 first-round losers (Simple/Capped pool)",
+      "16-tiered": "NBA 3-2-1 proposal pool: 10 non-playoff non-play-in + 4 record-9/10 + 2 7v8 losers"
+    },
+    "C": {
+      "null": "no cap (Classic / unbounded multi-year)",
+      "100": "stricter than Capped default",
+      "150": "Capped COLA default per Highley Substack",
+      "200": "looser cap, more accumulation"
+    },
+    "S": {
+      "single-season": "no cross-season memory (3-2-1 baseline)",
+      "unbounded": "Classic COLA multi-year accumulation",
+      "bounded-30yr": "rolling 30-year window",
+      "reset-on-championship": "clear index on title (event-based)"
+    }
+  },
+  "zengm_mapping_notes": {
+    "exposed_as_gameAttributes": [
+      "draftType (cola)"
+    ],
+    "exposed_as_constants": [
+      "COLA_ALPHA (= delta)",
+      "COLA_OPT_OUT_PENALTY"
+    ],
+    "requires_source_modification": [
+      "E (eligibility set size and rule)",
+      "C (cap value and clamp logic)",
+      "S (carry-over scope; currently unbounded by ZenGM)",
+      "W (lottery weighting; currently L_i/P for top-4 + rank-order for rest)",
+      "rho (PLAYOFF_FACTORS and DRAFT_LOTTERY_FACTORS arrays)",
+      "T (tiebreak)"
+    ],
+    "rationale": "ZenGM ships one COLA configuration (matches Classic). Sweeping the dials requires patching src/worker/core/draft/cola.ts and src/common/constants.ts at each step. See DIAL_MAPPING.md."
+  },
+  "_sensitivity_protocol": {
+    "default_runs": 50,
+    "thin_check_runs": 30,
+    "fat_check_runs": 100,
+    "purpose": "Verify the Pareto frontier is not an artefact of Monte Carlo noise. The shipped 2026-05-26 sensitivity re-ran a 9-config subset (the 5 Pareto-optimal configs + 4 dominated named variants) at each of {30, 100} replicates; an earlier draft of this note described a 4-config subset.",
+    "seed_strategy": "Fixed seed per (config_id, replicate_id). PRNG state captured in the run manifest for reproducibility."
+  },
+  "_named_anchors": {
+    "updated": "2026-06-11",
+    "purpose": "Off-grid named variants run alongside the 48 grid configs in the FULL-ENGINE validation sweep (frontier re-derived over all 50). These mechanisms differ on dials frozen in this grid (W / increment form / eligibility semantics), so they are implemented as bespoke driver configs, not grid points. Both use the same driver hook: compute the draft order driver-side, inject before ZenGM's draft phase.",
+    "anchors": {
+      "countdown-cola": {
+        "spec_source": "Highley Substack, 'NBA Tanking Is Solvable: Four Candidates' (Part 3)",
+        "reference_implementation": "docs/js/cola-engine.js computeCountdownCOLA (100k-trial MC audit, seed 42)",
+        "mechanism": "McCarty number (drought x wins); survivor-style elimination pools (5-team pools, 2-6 tickets); no team falls more than 4 spots"
+      },
+      "beckett-cola": {
+        "spec_source": "Highley & Sanderson Substack, 'Design Your Own Anti-Tanking NBA Draft: We Built Beckett COLA' (2026-04-10)",
+        "reference_implementation": null,
+        "mechanism": "Eligibility drought >= 2 (drought = years since last #1 pick, top-6 seed, or playoff series win); entries = drought x wins (McCarty number); top-4 raffled by entries, rest in McCarty order; drought resets on top-6 seed / series win / #1 pick; lottery-day pick attribution",
+        "open_spec_question": "No stockpile cap mentioned in the post; implementing uncapped pending co-author confirmation"
+      }
+    },
+    "excluded_per_coauthor_2026-06-11": {
+      "simple-lottery-cola": "would mostly mirror Simple COLA results",
+      "mccarty-cola": "not endorsed by co-author at this point",
+      "2-year-22": "not endorsed; spec not sourced",
+      "flat-10-plus-r": "not endorsed; spec not sourced"
+    }
+  }
+}
