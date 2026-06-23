@@ -63,6 +63,14 @@ type Config = {
 	// 1 = proportional to the multi-year index, >1 = steep). Distinct from
 	// COLA_ALPHA, the per-season increment. Ignored for other variants.
 	gamma?: number;
+	// Lottery depth for the "weighted" variant. Undefined (default) = full-depth
+	// lottery (every pool pick drawn at random by cola^gamma). A finite value
+	// (e.g. 4) is the MIDDLE OPTION: draw the top `lotteryDepth` picks at random,
+	// then order the rest of the pool deterministically by index (cola DESC), so
+	// picks past the depth go by drought, not record -- closing the same tanking
+	// tail full-depth closes while keeping a top-`lotteryDepth` lottery. Ignored
+	// for other variants.
+	lotteryDepth?: number;
 };
 
 type TeamRec = {
@@ -550,14 +558,31 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				// concentrates on the most-droughted. This removes the record-order
 				// tail (picks 5+) Classic leaves, the residual tanking channel.
 				const gamma = config.gamma ?? 1;
+				// Eligibility (dial E): E=14 lotteries only the 14 non-playoff teams
+				// (playoffRoundsWon < 0); E=22 (default) adds the 8 R1 losers
+				// (playoffRoundsWon <= 0). The tail (picks after the pool) is the
+				// complement, ordered by record.
+				const e14 = config.E === 14;
+				const inPool = (prw: number) => (e14 ? prw < 0 : prw <= 0);
+				// lotteryDepth: Infinity (default) = full-depth lottery; a finite
+				// value is the MIDDLE OPTION (top-`lotteryDepth` lottery, rest of the
+				// pool ordered deterministically by index, not record).
+				const lotteryDepth = config.lotteryDepth ?? Number.POSITIVE_INFINITY;
 				const colaByTid: Record<number, number> = {};
 				for (const t of teamsNow as any[]) colaByTid[t.tid] = t.cola ?? 0;
 				const remaining = tss
-					.filter((ts: any) => ts.playoffRoundsWon <= 0)
+					.filter((ts: any) => inPool(ts.playoffRoundsWon))
 					.map((ts: any) => ({ tid: ts.tid, w: Math.pow(colaByTid[ts.tid] ?? 0, gamma) }));
 				const order: Record<number, number> = {};
 				let pickNum = 1;
 				while (remaining.length > 0) {
+					if (pickNum > lotteryDepth) {
+						// Past the lottery depth: order the rest of the pool by index
+						// (cola^gamma) DESC, deterministically -- by drought, not record.
+						remaining.sort((a, b) => b.w - a.w);
+						for (const r of remaining) order[r.tid] = pickNum++;
+						break;
+					}
 					const total = remaining.reduce((s, x) => s + x.w, 0);
 					let idx = 0;
 					if (total > 0) {
@@ -574,10 +599,11 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 					order[remaining[idx]!.tid] = pickNum++;
 					remaining.splice(idx, 1);
 				}
-				// Deep-playoff teams (won >= 1 round) pick after the pool, worst
-				// record first; the champion picks last.
+				// Tail: teams outside the lottery pool pick after it, worst record
+				// first (champion last). For E=22 that is the 8 deep-playoff teams;
+				// for E=14, every playoff team (playoffRoundsWon >= 0).
 				for (const ts of tss
-					.filter((t: any) => t.playoffRoundsWon >= 1)
+					.filter((t: any) => !inPool(t.playoffRoundsWon))
 					.slice()
 					.sort((a: any, b: any) => a.won - b.won)) {
 					order[ts.tid] = pickNum++;
