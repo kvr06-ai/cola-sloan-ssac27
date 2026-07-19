@@ -14,6 +14,11 @@
  * drought in years. Restricted to the pool (teams that did not win a playoff
  * round), so the all-vs-nothing pool/non-pool split does not dominate.
  *
+ * NOTE (2026-06-24): the prw <= 0 filter below equals the lottery pool only in
+ * the E=22 runs. In E=14 runs it also sweeps in the 8 first-round losers (picks
+ * 15+, near-zero post-diminishment drought), inflating every slope; for E=14
+ * use e14_analysis.js (prw < 0).
+ *
  * A clearly NEGATIVE slope (more drought -> lower pick number -> earlier pick)
  * is the mechanism directing help to the long-suffering.
  *
