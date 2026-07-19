@@ -58,7 +58,7 @@ type Config = {
 	// permutation of picks across all teams (the draft-to-outcome channel probe,
 	// and the uniform-lottery baseline for the equity leg); "weighted" draws the
 	// full draft order over the eligible pool by cola^gamma (the W dial family).
-	variant?: "countdown" | "beckett" | "random" | "weighted";
+	variant?: "countdown" | "beckett" | "random" | "weighted" | "nba" | "t321";
 	// Weighting exponent for the "weighted" variant (0 = flat among eligible,
 	// 1 = proportional to the multi-year index, >1 = steep). Distinct from
 	// COLA_ALPHA, the per-season increment. Ignored for other variants.
@@ -71,6 +71,12 @@ type Config = {
 	// tail full-depth closes while keeping a top-`lotteryDepth` lottery. Ignored
 	// for other variants.
 	lotteryDepth?: number;
+	// Draw depth for the "t321" variant: how many top picks the tiered-ball
+	// draw assigns before the remainder falls back to record order. 4 = an
+	// NBA-style top-four lottery over the tiered balls; 16 = the full pool
+	// drawn by balls. The public 3-2-1 description does not pin this down,
+	// so the sweep runs both. Ignored for other variants ("nba" is always 4).
+	drawDepth?: number;
 };
 
 type TeamRec = {
@@ -614,6 +620,95 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				// snapshot, then apply the after-lottery decay to MY top-4 winners
 				// (mirrors the engine's DRAFT_LOTTERY_FACTORS), so the engine's
 				// discarded draw does not corrupt next season's weights.
+				const LOTTERY_DECAY = [0, 0.25, 0.5, 0.75];
+				for (const t of await idb.cache.teams.getAll()) {
+					let c = colaByTid[(t as any).tid] ?? 0;
+					const pk = order[(t as any).tid];
+					if (pk !== undefined && pk <= 4) c = Math.round(c * LOTTERY_DECAY[pk - 1]!);
+					if (((t as any).cola ?? 0) !== c) {
+						(t as any).cola = c;
+						await idb.cache.teams.put(t);
+					}
+				}
+				pendingTeams = await captureSeasonRecord(pendingSeason, colaPreByTid);
+			} else if (config.variant === "nba" || config.variant === "t321") {
+				// Record-based reference mechanisms (the own-metric comparison).
+				// Both rank the pool by CURRENT-SEASON record; the multi-year index
+				// plays no role in the draw. The index still evolves exactly as in
+				// the weighted arms (engine accumulation + decay applied to THIS
+				// mechanism's top-4 winners), so the drought covariate in the
+				// seasonLog stays comparable across arms.
+				//   "nba"  : the post-2019 NBA lottery. Pool = the 14 non-playoff
+				//            teams; official pick-1 ball counts by record rank
+				//            (140/140/140/125/105/90/75/60/45/30/20/15/10/5 per
+				//            1000); top-4 drawn without replacement; picks 5-14 by
+				//            record among the rest of the pool.
+				//   "t321" : the 2026 3-2-1 proposal. Pool = 16 teams (per
+				//            conference the bottom 8 by record, matching the
+				//            16-tiered eligibility approximation); four record
+				//            tiers of 4 get ball counts 2/3/2/1 (the bottom tier
+				//            deliberately below tier 2); the top drawDepth picks
+				//            drawn without replacement, remainder by record.
+				const colaByTid: Record<number, number> = {};
+				for (const t of teamsNow as any[]) colaByTid[t.tid] = t.cola ?? 0;
+				let pool: any[];
+				if (config.variant === "nba") {
+					pool = tss.filter((ts: any) => ts.playoffRoundsWon < 0);
+				} else {
+					const byConf: Record<number, any[]> = {};
+					for (const ts of tss) (byConf[ts.cid] ??= []).push(ts);
+					pool = Object.values(byConf).flatMap((c: any[]) =>
+						c.slice().sort((a, b) => a.won - b.won).slice(0, 8),
+					);
+				}
+				pool.sort((a: any, b: any) => a.won - b.won); // worst record first
+				const NBA_BALLS = [140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, 5];
+				const TIER_BALLS = [2, 3, 2, 1];
+				const weightOf = (rank: number) =>
+					config.variant === "nba"
+						? NBA_BALLS[rank] ?? 5
+						: TIER_BALLS[Math.min(3, Math.floor(rank / 4))]!;
+				const drawDepth = config.variant === "nba" ? 4 : (config.drawDepth ?? 4);
+				const remaining = pool.map((ts: any, i: number) => ({
+					tid: ts.tid,
+					w: weightOf(i),
+					won: ts.won,
+				}));
+				const order: Record<number, number> = {};
+				let pickNum = 1;
+				while (remaining.length > 0) {
+					if (pickNum > drawDepth) {
+						// Past the draw depth: rest of the pool by record, worst first.
+						remaining.sort((a, b) => a.won - b.won);
+						for (const r of remaining) order[r.tid] = pickNum++;
+						break;
+					}
+					const total = remaining.reduce((s, x) => s + x.w, 0);
+					const roll = Math.random() * total;
+					let cum = 0;
+					let idx = 0;
+					for (let i = 0; i < remaining.length; i++) {
+						cum += remaining[i]!.w;
+						if (roll < cum) {
+							idx = i;
+							break;
+						}
+					}
+					order[remaining[idx]!.tid] = pickNum++;
+					remaining.splice(idx, 1);
+				}
+				// Tail: teams outside the pool pick after it, worst record first.
+				const poolTids = new Set(pool.map((ts: any) => ts.tid));
+				for (const ts of tss
+					.filter((t: any) => !poolTids.has(t.tid))
+					.slice()
+					.sort((a: any, b: any) => a.won - b.won)) {
+					order[ts.tid] = pickNum++;
+				}
+				await phase.newPhase(PHASE.DRAFT, NO_COND); // engine draws + decays ITS winners
+				await injectDraftOrder(pendingSeason, order); // override the order
+				// Evolve the index under the SAME law as the weighted arms: restore
+				// the post-playoff snapshot, decay MY top-4 winners.
 				const LOTTERY_DECAY = [0, 0.25, 0.5, 0.75];
 				for (const t of await idb.cache.teams.getAll()) {
 					let c = colaByTid[(t as any).tid] ?? 0;
