@@ -250,8 +250,8 @@ footer p { margin: 0.3rem 0; }
     <dd>COLA as originally proposed. The top four picks are raffled with odds proportional to drought; picks 5-14 then follow this season's record, worst team first, exactly like today's NBA.</dd>
     <dt>Gamma family</dt>
     <dd>Every pick raffled by drought raised to a power gamma. Gamma = 0 makes every team equal, gamma = 1 makes odds proportional to drought, and higher values concentrate odds on the longest droughts.</dd>
-    <dt>Middle option</dt>
-    <dd>Classic with one change: picks 5-14 follow drought order instead of record order. The four-pick raffle fans already know stays.</dd>
+    <dt>Waitlist COLA</dt>
+    <dd>Classic with one change: picks 5-14 follow drought order instead of record order, so the whole board works like a season-ticket waitlist (wait longer, pick earlier). The four-pick raffle fans already know stays.</dd>
   </dl>
 </section>
 
@@ -316,7 +316,7 @@ footer p { margin: 0.3rem 0; }
   </div>
 
   <div id="panel-e14" role="tabpanel" aria-labelledby="tab-e14">
-    <p class="small">The NBA's actual lottery pool; includes the middle option.</p>
+    <p class="small">The NBA's actual lottery pool; includes Waitlist COLA.</p>
     <div class="table-scroll">
       <table>
         <caption>Questions 1 and 2 at E = 14</caption>
@@ -333,14 +333,14 @@ footer p { margin: 0.3rem 0; }
           <tr><th scope="row">Gamma = 1</th><td class="num">+0.15<span class="ci">[&minus;0.32, 0.63]</span></td><td class="num">&minus;0.572 &plusmn; 0.014</td></tr>
           <tr><th scope="row">Gamma = 2</th><td class="num">+0.28<span class="ci">[&minus;0.15, 0.71]</span></td><td class="num">&minus;0.948 &plusmn; 0.017</td></tr>
           <tr><th scope="row">Gamma = 3</th><td class="num">&minus;0.16<span class="ci">[&minus;0.62, 0.31]</span></td><td class="num">&minus;1.175 &plusmn; 0.015</td></tr>
-          <tr><th scope="row">Middle option</th><td class="num">&minus;0.07<span class="ci">[&minus;0.46, 0.32]</span></td><td class="num">&minus;0.989 &plusmn; 0.019</td></tr>
+          <tr><th scope="row">Waitlist COLA</th><td class="num">&minus;0.07<span class="ci">[&minus;0.46, 0.32]</span></td><td class="num">&minus;0.989 &plusmn; 0.019</td></tr>
           <tr><th scope="row">Countdown</th><td class="num na">not run at E = 14</td><td class="num na">not run at E = 14</td></tr>
           <tr><th scope="row">Beckett</th><td class="num na">not run at E = 14</td><td class="num na">not run at E = 14</td></tr>
         </tbody>
       </table>
     </div>
     <p class="small">
-      Question 3 at E = 14 is not yet measured for the middle option. Its top-four raffle is mechanically
+      Question 3 at E = 14 is not yet measured for Waitlist COLA. Its top-four raffle is mechanically
       identical to gamma = 1's, so the pick-1 ceiling is expected to carry; the deterministic tail is
       pending its own measurement.
     </p>
@@ -350,11 +350,11 @@ footer p { margin: 0.3rem 0; }
 <section>
   <h2>Verdict</h2>
   <p>
-    At the NBA's actual pool size, one design answers the first two questions at once. The middle option
+    At the NBA's actual pool size, one design answers the first two questions at once. Waitlist COLA
     holds the tanking gap at zero (&minus;0.07, against Classic's +1.94) and helps long-drought teams as
     strongly as Classic does (&minus;0.99 vs &minus;0.93 picks per drought-year, statistically
     indistinguishable), while keeping the four-pick lottery fans already know. Gamma = 1 also stops
-    tanking but helps less sharply here (&minus;0.57). The open item is question 3 for the middle option,
+    tanking but helps less sharply here (&minus;0.57). The open item is question 3 for Waitlist COLA,
     which we are measuring next.
   </p>
   <div class="table-scroll">
@@ -370,9 +370,9 @@ footer p { margin: 0.3rem 0; }
       </thead>
       <tbody>
         <tr><th scope="row">Classic minus gamma = 1</th><td>tanking</td><td class="num">6.83</td><td>Cohen's d = 1.39</td></tr>
-        <tr><th scope="row">Classic minus middle option</th><td>tanking</td><td class="num">8.96</td><td>d = 1.83</td></tr>
-        <tr><th scope="row">Gamma = 1 minus middle option</th><td>tanking</td><td class="num">0.72</td><td>indistinguishable</td></tr>
-        <tr><th scope="row">Middle option vs gamma = 1</th><td>help slope</td><td class="num">about 18</td><td>clearly separated</td></tr>
+        <tr><th scope="row">Classic minus Waitlist COLA</th><td>tanking</td><td class="num">8.96</td><td>d = 1.83</td></tr>
+        <tr><th scope="row">Gamma = 1 minus Waitlist COLA</th><td>tanking</td><td class="num">0.72</td><td>indistinguishable</td></tr>
+        <tr><th scope="row">Waitlist COLA vs gamma = 1</th><td>help slope</td><td class="num">about 18</td><td>clearly separated</td></tr>
       </tbody>
     </table>
   </div>
@@ -387,7 +387,7 @@ footer p { margin: 0.3rem 0; }
     drought pattern deliberately disagrees with the record order, so the designs visibly differ.
   </p>
   <p>
-    We mean this as a pressure test. Try to break the middle option: find a drought pattern where losing
+    We mean this as a pressure test. Try to break Waitlist COLA: find a drought pattern where losing
     pays again (the tanking gap goes clearly positive) or where help stops reaching the long droughts (the
     slope drifts toward zero). Anything you find sharpens the paper before a reviewer finds it first.
   </p>
@@ -404,7 +404,7 @@ footer p { margin: 0.3rem 0; }
     <label><input type="radio" name="mech" value="classic" checked><span>Classic</span></label>
     <label><input type="radio" name="mech" value="g1"><span>Gamma = 1 full depth</span></label>
     <label><input type="radio" name="mech" value="g2"><span>Gamma = 2</span></label>
-    <label><input type="radio" name="mech" value="mid"><span>Middle option</span></label>
+    <label><input type="radio" name="mech" value="mid"><span>Waitlist COLA</span></label>
   </fieldset>
 
   <div class="tiles" aria-live="polite">
@@ -469,7 +469,7 @@ footer p { margin: 0.3rem 0; }
       <li>weight<sub>i</sub> = drought<sub>i</sub><sup>gamma</sup>, with 0<sup>0</sup> = 1, so gamma = 0 gives every team weight 1.</li>
       <li>Flat and the gamma family draw all 14 picks sequentially without replacement, each pick choosing among the remaining teams with probability proportional to weight.</li>
       <li>Classic draws picks 1-4 sequentially proportional to drought (gamma = 1 weights), then assigns picks 5-14 to the remaining teams in record order, worst record first.</li>
-      <li>The middle option draws picks 1-4 as Classic does, then assigns picks 5-14 to the remaining teams by drought descending, ties broken by worse record first.</li>
+      <li>Waitlist COLA draws picks 1-4 as Classic does, then assigns picks 5-14 to the remaining teams by drought descending, ties broken by worse record first.</li>
       <li>If all remaining weights are zero, the draw is uniform among the remaining teams.</li>
     </ul>
   </details>
