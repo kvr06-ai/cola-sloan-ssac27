@@ -17,7 +17,7 @@
  * This script filters prw < 0.
  *
  * Index scale: all six configs (weighted included) carry the engine's x1000-scale
- * index; colaPre / 1000 ~ drought-years. Verified against the raw runs 2026-06-24.
+ * index; colaPre / 1000 ~ drought-years. Verified against the raw runs 2026-07-19.
  * Numbers cross-checked by clean-room recomputation (3-agent verification pass).
  *
  * Run from this directory:  node e14_analysis.js [runsDir]   (default runs/e14)
