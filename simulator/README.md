@@ -1,10 +1,12 @@
 # Simulator — the public two-test results page
 
 `index.html` is the canonical source of the interactive results page ("COLA
-weighting testbed: two tests in the full engine"): the E=22 and E=14 results
-tables, the verdict block, and the Monte Carlo lottery playground (14 drought
-sliders, mechanism selector, 20,000 draws per change). One self-contained file,
-no external dependencies.
+draft-lottery testbed: three questions in a full basketball simulation"): the
+E=22 and E=14 results tables, the verdict block, and the Monte Carlo lottery
+playground (three side-by-side designs: NBA today, Classic COLA, Waitlist COLA;
+scenario presets; drought sliders; the "what does one more losing streak buy?"
+tanking experiment; 20,000 draws per design per change). One self-contained
+file, no external dependencies.
 
 ## Where it is served
 
