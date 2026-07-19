@@ -104,25 +104,23 @@ tbody th[scope="row"] { font-weight: 500; white-space: nowrap; }
 .tab[aria-selected="true"] { background: var(--accent-fill); color: var(--accent-fill-ink); border-color: transparent; }
 .tab:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
 
-/* Segmented mechanism control */
-.seg { display: flex; flex-wrap: wrap; gap: 8px; border: 0; padding: 0; margin: 0.8rem 0; }
-.seg label { position: relative; }
-.seg input {
-  position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer;
+/* Scenario picker and shared selects */
+.scenario-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 1rem 0 0.3rem; }
+.scenario-row label, .tank-controls label { font-size: 0.88rem; color: var(--ink-2); }
+.sel {
+  font: inherit; font-size: 0.9rem; padding: 6px 10px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--ink);
 }
-.seg span {
-  display: inline-block; padding: 6px 14px; border-radius: 8px;
-  border: 1px solid var(--border); color: var(--ink-2); font-size: 0.9rem; cursor: pointer;
-}
-.seg input:checked + span { background: var(--accent-fill); color: var(--accent-fill-ink); border-color: transparent; }
-.seg input:focus-visible + span { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.sel:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.scenario-cap { font-size: 0.85rem; color: var(--muted); margin: 0.2rem 0 0.8rem; }
 
-/* Stat tiles */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; margin: 0.8rem 0; }
-.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
-.t-label { font-size: 0.84rem; color: var(--ink-2); }
-.t-value { font-size: 1.7rem; font-weight: 650; margin: 2px 0; }
-.t-sub { font-size: 0.8rem; color: var(--muted); }
+/* Scoreboard */
+.score-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0.8rem 0; }
+.score-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+.s-mech { font-size: 0.88rem; font-weight: 650; margin-bottom: 4px; }
+.s-stat { margin: 6px 0 0; }
+.s-label { font-size: 0.78rem; color: var(--ink-2); }
+.s-val { font-size: 1.05rem; font-weight: 650; }
 
 /* Chart */
 .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 0.8rem 0; }
@@ -132,13 +130,15 @@ figure.chart-card { margin-left: 0; margin-right: 0; }
 .ramp-legend { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 10px 0 4px; font-size: 0.8rem; color: var(--ink-2); }
 .ramp-legend .sw { display: inline-flex; align-items: center; gap: 5px; }
 .ramp-legend i { display: inline-block; width: 13px; height: 13px; border-radius: 3px; }
-.chart-scroll { position: relative; overflow-x: auto; }
-.chart-scroll svg { display: block; width: 100%; min-width: 560px; height: auto; }
+.charts-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 8px; }
+.mini-title { font-size: 0.88rem; font-weight: 650; margin: 0 0 4px; }
+.mini-sub { display: block; font-weight: 400; color: var(--muted); font-size: 0.78rem; }
+.mini { position: relative; }
+.mini svg { display: block; width: 100%; height: auto; }
 .chart-note { font-size: 0.8rem; color: var(--muted); margin: 8px 0 0; }
 .gridline { stroke: var(--grid); stroke-width: 1; }
 .baseline { stroke: var(--axis); stroke-width: 1; }
-.ax { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
-.ax-title { fill: var(--muted); font-size: 11px; }
+.ax { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
 .bar-0 { fill: var(--ramp-0); }
 .bar-1 { fill: var(--ramp-1); }
 .bar-2 { fill: var(--ramp-2); }
@@ -167,6 +167,20 @@ figure.chart-card { margin-left: 0; margin-right: 0; }
   border: 1px solid var(--border); background: transparent; color: var(--ink-2);
 }
 .btn:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.btn-primary { background: var(--accent-fill); color: var(--accent-fill-ink); border-color: transparent; }
+
+/* Tanking experiment */
+.tank-box { background: var(--surface); border: 1.5px solid var(--accent-fill); border-radius: 12px; padding: 14px 16px; margin: 1.4rem 0; }
+.tank-box h3 { margin-top: 0.2rem; }
+.tank-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0.7rem 0; }
+.tank-controls .btn { margin-top: 0; }
+.tank-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 0.8rem; }
+.tank-grid[hidden] { display: none; }
+.tank-card { background: var(--page); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.tk-mech { font-size: 0.82rem; font-weight: 650; color: var(--ink-2); }
+.tk-move { font-size: 0.86rem; color: var(--ink-2); margin: 2px 0; }
+.tk-delta { font-size: 1rem; font-weight: 650; }
+.tk-zero { color: var(--accent-text); }
 
 details { margin: 0.8rem 0; }
 summary { cursor: pointer; color: var(--ink-2); font-size: 0.9rem; }
@@ -181,6 +195,9 @@ footer p { margin: 0.3rem 0; }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px;
   clip-path: inset(50%); overflow: hidden; white-space: nowrap;
+}
+@media (max-width: 780px) {
+  .score-row, .charts-row, .tank-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .sl-grid { grid-template-columns: 1fr; }
@@ -394,47 +411,66 @@ footer p { margin: 0.3rem 0; }
 <section>
   <h2>Lottery playground</h2>
   <p>
-    Run the lotteries yourself. Team 1 has the worst current record and Team 14 the best in the pool. Set
-    each team's drought with the sliders, pick a design, and the page reruns 20,000 lotteries. The default
-    drought pattern deliberately disagrees with the record order, so the designs visibly differ.
+    Run the lotteries yourself. One scenario goes in, and all three designs come out side by side, so
+    comparing them is the default view. Team 1 has the worst current record and Team 14 the best in the
+    pool. Pick a scenario or set each team's drought with the sliders, and the page reruns 20,000
+    lotteries under each design.
   </p>
   <p>
     We mean this as a pressure test. Try to break Waitlist COLA: find a drought pattern where losing
-    pays again (the tanking gap goes clearly positive) or where help stops reaching the long droughts (the
-    slope drifts toward zero). Anything you find sharpens the paper before a reviewer finds it first.
+    pays again (its tanking gap goes clearly positive) or where help stops reaching the long droughts
+    (its help slope drifts toward zero). The NBA and Classic columns are the controls. Anything you find
+    sharpens the paper before a reviewer finds it first.
   </p>
   <p class="small">
-    The two live stats mirror questions 1 and 2. The tanking gap is the expected pick of Team 5 minus
-    Team 1 (positive means losing pays; want about zero). The help slope is the ordinary least squares (OLS)
-    slope of expected pick on drought-years across the 14 teams (want clearly negative).
+    The scoreboard mirrors questions 1 and 2 for each design. The tanking gap is the expected pick of
+    Team 5 minus Team 1 (positive means losing pays; want about zero). The help slope is the ordinary
+    least squares (OLS) slope of expected pick on drought years across the 14 teams (want clearly
+    negative).
+  </p>
+  <p class="footnote">
+    The "NBA today" column uses the real lottery's published pick-1 ball counts, simulated for a single
+    season. The full-engine run for the NBA lottery is in progress and will join the results tables
+    above when it lands.
   </p>
   <noscript><p class="note">The playground requires JavaScript. The results tables above are static.</p></noscript>
 
-  <fieldset class="seg" id="mech-seg">
-    <legend class="visually-hidden">Mechanism</legend>
-    <label><input type="radio" name="mech" value="flat"><span>Flat lottery (gamma = 0)</span></label>
-    <label><input type="radio" name="mech" value="classic" checked><span>Classic</span></label>
-    <label><input type="radio" name="mech" value="g1"><span>Gamma = 1 full depth</span></label>
-    <label><input type="radio" name="mech" value="g2"><span>Gamma = 2</span></label>
-    <label><input type="radio" name="mech" value="mid"><span>Waitlist COLA</span></label>
-  </fieldset>
+  <div class="scenario-row">
+    <label for="scenario-sel">Scenario</label>
+    <select id="scenario-sel" class="sel">
+      <option value="mixed" selected>Mixed league (default)</option>
+      <option value="collapse">The late-season collapse</option>
+      <option value="decade">A decade of waiting</option>
+      <option value="equal">Everyone equal</option>
+      <option value="custom" hidden>Custom</option>
+    </select>
+  </div>
+  <p class="scenario-cap" id="scenario-cap">Droughts deliberately disagree with the record order, so the three designs visibly differ.</p>
 
-  <div class="tiles" aria-live="polite">
-    <div class="tile">
-      <div class="t-label">Tanking gap</div>
-      <div class="t-value" id="tile-tank">&nbsp;</div>
-      <div class="t-sub">Expected pick of Team 5 minus Team 1. Positive means losing pays. Want about 0.</div>
+  <p class="sl-head">Drought years per team (Team 1 = worst current record, Team 14 = best in the pool)</p>
+  <div class="sl-grid" id="sl-grid"></div>
+
+  <div class="score-row" aria-live="polite">
+    <div class="score-card">
+      <div class="s-mech">NBA today</div>
+      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-nba">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-nba">&nbsp;</div></div>
     </div>
-    <div class="tile">
-      <div class="t-label">Help slope</div>
-      <div class="t-value" id="tile-help">&nbsp;</div>
-      <div class="t-sub">OLS slope of expected pick on drought-years. Want clearly negative.</div>
+    <div class="score-card">
+      <div class="s-mech">Classic COLA</div>
+      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-classic">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-classic">&nbsp;</div></div>
+    </div>
+    <div class="score-card">
+      <div class="s-mech">Waitlist COLA</div>
+      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-waitlist">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-waitlist">&nbsp;</div></div>
     </div>
   </div>
 
-  <figure class="chart-card">
-    <figcaption class="chart-title">Expected pick by team
-      <span class="chart-sub">Bar height is the expected pick (lower is an earlier pick); bar color is the team's drought.</span>
+  <figure class="chart-card" id="charts-card">
+    <figcaption class="chart-title">Expected pick by team under each design
+      <span class="chart-sub">Bar height is the expected pick (a shorter bar is an earlier pick); bar color is the team's drought.</span>
     </figcaption>
     <div class="ramp-legend">
       <span>Drought years</span>
@@ -444,19 +480,93 @@ footer p { margin: 0.3rem 0; }
       <span class="sw"><i style="background: var(--ramp-3)"></i>8-10</span>
       <span class="sw"><i style="background: var(--ramp-4)"></i>11-12</span>
     </div>
-    <div class="chart-scroll" id="chart-scroll">
-      <div id="chart-holder" aria-label="Bar chart of expected pick by team"></div>
-      <div class="pg-tip" id="pg-tip" hidden></div>
+    <div class="charts-row">
+      <div>
+        <div class="mini-title">NBA today
+          <span class="mini-sub">Top four raffled by record odds; picks 5-14 by record.</span>
+        </div>
+        <div class="mini">
+          <div id="chart-nba"></div>
+          <div class="pg-tip" hidden></div>
+        </div>
+      </div>
+      <div>
+        <div class="mini-title">Classic COLA
+          <span class="mini-sub">Top four raffled by drought; picks 5-14 by record.</span>
+        </div>
+        <div class="mini">
+          <div id="chart-classic"></div>
+          <div class="pg-tip" hidden></div>
+        </div>
+      </div>
+      <div>
+        <div class="mini-title">Waitlist COLA
+          <span class="mini-sub">Top four raffled by drought; picks 5-14 by drought.</span>
+        </div>
+        <div class="mini">
+          <div id="chart-waitlist"></div>
+          <div class="pg-tip" hidden></div>
+        </div>
+      </div>
     </div>
     <p class="chart-note">
-      Rerun on every change from 20,000 Monte Carlo draws; expected picks wiggle by about &plusmn;0.03
-      between runs. Hover or focus a column for that team's expected pick and pick-1 probability.
+      The horizontal axis is the team, 1 (worst current record) through 14 (best in the pool); the
+      vertical axis is the expected pick. Each change reruns 20,000 draws per design, so expected picks
+      wiggle by about &plusmn;0.03 between runs. Hover or focus a column for that team's expected pick
+      and pick-1 probability under that design.
     </p>
   </figure>
 
-  <p class="sl-head">Drought years per team (Team 1 = worst current record, Team 14 = best in the pool)</p>
-  <div class="sl-grid" id="sl-grid"></div>
-  <button class="btn" id="reset-btn" type="button">Reset to default droughts</button>
+  <div class="tank-box">
+    <h3>What does one more losing streak buy?</h3>
+    <p class="small">
+      Pick a team and drop it to the worst record in the league. Droughts do not move, and every other
+      team keeps its relative order; only the record ranking shifts. Each design then reports how many
+      picks that move buys.
+    </p>
+    <div class="tank-controls">
+      <label for="tank-team">Team</label>
+      <select id="tank-team" class="sel">
+        <option value="0">Team 1</option>
+        <option value="1">Team 2</option>
+        <option value="2">Team 3</option>
+        <option value="3">Team 4</option>
+        <option value="4" selected>Team 5</option>
+        <option value="5">Team 6</option>
+        <option value="6">Team 7</option>
+        <option value="7">Team 8</option>
+        <option value="8">Team 9</option>
+        <option value="9">Team 10</option>
+        <option value="10">Team 11</option>
+        <option value="11">Team 12</option>
+        <option value="12">Team 13</option>
+        <option value="13">Team 14</option>
+      </select>
+      <button class="btn btn-primary" id="tank-btn" type="button" aria-pressed="false">Drop to the worst record</button>
+    </div>
+    <div class="tank-grid" id="tank-grid" aria-live="polite" hidden>
+      <div class="tank-card">
+        <div class="tk-mech">NBA today</div>
+        <div class="tk-move" id="tk-move-nba">&nbsp;</div>
+        <div class="tk-delta" id="tk-delta-nba">&nbsp;</div>
+      </div>
+      <div class="tank-card">
+        <div class="tk-mech">Classic COLA</div>
+        <div class="tk-move" id="tk-move-classic">&nbsp;</div>
+        <div class="tk-delta" id="tk-delta-classic">&nbsp;</div>
+      </div>
+      <div class="tank-card">
+        <div class="tk-mech">Waitlist COLA</div>
+        <div class="tk-move" id="tk-move-waitlist">&nbsp;</div>
+        <div class="tk-delta" id="tk-delta-waitlist">&nbsp;</div>
+      </div>
+    </div>
+    <p class="footnote">
+      The scoreboard and charts above keep showing the league as it stands; these cards hold the
+      counterfactual. The rerun replays the same random draws, so a design that ignores the move shows
+      an exact zero.
+    </p>
+  </div>
 
   <details>
     <summary>Table view: per-team results</summary>
@@ -464,8 +574,17 @@ footer p { margin: 0.3rem 0; }
       <table>
         <thead>
           <tr>
-            <th scope="col">Team</th>
-            <th scope="col" class="num">Drought (years)</th>
+            <th scope="col" rowspan="2">Team</th>
+            <th scope="col" rowspan="2" class="num">Drought (years)</th>
+            <th scope="colgroup" colspan="2">NBA today</th>
+            <th scope="colgroup" colspan="2">Classic COLA</th>
+            <th scope="colgroup" colspan="2">Waitlist COLA</th>
+          </tr>
+          <tr>
+            <th scope="col" class="num">Expected pick</th>
+            <th scope="col" class="num">P(pick 1)</th>
+            <th scope="col" class="num">Expected pick</th>
+            <th scope="col" class="num">P(pick 1)</th>
             <th scope="col" class="num">Expected pick</th>
             <th scope="col" class="num">P(pick 1)</th>
           </tr>
@@ -478,11 +597,11 @@ footer p { margin: 0.3rem 0; }
   <details>
     <summary>Draw semantics</summary>
     <ul class="small">
-      <li>weight<sub>i</sub> = drought<sub>i</sub><sup>gamma</sup>, with 0<sup>0</sup> = 1, so gamma = 0 gives every team weight 1.</li>
-      <li>Flat and the gamma family draw all 14 picks sequentially without replacement, each pick choosing among the remaining teams with probability proportional to weight.</li>
-      <li>Classic draws picks 1-4 sequentially proportional to drought (gamma = 1 weights), then assigns picks 5-14 to the remaining teams in record order, worst record first.</li>
-      <li>Waitlist COLA draws picks 1-4 as Classic does, then assigns picks 5-14 to the remaining teams by drought descending, ties broken by worse record first.</li>
-      <li>If all remaining weights are zero, the draw is uniform among the remaining teams.</li>
+      <li>NBA today: the real post-2019 NBA lottery. Teams are ranked by current record (Team 1 = worst), and the pick-1 ball counts by record rank are 140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, 5 out of 1,000. Picks 1-4 are drawn sequentially without replacement, each pick proportional to the remaining teams' ball counts; picks 5-14 go to the remaining teams in record order, worst first. Drought plays no role.</li>
+      <li>Classic COLA: picks 1-4 are drawn sequentially without replacement with probability proportional to each team's drought years; picks 5-14 go to the remaining teams in record order, worst first.</li>
+      <li>Waitlist COLA: picks 1-4 exactly as Classic; picks 5-14 go to the remaining teams in drought order, longest drought first, ties broken by worse record first.</li>
+      <li>If every remaining drought weight is zero, the draw is uniform among the remaining teams.</li>
+      <li>Each change reruns 20,000 simulated lotteries per design, doubled while the tanking experiment is on so both record orderings are simulated.</li>
     </ul>
   </details>
 </section>
@@ -499,62 +618,80 @@ footer p { margin: 0.3rem 0; }
 "use strict";
 
 /* DRAW-CORE-BEGIN */
-function drawLottery(droughts, mech, rng) {
-  // Returns picks[teamIndex] = pick number (1-based). Team index 0 = worst
-  // current record. mech: "flat" | "g1" | "g2" | "classic" | "mid".
-  var n = droughts.length;
+// Pick-1 ball counts (out of 1,000) in the real post-2019 NBA lottery,
+// indexed by record rank (0 = worst current record).
+var NBA_BALLS = [140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, 5];
+
+function tankOrder(n, team) {
+  // Record order after `team` drops to the worst record: the chosen team
+  // moves to the front, the teams previously ranked above it shift down one
+  // place, and everyone else keeps its slot. Droughts are indexed by team
+  // id, so they stay attached to the right teams.
+  var order = [team];
+  for (var i = 0; i < n; i++) if (i !== team) order.push(i);
+  return order;
+}
+
+function drawLottery(order, droughts, mech, rng) {
+  // One simulated lottery. `order` lists team ids from worst current record
+  // to best; `droughts[teamId]` is drought years; mech is "nba", "classic",
+  // or "waitlist". Returns picks[teamId] = pick number (1-based).
+  var n = order.length;
+  var rank = new Array(n);
+  for (var i = 0; i < n; i++) rank[order[i]] = i;
   var picks = new Array(n).fill(0);
-  var remaining = [];
-  for (var t = 0; t < n; t++) remaining.push(t);
+  var remaining = order.slice(); // stays in record order as winners leave
   var pickNum = 1;
 
-  function weightedDraw(weights) {
-    // Index into `remaining`; uniform if all weights are zero.
+  function drawIndex() {
+    // Weighted draw among `remaining`; uniform if all weights are zero.
+    // Candidates are scanned in team-id order, which is identical across
+    // record orderings, so two runs that share a random stream pick the same
+    // winners whenever the weights do not depend on record rank. The scan
+    // order does not change the distribution. Exactly one rng() per pick.
+    var ids = remaining.slice().sort(function (a, b) { return a - b; });
+    var m = ids.length;
+    var w = new Array(m);
     var total = 0;
-    for (var i = 0; i < weights.length; i++) total += weights[i];
-    if (total <= 0) return Math.floor(rng() * weights.length);
-    var r = rng() * total;
-    for (var j = 0; j < weights.length; j++) {
-      r -= weights[j];
-      if (r < 0) return j;
+    for (var a = 0; a < m; a++) {
+      w[a] = mech === "nba" ? NBA_BALLS[rank[ids[a]]] : droughts[ids[a]];
+      total += w[a];
     }
-    return weights.length - 1;
+    var chosen = ids[m - 1];
+    if (total <= 0) {
+      chosen = ids[Math.floor(rng() * m)];
+    } else {
+      var r = rng() * total;
+      for (var b = 0; b < m; b++) {
+        r -= w[b];
+        if (r < 0) { chosen = ids[b]; break; }
+      }
+    }
+    return remaining.indexOf(chosen);
   }
 
-  if (mech === "classic" || mech === "mid") {
-    for (var k = 0; k < 4; k++) {
-      var w = remaining.map(function (t) { return droughts[t]; });
-      var idx = weightedDraw(w);
-      picks[remaining[idx]] = pickNum++;
-      remaining.splice(idx, 1);
-    }
-    var rest;
-    if (mech === "classic") {
-      rest = remaining.slice().sort(function (a, b) { return a - b; });
-    } else {
-      rest = remaining.slice().sort(function (a, b) {
-        return (droughts[b] - droughts[a]) || (a - b);
-      });
-    }
-    for (var m = 0; m < rest.length; m++) picks[rest[m]] = pickNum++;
-  } else {
-    var gamma = { flat: 0, g1: 1, g2: 2 }[mech];
-    for (var k2 = 0; k2 < n; k2++) {
-      var w2 = remaining.map(function (t) { return Math.pow(droughts[t], gamma); });
-      var idx2 = weightedDraw(w2);
-      picks[remaining[idx2]] = pickNum++;
-      remaining.splice(idx2, 1);
-    }
+  for (var k = 0; k < 4; k++) {
+    var idx = drawIndex();
+    picks[remaining[idx]] = pickNum++;
+    remaining.splice(idx, 1);
   }
+
+  var rest = remaining;
+  if (mech === "waitlist") {
+    rest = remaining.slice().sort(function (a, b) {
+      return (droughts[b] - droughts[a]) || (rank[a] - rank[b]);
+    });
+  }
+  for (var t = 0; t < rest.length; t++) picks[rest[t]] = pickNum++;
   return picks;
 }
 
-function simulate(droughts, mech, nSims, rng) {
-  var n = droughts.length;
+function simulate(order, droughts, mech, nSims, rng) {
+  var n = order.length;
   var sumPick = new Array(n).fill(0);
   var firstCount = new Array(n).fill(0);
   for (var s = 0; s < nSims; s++) {
-    var picks = drawLottery(droughts, mech, rng);
+    var picks = drawLottery(order, droughts, mech, rng);
     for (var t = 0; t < n; t++) {
       sumPick[t] += picks[t];
       if (picks[t] === 1) firstCount[t]++;
@@ -580,22 +717,51 @@ function olsSlope(xs, ys) {
 }
 /* DRAW-CORE-END */
 
-var DEFAULT_DROUGHTS = [3, 5, 1, 8, 2, 6, 1, 10, 4, 2, 7, 1, 3, 0];
 var N = 14;
 var N_SIMS = 20000;
-var droughts = DEFAULT_DROUGHTS.slice();
-var mech = "classic";
-var latest = null;
+var MECHS = ["nba", "classic", "waitlist"];
+var MECH_NAME = { nba: "NBA today", classic: "Classic COLA", waitlist: "Waitlist COLA" };
+var BASE_ORDER = [];
+for (var bi = 0; bi < N; bi++) BASE_ORDER.push(bi);
+
+var SCENARIOS = {
+  mixed: {
+    droughts: [3, 5, 1, 8, 2, 6, 1, 10, 4, 2, 7, 1, 3, 0],
+    caption: "Droughts deliberately disagree with the record order, so the three designs visibly differ."
+  },
+  collapse: {
+    droughts: [1, 6, 8, 3, 2, 9, 4, 2, 5, 1, 7, 3, 1, 0],
+    caption: "The league's worst record belongs to a team only one year into its slump; watch who each design rewards."
+  },
+  decade: {
+    droughts: [2, 3, 1, 4, 2, 12, 1, 3, 2, 1, 4, 1, 2, 0],
+    caption: "Team 6 has waited twelve years with a mid-pool record; only drought-based designs move it up."
+  },
+  equal: {
+    droughts: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+    caption: "With identical droughts the drought-based designs go flat, and only the NBA's record odds separate teams."
+  },
+  custom: {
+    droughts: null,
+    caption: "Custom drought pattern, edited by hand."
+  }
+};
+
+var droughts = SCENARIOS.mixed.droughts.slice();
+var tankActive = false;
+var tankTeam = 4; // 0-based, so Team 5
+var baseRes = null;
+var tankRes = null;
 var timer = null;
 
-// Chart geometry (viewBox units).
-var VB_W = 760, VB_H = 332;
-var M = { t: 16, r: 10, b: 44, l: 42 };
+// Mini-chart geometry (viewBox units; one chart per design).
+var VB_W = 300, VB_H = 270;
+var M = { t: 12, r: 6, b: 30, l: 28 };
 var plotW = VB_W - M.l - M.r;
 var plotH = VB_H - M.t - M.b;
 var base = M.t + plotH;
 var band = plotW / N;
-var barW = Math.min(24, band - 8);
+var barW = 12;
 
 function yPos(v) { return base - (v / N) * plotH; }
 function rampIdx(d) { return Math.round((d / 12) * 4); }
@@ -615,60 +781,122 @@ function fmtPick(v) { return v.toFixed(2); }
 function fmtP1(p) { return (p * 100).toFixed(1) + "%"; }
 function fmtSigned(v, dp) { return (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(dp); }
 
-function drawChart(res) {
-  var s = '<svg viewBox="0 0 ' + VB_W + " " + VB_H + '" role="img" aria-label="Expected pick by team, bars colored by drought years">';
-  for (var g = 2; g <= 14; g += 2) {
-    var gy = yPos(g);
-    s += '<line class="gridline" x1="' + M.l + '" y1="' + gy + '" x2="' + (VB_W - M.r) + '" y2="' + gy + '"></line>';
-    s += '<text class="ax" x="' + (M.l - 7) + '" y="' + (gy + 3.5) + '" text-anchor="end">' + g + "</text>";
-  }
-  s += '<line class="baseline" x1="' + M.l + '" y1="' + base + '" x2="' + (VB_W - M.r) + '" y2="' + base + '"></line>';
-  for (var i = 0; i < N; i++) {
-    var x = M.l + i * band + (band - barW) / 2;
-    var yTop = yPos(res.ePick[i]);
-    s += '<path class="bar-' + rampIdx(droughts[i]) + '" d="' + barPath(x, yTop) + '"></path>';
-    s += '<text class="ax" x="' + (M.l + i * band + band / 2) + '" y="' + (base + 16) + '" text-anchor="middle">' + (i + 1) + "</text>";
-  }
-  s += '<text class="ax-title" x="' + (M.l + plotW / 2) + '" y="' + (base + 34) + '" text-anchor="middle">Team (1 = worst current record)</text>';
-  for (var h = 0; h < N; h++) {
-    s += '<rect class="hit" data-i="' + h + '" tabindex="0" role="img" aria-label="' + hitLabel(h, res) + '" x="' + (M.l + h * band) + '" y="' + M.t + '" width="' + band + '" height="' + plotH + '"></rect>';
-  }
-  s += "</svg>";
-  document.getElementById("chart-holder").innerHTML = s;
-}
-
-function hitLabel(i, res) {
-  return "Team " + (i + 1) + ", drought " + droughts[i] +
+function hitLabel(mech, i) {
+  var res = baseRes[mech];
+  return MECH_NAME[mech] + ", Team " + (i + 1) + ", drought " + droughts[i] +
     (droughts[i] === 1 ? " year" : " years") +
     ", expected pick " + fmtPick(res.ePick[i]) +
     ", pick-1 probability " + fmtP1(res.p1[i]);
 }
 
-function updateTiles(res) {
-  var grad = res.ePick[4] - res.ePick[0];
-  var slope = olsSlope(droughts, res.ePick);
-  document.getElementById("tile-tank").textContent = fmtSigned(grad, 2) + " picks";
-  document.getElementById("tile-help").textContent =
-    slope === null ? "n/a (no drought variation)" : fmtSigned(slope, 3);
+function drawCharts() {
+  for (var mi = 0; mi < MECHS.length; mi++) {
+    var mech = MECHS[mi];
+    var res = baseRes[mech];
+    var s = '<svg viewBox="0 0 ' + VB_W + " " + VB_H + '" role="img" aria-label="' +
+      MECH_NAME[mech] + ': expected pick by team, bars colored by drought years">';
+    for (var g = 2; g <= 14; g += 2) {
+      var gy = yPos(g);
+      s += '<line class="gridline" x1="' + M.l + '" y1="' + gy + '" x2="' + (VB_W - M.r) + '" y2="' + gy + '"></line>';
+      s += '<text class="ax" x="' + (M.l - 6) + '" y="' + (gy + 4) + '" text-anchor="end">' + g + "</text>";
+    }
+    s += '<line class="baseline" x1="' + M.l + '" y1="' + base + '" x2="' + (VB_W - M.r) + '" y2="' + base + '"></line>';
+    for (var i = 0; i < N; i++) {
+      var x = M.l + i * band + (band - barW) / 2;
+      s += '<path class="bar-' + rampIdx(droughts[i]) + '" d="' + barPath(x, yPos(res.ePick[i])) + '"></path>';
+      s += '<text class="ax" x="' + (M.l + i * band + band / 2) + '" y="' + (base + 15) + '" text-anchor="middle">' + (i + 1) + "</text>";
+    }
+    for (var h = 0; h < N; h++) {
+      s += '<rect class="hit" data-m="' + mech + '" data-i="' + h + '" tabindex="0" role="img" aria-label="' +
+        hitLabel(mech, h) + '" x="' + (M.l + h * band) + '" y="' + M.t + '" width="' + band + '" height="' + plotH + '"></rect>';
+    }
+    s += "</svg>";
+    document.getElementById("chart-" + mech).innerHTML = s;
+  }
 }
 
-function updateTable(res) {
+function updateScore() {
+  for (var mi = 0; mi < MECHS.length; mi++) {
+    var mech = MECHS[mi];
+    var res = baseRes[mech];
+    var gap = res.ePick[4] - res.ePick[0];
+    var slope = olsSlope(droughts, res.ePick);
+    document.getElementById("sb-tank-" + mech).textContent = fmtSigned(gap, 2) + " picks";
+    document.getElementById("sb-help-" + mech).textContent =
+      slope === null ? "n/a" : fmtSigned(slope, 3);
+  }
+}
+
+function updateTank() {
+  document.getElementById("tank-grid").hidden = !tankActive;
+  if (!tankActive || !tankRes) return;
+  for (var mi = 0; mi < MECHS.length; mi++) {
+    var mech = MECHS[mi];
+    var before = baseRes[mech].ePick[tankTeam];
+    var after = tankRes[mech].ePick[tankTeam];
+    var d1 = Math.round((before - after) * 10) / 10;
+    document.getElementById("tk-move-" + mech).textContent =
+      "Team " + (tankTeam + 1) + ": pick " + before.toFixed(1) + " to " + after.toFixed(1);
+    var deltaEl = document.getElementById("tk-delta-" + mech);
+    if (d1 > 0) {
+      deltaEl.textContent = "tanking bought " + d1.toFixed(1) + " picks";
+      deltaEl.classList.remove("tk-zero");
+    } else if (d1 < 0) {
+      deltaEl.textContent = "tanking cost " + Math.abs(d1).toFixed(1) + " picks";
+      deltaEl.classList.remove("tk-zero");
+    } else {
+      deltaEl.textContent = "tanking bought nothing";
+      deltaEl.classList.add("tk-zero");
+    }
+  }
+}
+
+function updateTable() {
   var rows = "";
   for (var i = 0; i < N; i++) {
     rows += '<tr><th scope="row">Team ' + (i + 1) + "</th>" +
-      '<td class="num">' + droughts[i] + "</td>" +
-      '<td class="num">' + fmtPick(res.ePick[i]) + "</td>" +
-      '<td class="num">' + fmtP1(res.p1[i]) + "</td></tr>";
+      '<td class="num">' + droughts[i] + "</td>";
+    for (var mi = 0; mi < MECHS.length; mi++) {
+      var res = baseRes[MECHS[mi]];
+      rows += '<td class="num">' + fmtPick(res.ePick[i]) + "</td>" +
+        '<td class="num">' + fmtP1(res.p1[i]) + "</td>";
+    }
+    rows += "</tr>";
   }
   document.getElementById("pg-tbody").innerHTML = rows;
 }
 
+function mulberry32(seed) {
+  // Small seedable generator, so the tanked rerun can replay the same random
+  // draws as the baseline run (paired noise; exact zero deltas).
+  var a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) | 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 function recompute() {
-  var res = simulate(droughts, mech, N_SIMS, Math.random);
-  latest = res;
-  updateTiles(res);
-  drawChart(res);
-  updateTable(res);
+  var seed = (Math.random() * 4294967296) >>> 0; // fresh each run
+  baseRes = {};
+  for (var mi = 0; mi < MECHS.length; mi++) {
+    baseRes[MECHS[mi]] = simulate(BASE_ORDER, droughts, MECHS[mi], N_SIMS, mulberry32(seed + mi));
+  }
+  if (tankActive) {
+    var tOrder = tankOrder(N, tankTeam);
+    tankRes = {};
+    for (var mj = 0; mj < MECHS.length; mj++) {
+      tankRes[MECHS[mj]] = simulate(tOrder, droughts, MECHS[mj], N_SIMS, mulberry32(seed + mj));
+    }
+  } else {
+    tankRes = null;
+  }
+  updateScore();
+  drawCharts();
+  updateTank();
+  updateTable();
 }
 
 function schedule() {
@@ -683,8 +911,8 @@ function schedule() {
   for (var i = 0; i < N; i++) {
     html += '<div class="sl-row">' +
       '<label for="sl-' + i + '">Team ' + (i + 1) + "</label>" +
-      '<input type="range" id="sl-' + i + '" data-i="' + i + '" min="0" max="12" step="1" value="' + DEFAULT_DROUGHTS[i] + '">' +
-      '<output id="ov-' + i + '">' + DEFAULT_DROUGHTS[i] + "</output>" +
+      '<input type="range" id="sl-' + i + '" data-i="' + i + '" min="0" max="12" step="1" value="' + droughts[i] + '">' +
+      '<output id="ov-' + i + '">' + droughts[i] + "</output>" +
       "</div>";
   }
   grid.innerHTML = html;
@@ -694,64 +922,90 @@ function schedule() {
     var i = parseInt(el.getAttribute("data-i"), 10);
     droughts[i] = parseInt(el.value, 10);
     document.getElementById("ov-" + i).textContent = el.value;
+    setScenario("custom");
     schedule();
   });
 })();
 
-document.getElementById("reset-btn").addEventListener("click", function () {
-  droughts = DEFAULT_DROUGHTS.slice();
+function setSliders() {
   for (var i = 0; i < N; i++) {
-    document.getElementById("sl-" + i).value = DEFAULT_DROUGHTS[i];
-    document.getElementById("ov-" + i).textContent = DEFAULT_DROUGHTS[i];
+    document.getElementById("sl-" + i).value = droughts[i];
+    document.getElementById("ov-" + i).textContent = droughts[i];
   }
+}
+
+function setScenario(key) {
+  document.getElementById("scenario-sel").value = key;
+  document.getElementById("scenario-cap").textContent = SCENARIOS[key].caption;
+}
+
+document.getElementById("scenario-sel").addEventListener("change", function () {
+  var sc = SCENARIOS[this.value];
+  if (!sc || !sc.droughts) return;
+  droughts = sc.droughts.slice();
+  setSliders();
+  setScenario(this.value);
   recompute();
 });
 
-document.getElementById("mech-seg").addEventListener("change", function (e) {
-  if (e.target.name === "mech") {
-    mech = e.target.value;
-    recompute();
-  }
+// Tanking experiment.
+document.getElementById("tank-btn").addEventListener("click", function () {
+  tankActive = !tankActive;
+  this.textContent = tankActive ? "Undo" : "Drop to the worst record";
+  this.setAttribute("aria-pressed", tankActive ? "true" : "false");
+  recompute();
 });
 
-// Tooltip (delegated so it survives chart rebuilds).
-var tip = document.getElementById("pg-tip");
-var scrollBox = document.getElementById("chart-scroll");
+document.getElementById("tank-team").addEventListener("change", function () {
+  tankTeam = parseInt(this.value, 10);
+  if (tankActive) recompute();
+});
 
-function showTip(i) {
-  if (!latest) return;
-  var svg = scrollBox.querySelector("svg");
-  if (!svg) return;
-  var sx = svg.clientWidth / VB_W;
-  var sy = svg.clientHeight / VB_H;
-  var cx = (M.l + i * band + band / 2) * sx;
-  cx = Math.max(70, Math.min(svg.clientWidth - 70, cx));
-  var cy = yPos(latest.ePick[i]) * sy;
-  tip.innerHTML = "<strong>Team " + (i + 1) + "</strong> &middot; drought " + droughts[i] +
-    (droughts[i] === 1 ? " year" : " years") + "<br>" +
-    "expected pick " + fmtPick(latest.ePick[i]) + " &middot; P(pick 1) " + fmtP1(latest.p1[i]);
-  tip.style.left = cx + "px";
-  tip.style.top = cy + "px";
-  tip.hidden = false;
+// Tooltips (delegated so they survive chart rebuilds; one tip per mini chart).
+var chartsCard = document.getElementById("charts-card");
+
+function tipFor(el) {
+  var mini = el.closest(".mini");
+  if (!mini) return null;
+  return { tip: mini.querySelector(".pg-tip"), svg: mini.querySelector("svg") };
 }
-function hideTip() { tip.hidden = true; }
 
-scrollBox.addEventListener("pointerover", function (e) {
-  var el = e.target;
-  if (el.classList && el.classList.contains("hit")) {
-    showTip(parseInt(el.getAttribute("data-i"), 10));
-  }
+function showTip(el) {
+  if (!baseRes) return;
+  var ctx = tipFor(el);
+  if (!ctx || !ctx.svg || !ctx.tip) return;
+  var mech = el.getAttribute("data-m");
+  var i = parseInt(el.getAttribute("data-i"), 10);
+  var res = baseRes[mech];
+  var sx = ctx.svg.clientWidth / VB_W;
+  var sy = ctx.svg.clientHeight / VB_H;
+  var cx = (M.l + i * band + band / 2) * sx;
+  cx = Math.max(78, Math.min(ctx.svg.clientWidth - 78, cx));
+  var cy = yPos(res.ePick[i]) * sy;
+  ctx.tip.innerHTML = "<strong>Team " + (i + 1) + "</strong> &middot; drought " + droughts[i] +
+    (droughts[i] === 1 ? " year" : " years") + "<br>" +
+    "expected pick " + fmtPick(res.ePick[i]) + " &middot; P(pick 1) " + fmtP1(res.p1[i]);
+  ctx.tip.style.left = cx + "px";
+  ctx.tip.style.top = cy + "px";
+  ctx.tip.hidden = false;
+}
+
+function hideTip(el) {
+  var ctx = tipFor(el);
+  if (ctx && ctx.tip) ctx.tip.hidden = true;
+}
+
+chartsCard.addEventListener("pointerover", function (e) {
+  if (e.target.classList && e.target.classList.contains("hit")) showTip(e.target);
 });
-scrollBox.addEventListener("pointerout", function (e) {
-  if (e.target.classList && e.target.classList.contains("hit")) hideTip();
+chartsCard.addEventListener("pointerout", function (e) {
+  if (e.target.classList && e.target.classList.contains("hit")) hideTip(e.target);
 });
-scrollBox.addEventListener("focusin", function (e) {
-  if (e.target.classList && e.target.classList.contains("hit")) {
-    showTip(parseInt(e.target.getAttribute("data-i"), 10));
-  }
+chartsCard.addEventListener("focusin", function (e) {
+  if (e.target.classList && e.target.classList.contains("hit")) showTip(e.target);
 });
-scrollBox.addEventListener("focusout", function (e) {
-  if (e.target.classList && e.target.classList.contains("hit")) hideTip();
+chartsCard.addEventListener("focusout", function (e) {
+  if (e.target.classList && e.target.classList.contains("hit")) hideTip(e.target);
 });
 
 // Tabs.
