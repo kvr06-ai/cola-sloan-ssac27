@@ -417,16 +417,20 @@ footer p { margin: 0.3rem 0; }
     lotteries under each design.
   </p>
   <p>
-    We mean this as a pressure test. Try to break Waitlist COLA: find a drought pattern where losing
-    pays again (its tanking gap goes clearly positive) or where help stops reaching the long droughts
-    (its help slope drifts toward zero). The NBA and Classic columns are the controls. Anything you find
+    We mean this as a pressure test. Try to break Waitlist COLA: find a scenario where a losing streak
+    buys picks (its buys number moves off zero) or where help stops reaching the long droughts (its
+    help slope drifts toward zero). The NBA and Classic columns are the controls. Anything you find
     sharpens the paper before a reviewer finds it first.
   </p>
   <p class="small">
-    The scoreboard mirrors questions 1 and 2 for each design. The tanking gap is the expected pick of
-    Team 5 minus Team 1 (positive means losing pays; want about zero). The help slope is the ordinary
-    least squares (OLS) slope of expected pick on drought years across the 14 teams (want clearly
-    negative).
+    The scoreboard mirrors questions 1 and 2 for each design. The first number is the tanking test run
+    live. The page drops Team 5 (the fifth-worst record) to the worst record and reports how many picks
+    that losing streak buys under each design, on paired draws, so a design that never reads the record
+    shows an exact zero. The help slope is the ordinary least squares (OLS) slope of expected pick on
+    drought years across the 14 teams (want clearly negative). One reading note for the charts: the
+    worst-record team can still draft early under Waitlist COLA when it also owns a long drought. That
+    is the help channel at work, not a reward for losing; the buys number is the test of what losing
+    itself earns.
   </p>
   <p class="footnote">
     The "NBA today" column uses the real lottery's published pick-1 ball counts, simulated for a single
@@ -453,17 +457,17 @@ footer p { margin: 0.3rem 0; }
   <div class="score-row" aria-live="polite">
     <div class="score-card">
       <div class="s-mech">NBA today</div>
-      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-nba">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">One losing streak buys (want 0 picks)</div><div class="s-val" id="sb-tank-nba">&nbsp;</div></div>
       <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-nba">&nbsp;</div></div>
     </div>
     <div class="score-card">
       <div class="s-mech">Classic COLA</div>
-      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-classic">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">One losing streak buys (want 0 picks)</div><div class="s-val" id="sb-tank-classic">&nbsp;</div></div>
       <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-classic">&nbsp;</div></div>
     </div>
     <div class="score-card">
       <div class="s-mech">Waitlist COLA</div>
-      <div class="s-stat"><div class="s-label">Tanking gap (want about 0)</div><div class="s-val" id="sb-tank-waitlist">&nbsp;</div></div>
+      <div class="s-stat"><div class="s-label">One losing streak buys (want 0 picks)</div><div class="s-val" id="sb-tank-waitlist">&nbsp;</div></div>
       <div class="s-stat"><div class="s-label">Help slope (want clearly negative)</div><div class="s-val" id="sb-help-waitlist">&nbsp;</div></div>
     </div>
   </div>
@@ -761,6 +765,7 @@ var tankActive = false;
 var tankTeam = 4; // 0-based, so Team 5
 var baseRes = null;
 var tankRes = null;
+var scoreTankRes = null;
 var timer = null;
 
 // Mini-chart geometry (viewBox units; one chart per design).
@@ -828,9 +833,9 @@ function updateScore() {
   for (var mi = 0; mi < MECHS.length; mi++) {
     var mech = MECHS[mi];
     var res = baseRes[mech];
-    var gap = res.ePick[4] - res.ePick[0];
+    var buy = res.ePick[4] - scoreTankRes[mech].ePick[4];
     var slope = olsSlope(droughts, res.ePick);
-    document.getElementById("sb-tank-" + mech).textContent = fmtSigned(gap, 2) + " picks";
+    document.getElementById("sb-tank-" + mech).textContent = fmtSigned(buy, 2) + " picks";
     document.getElementById("sb-help-" + mech).textContent =
       slope === null ? "n/a" : fmtSigned(slope, 3);
   }
@@ -901,6 +906,18 @@ function recompute() {
     }
   } else {
     tankRes = null;
+  }
+  // Scoreboard causal stat: what dropping the 5th-worst team (index 4) to the
+  // worst record buys under each design, on paired streams (same seeds as the
+  // baseline), so a design that never reads the record shows an exact zero.
+  if (tankActive && tankTeam === 4 && tankRes) {
+    scoreTankRes = tankRes;
+  } else {
+    var sOrder = tankOrder(N, 4);
+    scoreTankRes = {};
+    for (var ms = 0; ms < MECHS.length; ms++) {
+      scoreTankRes[MECHS[ms]] = simulate(sOrder, droughts, MECHS[ms], N_SIMS, mulberry32(seed + ms));
+    }
   }
   updateScore();
   drawCharts();
