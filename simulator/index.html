@@ -363,11 +363,20 @@ footer p { margin: 0.3rem 0; }
           <tr><th scope="row">Gamma = 2</th><td class="num">+0.28<span class="ci">[&minus;0.15, 0.71]</span></td><td class="num">&minus;0.948 &plusmn; 0.017</td></tr>
           <tr><th scope="row">Gamma = 3</th><td class="num">&minus;0.16<span class="ci">[&minus;0.62, 0.31]</span></td><td class="num">&minus;1.175 &plusmn; 0.015</td></tr>
           <tr><th scope="row">Waitlist COLA</th><td class="num">&minus;0.07<span class="ci">[&minus;0.46, 0.32]</span></td><td class="num">&minus;0.989 &plusmn; 0.019</td></tr>
+          <tr><th scope="row">NBA today</th><td class="num">+1.17<span class="ci">[0.96, 1.39]</span></td><td class="num">&minus;0.029 &plusmn; 0.016</td></tr>
+          <tr><th scope="row">3-2-1, top-four draw*</th><td class="num">+1.71<span class="ci">[1.52, 1.91]</span></td><td class="num">&minus;0.067 &plusmn; 0.021</td></tr>
+          <tr><th scope="row">3-2-1, full-16 draw*</th><td class="num">&minus;1.15<span class="ci">[&minus;1.60, &minus;0.71]</span></td><td class="num">&minus;0.032 &plusmn; 0.018</td></tr>
           <tr><th scope="row">Countdown</th><td class="num na">not run at E = 14</td><td class="num na">not run at E = 14</td></tr>
           <tr><th scope="row">Beckett</th><td class="num na">not run at E = 14</td><td class="num na">not run at E = 14</td></tr>
         </tbody>
       </table>
     </div>
+    <p class="footnote">
+      * The NBA row runs on the same 14-team pool as the COLA rows. The 3-2-1 rows draw over the
+      proposal's own 16-team pool (per conference, the bottom eight by record); the two rows bracket the
+      proposal's unspecified draw depth, an NBA-style top-four draw versus the full pool drawn by tiered
+      balls.
+    </p>
     <p class="small">
       Question 3 at E = 14 is not yet measured for Waitlist COLA. Its top-four raffle is mechanically
       identical to gamma = 1's, so the pick-1 ceiling is expected to carry; the deterministic tail is
@@ -383,8 +392,13 @@ footer p { margin: 0.3rem 0; }
     holds the tanking gap at zero (&minus;0.07, against Classic's +1.94) and helps long-drought teams as
     strongly as Classic does (&minus;0.99 vs &minus;0.93 picks per drought-year, statistically
     indistinguishable), while keeping the four-pick lottery fans already know. Gamma = 1 also stops
-    tanking but helps less sharply here (&minus;0.57). The open item is question 3 for Waitlist COLA,
-    which we are measuring next.
+    tanking but helps less sharply here (&minus;0.57). Measured in the same engine, today's NBA
+    lottery pays +1.17 picks for finishing worst and directs no help by drought, and the 3-2-1 proposal
+    either pays more (+1.71 with an NBA-style top-four draw, because its record-ordered tail dominates
+    the punished bottom tier) or flips to a penalty (&minus;1.15 with a full-pool draw). Only the
+    drought-based designs deliver drought-directed help, and only Waitlist COLA does so while holding
+    the tanking test at zero. The open item is question 3 for Waitlist COLA, which we are measuring
+    next.
   </p>
   <div class="table-scroll">
     <table>
@@ -434,8 +448,8 @@ footer p { margin: 0.3rem 0; }
   </p>
   <p class="footnote">
     The "NBA today" column uses the real lottery's published pick-1 ball counts, simulated for a single
-    season. The full-engine run for the NBA lottery is in progress and will join the results tables
-    above when it lands.
+    season. The full-engine run for the NBA lottery has landed in the E = 14 table above; the engine
+    measures today's lottery at about 1.2 picks of tanking reward.
   </p>
   <noscript><p class="note">The playground requires JavaScript. The results tables above are static.</p></noscript>
 
