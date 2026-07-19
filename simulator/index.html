@@ -599,7 +599,7 @@ footer p { margin: 0.3rem 0; }
     <ul class="small">
       <li>NBA today: the real post-2019 NBA lottery. Teams are ranked by current record (Team 1 = worst), and the pick-1 ball counts by record rank are 140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, 5 out of 1,000. Picks 1-4 are drawn sequentially without replacement, each pick proportional to the remaining teams' ball counts; picks 5-14 go to the remaining teams in record order, worst first. Drought plays no role.</li>
       <li>Classic COLA: picks 1-4 are drawn sequentially without replacement with probability proportional to each team's drought years; picks 5-14 go to the remaining teams in record order, worst first.</li>
-      <li>Waitlist COLA: picks 1-4 exactly as Classic; picks 5-14 go to the remaining teams in drought order, longest drought first, ties broken by worse record first.</li>
+      <li>Waitlist COLA: picks 1-4 exactly as Classic; picks 5-14 go to the remaining teams in drought order, longest drought first, ties broken at random. Record has no channel into the board, ties included.</li>
       <li>If every remaining drought weight is zero, the draw is uniform among the remaining teams.</li>
       <li>Each change reruns 20,000 simulated lotteries per design, doubled while the tanking experiment is on so both record orderings are simulated.</li>
     </ul>
@@ -678,8 +678,17 @@ function drawLottery(order, droughts, mech, rng) {
 
   var rest = remaining;
   if (mech === "waitlist") {
+    // Ties in drought are broken AT RANDOM (a fresh jitter per draw), so this
+    // season's record has no channel into the board, ties included. Matches
+    // the engine runs, where the realized tie order is record-uncorrelated.
+    // Jitter is assigned in team-id order (like drawIndex scans candidates),
+    // so paired runs sharing a random stream give the same team the same
+    // jitter regardless of record order, and the tanking delta stays exact.
+    var jitter = {};
+    var jitIds = remaining.slice().sort(function (a, b) { return a - b; });
+    for (var j2 = 0; j2 < jitIds.length; j2++) jitter[jitIds[j2]] = rng();
     rest = remaining.slice().sort(function (a, b) {
-      return (droughts[b] - droughts[a]) || (rank[a] - rank[b]);
+      return (droughts[b] - droughts[a]) || (jitter[a] - jitter[b]);
     });
   }
   for (var t = 0; t < rest.length; t++) picks[rest[t]] = pickNum++;
