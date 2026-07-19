@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COLA weighting testbed: two tests in the full engine</title>
-<meta name="description" content="A lottery-weighting testbed for Carry-Over Lottery Allocation (COLA) run in the full ZenGM Basketball GM engine: a tanking test and a help test at two eligibility pools, plus an interactive lottery playground.">
+<title>COLA draft-lottery testbed: three questions in a full basketball simulation</title>
+<meta name="description" content="Can an NBA draft lottery stop rewarding losing? A testbed for Carry-Over Lottery Allocation (COLA) in the full ZenGM Basketball GM engine: does losing pay, does help reach the longest droughts, can the pool be gamed. With an interactive lottery playground.">
 <style>
 :root {
   color-scheme: light;
@@ -192,40 +192,54 @@ footer p { margin: 0.3rem 0; }
 <div class="wrap">
 
 <header>
-  <h1>COLA weighting testbed: two tests in the full engine</h1>
+  <h1>COLA draft-lottery testbed: three questions in a full basketball simulation</h1>
   <p class="meta">2026-07-19 &middot; Highley &amp; Rajan, SSAC27 working results</p>
   <p>
-    Carry-Over Lottery Allocation (COLA) is a National Basketball Association (NBA) draft reform in which
-    draft priority comes from a multi-year "drought" index (roughly one unit per season out of contention)
-    instead of the single-season record. This page reports a lottery-weighting testbed run in the full
-    <a href="https://zengm.com/basketball/">ZenGM Basketball GM</a> engine, scored as two tests at two
-    eligibility pools, with an interactive lottery playground at the end.
+    Every year some National Basketball Association (NBA) teams lose on purpose, because a worse record buys
+    better lottery odds at the next draft. Banchio and Munro proved the dilemma is structural: any lottery
+    that reads this season's records and favors worse teams must reward losing. Carry-Over Lottery
+    Allocation (COLA) changes what the lottery reads. Draft priority comes from a team's <em>drought</em>,
+    the number of seasons it has spent out of contention, so one extra loss this season no longer moves
+    the needle.
   </p>
-  <p class="note">
-    This page supersedes the earlier Pareto frontier viewer. The earlier grid's equity objective saturated,
-    and its headline did not survive the move to the full engine; details are in the paper.
+  <p>
+    This page reports how COLA designs behave inside <a href="https://zengm.com/basketball/">ZenGM
+    Basketball GM</a>, a complete basketball simulation (every game played out, generated rosters and
+    contracts, AI general managers), and it ends with a playground where you can run the lotteries
+    yourself.
   </p>
 </header>
 
 <section>
-  <h2>How to read this</h2>
-  <p>Both tests are in pick units on the same draft board.</p>
+  <h2>The three questions</h2>
+  <p>
+    Any draft reform has to answer three questions at once. The first two are exactly the pair the
+    impossibility result says single-season records cannot deliver together.
+  </p>
   <ul>
     <li>
-      <strong>Test (a), tanking.</strong> The expected-pick gap between the worst-record team and the
-      fifth-worst-record team, with teams ranked by the current season's record. Positive means losing pays.
-      The target is about zero.
+      <strong>1. Does losing pay?</strong> Line the lottery teams up by this season's record and compare
+      the worst team's average pick with the fifth-worst team's. If the worst team drafts about two picks
+      earlier, one more loss buys a better pick and tanking pays. A tanking-proof design holds this gap
+      at about zero.
     </li>
     <li>
-      <strong>Test (b), help.</strong> Does a longer-drought team draft earlier? At the 22-team pool (E = 22)
-      this is the same #1-vs-#5 gap with teams ranked by each mechanism's own index, and the target is a wide
-      positive gap. At the 14-team pool (E = 14) it is the per-drought-year pick slope among pool teams, and
-      the target is a clearly negative slope.
+      <strong>2. Does help reach the teams that have waited longest?</strong> The draft exists to rebuild
+      the weakest franchises, and under COLA "weakest" means the longest drought. So we ask whether an
+      extra year of drought buys an earlier pick. At the 22-team pool this is the expected-pick gap between
+      the highest-drought and fifth-highest-drought teams (want a wide positive gap); at the 14-team pool
+      it is the picks-per-drought-year slope (want clearly negative).
+    </li>
+    <li>
+      <strong>3. Can the pool be gamed?</strong> A subtler trick: lose on purpose to push a rival into the
+      playoffs, shrink the lottery pool, and raise your own odds. We simulate the worst case and compare it
+      against a proven ceiling of about 4%.
     </li>
   </ul>
   <p>
-    For scale, a first-overall pick is worth about 2-3 wins over a thirtieth pick at its peak, so help is a
-    pick-level dial with a modest outcome channel.
+    For scale, a first-overall pick is worth about 2-3 more wins than a thirtieth pick at its peak. Real
+    but modest, which is why the tests score draft picks, where the mechanism acts, rather than
+    championships.
   </p>
 </section>
 
@@ -233,36 +247,39 @@ footer p { margin: 0.3rem 0; }
   <h2>Mechanisms</h2>
   <dl>
     <dt>Classic</dt>
-    <dd>Top-four lottery drawn proportional to the index; picks 5-14 ordered by current record (worse record earlier).</dd>
+    <dd>COLA as originally proposed. The top four picks are raffled with odds proportional to drought; picks 5-14 then follow this season's record, worst team first, exactly like today's NBA.</dd>
     <dt>Gamma family</dt>
-    <dd>Every pick drawn sequentially with probability proportional to index<sup>gamma</sup>. Gamma = 0 is a flat lottery, gamma = 1 is proportional, and higher values are steeper.</dd>
+    <dd>Every pick raffled by drought raised to a power gamma. Gamma = 0 makes every team equal, gamma = 1 makes odds proportional to drought, and higher values concentrate odds on the longest droughts.</dd>
     <dt>Middle option</dt>
-    <dd>Top-four lottery drawn proportional to the index (same as Classic); picks 5-14 ordered by the index instead of record.</dd>
+    <dd>Classic with one change: picks 5-14 follow drought order instead of record order. The four-pick raffle fans already know stays.</dd>
   </dl>
 </section>
 
 <section>
-  <h2>Results at two eligibility pools</h2>
+  <h2>Results at two pool sizes</h2>
   <p class="small">
-    All runs are n = 48 independent leagues &times; 15 seasons per mechanism. Brackets are 95% confidence
-    intervals (CIs). Cells we have not measured say "not measured".
+    E is the number of teams eligible for the lottery. E = 14 is the 14 teams that missed the playoffs,
+    the NBA's actual lottery pool and COLA's canonical choice. E = 22 adds the eight first-round losers,
+    the pool our first sweep standardized on. All runs are n = 48 independent leagues &times; 15 seasons
+    per mechanism; brackets are 95% confidence intervals (CIs). Cells we have not measured say "not
+    measured".
   </p>
 
   <div class="tabs" role="tablist" aria-label="Eligibility pool">
-    <button class="tab" id="tab-e22" role="tab" aria-selected="true" aria-controls="panel-e22">E = 22 pool</button>
-    <button class="tab" id="tab-e14" role="tab" aria-selected="false" aria-controls="panel-e14">E = 14 pool</button>
+    <button class="tab" id="tab-e14" role="tab" aria-selected="true" aria-controls="panel-e14">E = 14 pool</button>
+    <button class="tab" id="tab-e22" role="tab" aria-selected="false" aria-controls="panel-e22">E = 22 pool</button>
   </div>
 
-  <div id="panel-e22" role="tabpanel" aria-labelledby="tab-e22">
-    <p class="small">The 22 teams that did not win a playoff round; the original sweep.</p>
+  <div id="panel-e22" role="tabpanel" aria-labelledby="tab-e22" hidden>
+    <p class="small">The original sweep, with the named Countdown and Beckett variants as reference points.</p>
     <div class="table-scroll">
       <table>
-        <caption>Two tests at E = 22</caption>
+        <caption>Questions 1 and 2 at E = 22</caption>
         <thead>
           <tr>
             <th scope="col">Mechanism</th>
-            <th scope="col" class="num">Tanking gradient <span class="th-sub">want about 0</span></th>
-            <th scope="col" class="num">Help gap, rank by own index <span class="th-sub">want wide positive</span></th>
+            <th scope="col" class="num">Q1: tanking gap <span class="th-sub">want about 0</span></th>
+            <th scope="col" class="num">Q2: help gap, rank by drought <span class="th-sub">want wide positive</span></th>
           </tr>
         </thead>
         <tbody>
@@ -280,7 +297,7 @@ footer p { margin: 0.3rem 0; }
 
     <div class="table-scroll">
       <table>
-        <caption>Manipulation at E = 22: worst realized pool-swap gain in pick-1 probability, against the roughly 4% analytic bound</caption>
+        <caption>Question 3 at E = 22: worst simulated pool-swap gain in pick-1 probability, against the proven ceiling of about 4%</caption>
         <thead>
           <tr>
             <th scope="col">Mechanism</th>
@@ -298,16 +315,16 @@ footer p { margin: 0.3rem 0; }
     </div>
   </div>
 
-  <div id="panel-e14" role="tabpanel" aria-labelledby="tab-e14" hidden>
-    <p class="small">The 14 non-playoff teams, COLA's canonical eligibility; the confirmatory rerun plus the middle option.</p>
+  <div id="panel-e14" role="tabpanel" aria-labelledby="tab-e14">
+    <p class="small">The NBA's actual lottery pool; includes the middle option.</p>
     <div class="table-scroll">
       <table>
-        <caption>Two tests at E = 14</caption>
+        <caption>Questions 1 and 2 at E = 14</caption>
         <thead>
           <tr>
             <th scope="col">Mechanism</th>
-            <th scope="col" class="num">Tanking gradient <span class="th-sub">want about 0</span></th>
-            <th scope="col" class="num">Help slope, picks per drought-year <span class="th-sub">want clearly negative</span></th>
+            <th scope="col" class="num">Q1: tanking gap <span class="th-sub">want about 0</span></th>
+            <th scope="col" class="num">Q2: help slope, picks per drought-year <span class="th-sub">want clearly negative</span></th>
           </tr>
         </thead>
         <tbody>
@@ -323,9 +340,9 @@ footer p { margin: 0.3rem 0; }
       </table>
     </div>
     <p class="small">
-      Manipulation at E = 14 is not yet measured for the middle option. Its top-four draw is mechanically
-      identical to gamma = 1's, so the pick-1 bound is expected to carry; the deterministic tail is pending
-      its own measurement.
+      Question 3 at E = 14 is not yet measured for the middle option. Its top-four raffle is mechanically
+      identical to gamma = 1's, so the pick-1 ceiling is expected to carry; the deterministic tail is
+      pending its own measurement.
     </p>
   </div>
 </section>
@@ -333,10 +350,12 @@ footer p { margin: 0.3rem 0; }
 <section>
   <h2>Verdict</h2>
   <p>
-    At E = 14, the middle option clears the tanking test (its CI includes zero, against Classic's +1.94) and
-    directs help statistically indistinguishably from Classic (&minus;0.99 vs &minus;0.93 picks per
-    drought-year, Welch t about 1.5), while keeping the NBA-familiar four-pick lottery. The gamma = 1
-    mechanism also clears the tanking test but directs help less sharply at E = 14 (&minus;0.57).
+    At the NBA's actual pool size, one design answers the first two questions at once. The middle option
+    holds the tanking gap at zero (&minus;0.07, against Classic's +1.94) and helps long-drought teams as
+    strongly as Classic does (&minus;0.99 vs &minus;0.93 picks per drought-year, statistically
+    indistinguishable), while keeping the four-pick lottery fans already know. Gamma = 1 also stops
+    tanking but helps less sharply here (&minus;0.57). The open item is question 3 for the middle option,
+    which we are measuring next.
   </p>
   <div class="table-scroll">
     <table>
@@ -363,13 +382,17 @@ footer p { margin: 0.3rem 0; }
 <section>
   <h2>Lottery playground</h2>
   <p>
-    A client-side Monte Carlo simulator over the 14-team pool. Team 1 has the worst current record and
-    Team 14 the best record in the pool. Set each team's drought with the sliders, pick a mechanism, and the
-    page reruns 20,000 lotteries. The default drought vector is deliberately imperfectly correlated with
-    record so the mechanisms visibly differ.
+    Run the lotteries yourself. Team 1 has the worst current record and Team 14 the best in the pool. Set
+    each team's drought with the sliders, pick a design, and the page reruns 20,000 lotteries. The default
+    drought pattern deliberately disagrees with the record order, so the designs visibly differ.
+  </p>
+  <p>
+    We mean this as a pressure test. Try to break the middle option: find a drought pattern where losing
+    pays again (the tanking gap goes clearly positive) or where help stops reaching the long droughts (the
+    slope drifts toward zero). Anything you find sharpens the paper before a reviewer finds it first.
   </p>
   <p class="small">
-    The two summary stats mirror the tests above. The tanking gradient is the expected pick of Team 5 minus
+    The two live stats mirror questions 1 and 2. The tanking gap is the expected pick of Team 5 minus
     Team 1 (positive means losing pays; want about zero). The help slope is the ordinary least squares (OLS)
     slope of expected pick on drought-years across the 14 teams (want clearly negative).
   </p>
@@ -386,7 +409,7 @@ footer p { margin: 0.3rem 0; }
 
   <div class="tiles" aria-live="polite">
     <div class="tile">
-      <div class="t-label">Tanking gradient</div>
+      <div class="t-label">Tanking gap</div>
       <div class="t-value" id="tile-tank">&nbsp;</div>
       <div class="t-sub">Expected pick of Team 5 minus Team 1. Positive means losing pays. Want about 0.</div>
     </div>
