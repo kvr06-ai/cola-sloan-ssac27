@@ -265,6 +265,18 @@ footer p { margin: 0.3rem 0; }
     measured".
   </p>
 
+  <p class="note">
+    <strong>How to read a cell.</strong> Take Classic's +1.94 [1.71, 2.17] in the tanking column. Rank
+    the lottery teams by this season's record; across the 48 simulated leagues, the worst-record team
+    drafts on average 1.94 picks earlier than the fifth-worst team. Finishing dead last buys about two
+    extra picks, and that is the tanking reward. The bracket is where the true gap sits with 95%
+    confidence, so when it contains zero the design pays nothing for losing. The help column at E = 14
+    is a rate instead of a gap. Classic's &minus;0.930 &plusmn; 0.036 means one extra year of drought
+    moves a team about one pick earlier, give or take the wobble across leagues. At E = 22 the help
+    number is a gap again, computed like the tanking gap but with teams ranked by drought instead of
+    record.
+  </p>
+
   <div class="tabs" role="tablist" aria-label="Eligibility pool">
     <button class="tab" id="tab-e14" role="tab" aria-selected="true" aria-controls="panel-e14">E = 14 pool</button>
     <button class="tab" id="tab-e22" role="tab" aria-selected="false" aria-controls="panel-e22">E = 22 pool</button>
