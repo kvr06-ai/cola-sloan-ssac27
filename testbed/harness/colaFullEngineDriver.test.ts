@@ -77,6 +77,18 @@ type Config = {
 	// drawn by balls. The public 3-2-1 description does not pin this down,
 	// so the sweep runs both. Ignored for other variants ("nba" is always 4).
 	drawDepth?: number;
+	// Behavioral tanking agent (Sim 3). When set, one team shuts down its best
+	// players at the trade deadline of the named season and plays out the rest of
+	// the year without them, which is what a team that has decided to lose on
+	// purpose actually does. Paired against an identical run with `tank` unset:
+	// same config id and seed means the two leagues are the same league, play the
+	// same games, and diverge only from the shutdown onward.
+	//   season   0-based index into the run's seasons; the shutdown happens once.
+	//   rank     which team tanks, counted from the bottom of the standings at the
+	//            deadline (1 = worst record, 5 = fifth-worst, the contrast leg (a)
+	//            scores).
+	//   players  how many of its highest-rated players it sits.
+	tank?: { season: number; rank: number; players?: number };
 };
 
 type TeamRec = {
@@ -98,6 +110,10 @@ type SeasonRec = {
 	elapsedSecs: number;
 	cachePlayers: number;
 	teams: TeamRec[];
+	// Set on the one season the tanking agent acted, to the team it acted on.
+	// The control arm records the same team without having touched it, which is
+	// what makes the two arms comparable team by team.
+	tankedTid?: number | null;
 };
 
 const NO_COND = {};
@@ -205,6 +221,46 @@ async function applyCapClamp(C: Config["C"]) {
 // (this is deleteOldData's boxScores + events). Box scores are not retained in
 // the cache, so they are cleared from the league directly; events are cached,
 // so clearing them through the cache API propagates on the next flush.
+// Sim 3's behavioral tanking agent. Called at the trade deadline of the tank
+// season: find the team sitting `rank` places off the bottom of the standings
+// and sit its `numPlayers` highest-rated players for the remainder of the year.
+// The engine does the rest -- the AI still coaches the team, it just no longer
+// has its best players available, so the losses are simulated rather than
+// imposed. Returns the team that tanked (also returned when numPlayers is 0,
+// which is how the control arm identifies the same team without touching it).
+async function applyTankShutdown(
+	rank: number,
+	numPlayers: number,
+): Promise<number | null> {
+	const seasonNow = g.get("season");
+	const tss = (await idb.cache.teamSeasons.getAll()).filter(
+		(ts: any) => ts.season === seasonNow,
+	);
+	if (!tss.length) return null;
+	const gp = (ts: any) =>
+		(ts.won ?? 0) + (ts.lost ?? 0) + (ts.tied ?? 0) + (ts.otl ?? 0);
+	const winp = (ts: any) => (gp(ts) > 0 ? (ts.won ?? 0) / gp(ts) : 0);
+	const ranked = tss.slice().sort((a: any, b: any) => winp(a) - winp(b));
+	const target: any = ranked[rank - 1];
+	if (!target) return null;
+	if (numPlayers > 0) {
+		// Out for the rest of the season and healed by the time the next one
+		// starts, so the intervention is confined to the season being measured.
+		const rest = Math.max(1, g.get("numGames") - gp(target) + 1);
+		const roster = (await idb.cache.players.getAll()).filter(
+			(p: any) => p.tid === target.tid,
+		);
+		roster.sort(
+			(a: any, b: any) => (last(b.ratings)?.ovr ?? 0) - (last(a.ratings)?.ovr ?? 0),
+		);
+		for (const p of roster.slice(0, numPlayers) as any[]) {
+			p.injury = { type: "Shut down for the season", gamesRemaining: rest };
+			await idb.cache.players.put(p);
+		}
+	}
+	return target.tid;
+}
+
 // (Retired players are NOT cache-resident -- tid -3 lives only in idb.league --
 // so they are left alone; they are tiny and not the working set the per-game
 // sim iterates. The residual ~1s/season drift is idb.league query cost from
@@ -499,6 +555,8 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 	let pendingTeams: TeamRec[] | null = null;
 	let pendingSeason = START;
 	let priorChampionTid: number | null = null;
+	let tankApplied = false;
+	let tankedTid: number | null = null;
 	let seasonStart = Date.now();
 	let guard = 0;
 	const guardMax = config.seasons * 25 + 50;
@@ -516,7 +574,22 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 			ph === PHASE.REGULAR_SEASON ||
 			ph === PHASE.AFTER_TRADE_DEADLINE
 		) {
-			await game.play(await season.getDaysLeftSchedule(), NO_COND);
+			const daysLeft = await season.getDaysLeftSchedule();
+			if (config.tank && !tankApplied && records.length === config.tank.season) {
+				// Play to the season's midpoint, then hand control to the tanking
+				// agent. The control arm runs this same split with zero players sat,
+				// so both arms draw on the random stream identically and the two
+				// leagues stay the same league up to the moment of the shutdown.
+				const half = Math.floor(daysLeft / 2);
+				if (half > 0) await game.play(half, NO_COND);
+				tankedTid = await applyTankShutdown(
+					config.tank.rank,
+					config.tank.players ?? 5,
+				);
+				tankApplied = true;
+			} else {
+				await game.play(daysLeft, NO_COND);
+			}
 		} else if (ph === PHASE.PLAYOFFS) {
 			await game.play(100, NO_COND);
 		} else if (ph === PHASE.DRAFT_LOTTERY) {
@@ -767,6 +840,7 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				elapsedSecs: Number(((Date.now() - seasonStart) / 1000).toFixed(2)),
 				cachePlayers,
 				teams: pendingTeams ?? [],
+				tankedTid: config.tank && records.length === config.tank.season ? tankedTid : null,
 			});
 			seasonStart = Date.now();
 		} else {
@@ -806,7 +880,11 @@ function mulberry32(seed: number) {
 
 // Project rich driver records to the seasonLog shape objectives.js consumes.
 function toSeasonLog(records: SeasonRec[]) {
-	return records.map((r) => ({ season: r.season, teams: r.teams }));
+	return records.map((r) => ({
+		season: r.season,
+		teams: r.teams,
+		...(r.tankedTid != null ? { tankedTid: r.tankedTid } : {}),
+	}));
 }
 
 async function runReplicate(config: Config, seed: number) {
