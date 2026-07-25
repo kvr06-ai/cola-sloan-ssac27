@@ -478,7 +478,7 @@ ticket.
 
 **B-3. NBA historical record (1999-2025) is NOT factored into this sweep.**
 The sweep is forward-simulated. The COLA Explorer
-(`life/research/Collaborations/wip-papers/cola-manipulation-bound/docs/`)
+(`life/research/Collaborations/highley-cola/cola-manipulation-bound/docs/`)
 handles the historical backtest; the testbed handles forward Pareto
 exploration. The two evidence streams are complementary, not redundant.
 
