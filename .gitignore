@@ -23,6 +23,11 @@ testbed/*.pdf
 # The harness SCRIPTS under testbed/harness/ are tracked; the fork and runs are not.
 testbed/harness/zengm-fork/
 testbed/harness/runs/
+# Exception: the NBA-rules arm is committed as the shared substrate for
+# metric_screen.js, so a fresh clone can screen candidate priority metrics
+# without first re-running a sweep.
+!testbed/harness/runs/ref/
+!testbed/harness/runs/ref/nba.json
 testbed/harness/**/node_modules/
 # Legacy pre-migration paths (kept so anything created earlier stays ignored).
 testbed/zengm-fork/
