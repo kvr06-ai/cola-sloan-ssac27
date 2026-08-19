@@ -60,21 +60,21 @@
 %    reference run satisfy this); code encouraged.
 
 \title{Waitlist \cola{}:\\A Record-Blind NBA Draft Order With No Tanking Reward}
-% \hq{Title is yours to set. This one names the mechanism and states the property
-% we measure. Alternatives we considered: ``Carry-Over Lottery Allocation:
-% Rewarding Long Droughts Without Rewarding Losing'', and ``A Draft Order That
-% Cannot Be Tanked For''.}
+% \hq{This is a working title and I am happy to iterate on it with you. It names
+% the mechanism and states the property I measure. Alternatives I considered:
+% ``Carry-Over Lottery Allocation: Rewarding Long Droughts Without Rewarding
+% Losing'', and ``A Draft Order That Cannot Be Tanked For''.}
 
 \author{
   Timothy Highley\thanks{La Salle University. \texttt{highley@lasalle.edu}}
-  \and
+  \quad
   Kaushik Rajan\thanks{Independent researcher. \texttt{kaushi@alumni.ncsu.edu}}
-  \and
-  Tannah Duncan\thanks{La Salle University.}
-  \\[1ex]
-  Ilia Volkov\thanks{La Salle University.}
-  \and
-  Kibur Assefa\thanks{La Salle University.}
+  \quad
+  Tannah Duncan\thanks{La Salle University. \texttt{duncant4@lasalle.edu}}
+  \\[1.2ex]
+  Ilia Volkov\thanks{La Salle University. \texttt{volkovi1@lasalle.edu}}
+  \quad
+  Kibur Assefa\thanks{La Salle University. \texttt{assefak1@lasalle.edu}}
 }
 
 \date{\today}
@@ -84,7 +84,7 @@
 \maketitle
 
 \begin{center}
-\hq{The author list is our proposal. We read the five-author note as including Kibur, and kept Duncan and Volkov in the order of the original paper. Does this order work for you?}
+\hq{The author list is my proposal. I read your five-author note as including Kibur, and I kept Duncan and Volkov in the order of the original paper. Does this order work for you?}
 \end{center}
 
 \begin{abstract}
@@ -230,7 +230,7 @@ $T$ & most wins & no ties arise & no ties arise & \textbf{uniform at random} & n
 \label{tab:variant-map}
 \end{table}
 
-The variants trade explainability, anti-tanking strength, and exposure to playoff-series manipulation against one another. Simple and Simple Lottery \cola{} appear in \citet{highley2026solvable3}; Countdown \cola{} in the same series; Beckett \cola{} in \citet{highley2026beckett}; and Capped \cola{} in \citet{highley2026solvable5}, introduced after the league was reported reluctant to adopt a lottery whose pool size could vary, and whose cap of $\Max = 150$ is what bounds the incentive to lose a playoff series (Lemma~\ref{lem:capped-bound}). The 3-2-1 reform sits at a corner of the space where four dials are inert. Nothing accumulates, nothing diminishes, no cap binds, and priority is recomputed from scratch each season, leaving only eligibility and the draw itself to carry the design (\S\ref{sec:cola-tank321}). \hq{Beckett \cola{}'s published description mentions no cap, so its cap cell reads none, and it resolves ties only for playoff teams outside the pool, so the tiebreak among pool teams level on entries is marked unspecified. Is the column right as written, and how should ties on entries be broken in the deterministic tail?}
+The variants trade explainability, anti-tanking strength, and exposure to playoff-series manipulation against one another. Simple and Simple Lottery \cola{} appear in \citet{highley2026solvable3}; Countdown \cola{} in the same series; Beckett \cola{} in \citet{highley2026beckett}; and Capped \cola{} in \citet{highley2026solvable5}, introduced after the league was reported reluctant to adopt a lottery whose pool size could vary, and whose cap of $\Max = 150$ is what bounds the incentive to lose a playoff series (Lemma~\ref{lem:capped-bound}). The 3-2-1 reform sits at a corner of the space where four dials are inert. Nothing accumulates, nothing diminishes, no cap binds, and priority is recomputed from scratch each season, leaving only eligibility and the draw itself to carry the design (\S\ref{sec:cola-tank321}). \hq{I filled in Beckett \cola{}'s column from its published description, which mentions no cap, so the cap cell reads none, and which resolves ties only for playoff teams outside the pool, so I marked the tiebreak among pool teams level on entries unspecified. Is the column right as written, and how should ties on entries break in the deterministic tail?}
 
 Waitlist \cola{} is new here, and the formalism is what makes it easy to state. It holds every Classic setting and moves the second half of the $W$ dial from reverse record to the index. That single move is what \S\ref{sec:empirical} shows carries the entire anti-tanking result, and it costs none of the structure that makes Classic legible, since the televised part of the event, the four-pick raffle, is untouched. The tiebreak dial then has to be filled in. Under Classic the tail is ordered by record and exact ties are rare and inconsequential; under Waitlist the tail is ordered by an integer index that increments in fixed steps, so several teams routinely arrive at the same value, and roughly a third of tail assignments in our runs involve at least one tie. Breaking those ties by record would smuggle the record back into the mechanism through the one door the design just closed, which is why $T$ is a uniform random draw among equals. That choice is what makes the mechanism record-blind in the strict sense, ties included.
 
@@ -570,7 +570,7 @@ Classic \cola{}           & $0.34$ & $1.08$ & $86\%$ & $1.90\%$ \\
 
 \paragraph{What the run does and does not establish.} The discriminating results are firm. Waitlist \cola{}'s tanking column holds a 95\% interval of $[-0.57, 0.33]$ that contains zero while Classic \cola{}'s is $[1.65, 2.11]$ and the NBA's is $[0.85, 1.34]$; the Classic-minus-Waitlist contrast is Welch $t = 7.95$ with Cohen's $d = 1.62$, and NBA-minus-Waitlist is $t = 4.76$, $d = 0.97$. The causal zero is exact. Four limitations remain. Equity at the outcome does not separate. Across all nine mechanisms the drought tail sits between $11.6$ and $11.8$ years and the three-season recovery rate between $0.178$ and $0.196$, with Waitlist \cola{} at $0.196 \pm 0.005$ against the NBA lottery's $0.194 \pm 0.005$. That null follows from the modest draft channel, and it caps what can be claimed for equity at the outcome. Low power is not the explanation, since the intervals are tight. The manipulation figures are opportunity envelopes from the engine's index distribution, so they bound the temptation available, leaving take-up unmeasured. The 15-season horizon partly censors the drought tail. And the exact pick model behind the counterfactual and the manipulation leg is a model of the draw, though it was validated against the engine first, reproducing all $21{,}600$ deterministic tail assignments and matching realized pick-one frequencies within sampling error in every bin, and the causal figures were re-derived by an independently written Monte Carlo implementation of all three mechanisms that agrees to sampling error ($1.31$ against $1.32$, $1.86$ against $1.87$, zero against zero).
 
-\paragraph{The configuration that clears all three legs.} Waitlist \cola{} holds the tanking column at zero, concentrates help on the long-suffering as hard as any configuration that also holds that column at zero, and concedes no more to pool manipulation than the lottery the league runs today. It asks one change of Classic \cola{}: order picks 5 through 14 by the carry-over index, and break ties on that index at random. Everything a broadcast audience recognizes survives, since the four-pick raffle on stage is untouched and its odds come from the same index Classic already uses. What does not survive is the part of the draft that pays a team for losing, which turns out to have been living entirely in those ten unlotteried slots. Two steeper weightings clear both columns as well, squaring the index reaching $+1.77$ and cubing it $+2.43$ on column (b), and we report them as viable. Both buy that concentration by distorting the raffle. Waitlist \cola{} reaches the same place with odds left exactly proportional to how long each team has waited, by putting the sharpness in the deterministic tail. \hq{Should Classic \cola{} stay in the results tables? It pays for losing more than the lottery it would replace, and it is also the controlled half of the Classic-to-Waitlist pair that isolates the tail dial, so dropping it would leave the NBA lottery as the sole status-quo baseline and move the one-dial comparison into prose. And should Waitlist \cola{} be presented as a distinct named variant, as it is here, or as a recommended setting of Classic \cola{}?}
+\paragraph{The configuration that clears all three legs.} Waitlist \cola{} holds the tanking column at zero, concentrates help on the long-suffering as hard as any configuration that also holds that column at zero, and concedes no more to pool manipulation than the lottery the league runs today. It asks one change of Classic \cola{}: order picks 5 through 14 by the carry-over index, and break ties on that index at random. Everything a broadcast audience recognizes survives, since the four-pick raffle on stage is untouched and its odds come from the same index Classic already uses. What does not survive is the part of the draft that pays a team for losing, which turns out to have been living entirely in those ten unlotteried slots. Two steeper weightings clear both columns as well, squaring the index reaching $+1.77$ and cubing it $+2.43$ on column (b), and we report them as viable. Both buy that concentration by distorting the raffle. Waitlist \cola{} reaches the same place with odds left exactly proportional to how long each team has waited, by putting the sharpness in the deterministic tail. \hq{Should Classic \cola{} stay in the results tables? It pays for losing more than the lottery it would replace, but it is also the controlled half of the Classic-to-Waitlist pair that isolates the tail dial, so if I drop it the NBA lottery becomes the sole status-quo baseline and the one-dial comparison moves into prose. And should Waitlist \cola{} be presented as a distinct named variant, as it is here, or as a recommended setting of Classic \cola{}?}
 
 \subsection{Historical Backtest}
 \label{sec:backtest}
