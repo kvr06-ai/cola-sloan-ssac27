@@ -1,0 +1,110 @@
+%%%% ssac27-abstract.tex
+%%%% Standalone abstract for the SSAC27 Research Paper Competition.
+%%%%
+%%%% SUBMISSION SPEC (verified at sloansportsconference.com, 2026-08-19):
+%%%%   - Due Oct 1, 2026 11:59pm EST via Google Form.
+%%%%   - Under 500 words INCLUDING title and body. Tables sit outside that count.
+%%%%   - At most two tables and figures combined. We use exactly two tables.
+%%%%   - Required sections: Introduction, Methods, Results, Conclusion.
+%%%%   - Judged on novelty, academic rigor, reproducibility, and application.
+%%%%   - Accepted manuscripts carry NO abstract section, so this document is a
+%%%%     standalone selection artifact and must read without the paper.
+%%%%   - Finalist title blocks show track and Paper ID with no author names; an
+%%%%     ID is assigned after acceptance, so only the track appears here.
+%%%%
+%%%% Word count: python3 wordcount_abstract.py
+
+\documentclass[10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=0.72in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage[table]{xcolor}
+\usepackage[font=small,skip=4pt,justification=centering]{caption}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\urlstyle{same}
+
+\definecolor{accent}{RGB}{234,240,247}
+\definecolor{rule}{RGB}{120,130,140}
+
+\titleformat{\section}{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{6pt}{3pt}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{2pt}
+
+\pagestyle{empty}
+
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Waitlist COLA: A Record-Blind NBA Draft Order\\[2pt]
+With No Tanking Reward}\\[7pt]
+{\normalsize Paper Track: Basketball}\\[2pt]
+{\small Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}}
+\end{center}
+
+\section{Introduction}
+
+A team eliminated from playoff contention improves its next draft position by losing. Roughly a third of the National Basketball Association's thirty teams were openly losing late in the 2025-26 season, and the commissioner conceded that the incentives are misaligned. For a decade the league answered by re-weighting its lottery odds, and in May 2026 adopted a wider sixteen-team format called 3-2-1. Banchio and Munro (SSAC 2020) proved that no rule setting draft chances from end-of-season records, while giving worse records better chances, can remove the incentive. We ask which component of a lottery carries the reward for losing.
+
+\section{Methods}
+
+We evaluate nine mechanisms across 14{,}004 league-seasons of ZenGM Basketball-GM, an open-source simulator that plays every game with generated rosters and automated general managers, so the path from draft pick to later standings is the engine's own. Each runs 48 independent leagues of 15 seasons, with uncertainty at the replicate level. Each is scored on one statistic read twice, the gap in draft position between the first- and fifth-ranked team, ranked once by this season's record and once by the mechanism's own priority metric. A paired counterfactual moves one team's record while holding the season fixed, and a behavioral arm sits a team's five best players at midseason.
+
+\begin{center}
+\small
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{l r r}
+\toprule
+\textbf{What the rule reads} & \textbf{Reward for losing} & \textbf{Share} \\
+\midrule
+Both components read record (rule through 2026) & $1.30$ & $100\%$ \\
+Draw made record-blind, queue by record & $1.98$ & $152\%$ \\
+Queue made record-blind, draw unchanged & $0.61$ & $47\%$ \\
+Neither component reads record & $-0.16$ & noise floor \\
+\bottomrule
+\end{tabular}\\[3pt]
+\begin{minipage}{0.94\linewidth}\centering\small
+\textbf{Table 1.} Where the reward for losing lives, in places of draft position gained by the worst-record team over the fifth-worst. Flattening the draw alone makes tanking pay better.
+\end{minipage}
+\end{center}
+
+\section{Results}
+
+Through the 2026 draft, four picks were drawn and picks 5 through 14 followed reverse record. Table 1 switches each component off. The reward sits mostly in the ten picks awarded after the televised draw, and a record-blind draw raises it. The adopted format confirms this. Holding a 3-2-1-shaped ball allocation fixed and drawing only four picks leaves a reward of $+1.76$, worse than the rule it replaced; drawing all sixteen positions, as adopted, takes it to $-1.22$. Every gain 3-2-1 makes against tanking comes from how deep it draws.
+
+Table 2 scores mechanisms under both rankings. Wherever a rule treats the worst record as the most deserving, the two readings are one number, which is the impossibility made visible. Waitlist COLA separates them. Moving a team from the fifth-worst record to the worst buys $1.87$ places under the original COLA variant and $1.32$ under the 2026 rule, and exactly zero under Waitlist COLA in all 720 seasons.
+
+\begin{center}
+\small
+\setlength{\tabcolsep}{10pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{l r r}
+\toprule
+\textbf{Mechanism} & \textbf{Ranked by record} & \textbf{Ranked by own metric} \\
+ & \textit{want} $0$ & \textit{want wide} \\
+\midrule
+NBA lottery, 2019 rules & $+1.09 \pm 0.12$ & $+1.09 \pm 0.12$ \\
+3-2-1 as adopted & $-1.22 \pm 0.25$ & $-1.22 \pm 0.25$ \\
+Classic COLA & $+1.88 \pm 0.11$ & $+1.38 \pm 0.24$ \\
+\rowcolor{accent}
+\textbf{Waitlist COLA} & $\mathbf{-0.12 \pm 0.22}$ & $\mathbf{+1.71 \pm 0.13}$ \\
+\bottomrule
+\end{tabular}\\[3pt]
+\begin{minipage}{0.94\linewidth}\centering\small
+\textbf{Table 2.} One statistic under two rankings. Record-based rules post identical columns by construction, so they cannot aim help without paying for losing. Waitlist COLA holds the first column at zero while concentrating help in the second.
+\end{minipage}
+\end{center}
+
+\section{Conclusion}
+
+Carry-Over Lottery Allocation assigns priority from a multi-year index of how long a franchise has gone without success. Waitlist COLA leaves its four-pick draw untouched, orders the remaining picks by that index, and breaks ties at random. A league can therefore take the reward for losing to zero while helping long-suffering teams more than either rule it would replace, through a change confined to picks no broadcast covers. The adopted format expires after the 2029 draft, when a fresh vote reopens the question.
+
+\end{document}
