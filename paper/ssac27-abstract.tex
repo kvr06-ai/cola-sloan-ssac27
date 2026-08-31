@@ -19,11 +19,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{times}
-\usepackage[margin=0.7in]{geometry}
+\usepackage[margin=0.65in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[table]{xcolor}
-\usepackage[font=small,skip=4pt,justification=centering]{caption}
+\usepackage[font=small,skip=3pt,justification=centering]{caption}
 \usepackage{titlesec}
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
@@ -51,47 +51,48 @@ With No Tanking Reward}\\[7pt]
 
 \section{Introduction}
 
-A team eliminated from playoff contention improves its next draft position by losing, and roughly a third of National Basketball Association (NBA) teams were openly doing so in the 2025-26 season. For a decade the league answered by re-weighting its lottery odds, and in May 2026 adopted a wider sixteen-team format called 3-2-1. Banchio and Munro (SSAC 2020) proved that any rule giving worse end-of-season records better draft odds must reward losing.
+National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this late in the 2025-26 season. For ten years the league has answered by adjusting its lottery odds, most recently in May 2026 with a sixteen-team format called 3-2-1. Banchio and Munro (SSAC 2020) proved that adjusting odds cannot fix this, because any rule giving worse records better odds still rewards losing.
 
-Carry-Over Lottery Allocation (\textsc{Cola}) escapes that impossibility by changing what the draft reads. Every team carries an index that grows each season it misses the playoffs and falls when it succeeds, so priority tracks how long a franchise has waited and one season moves it little. \textsc{Cola} is a family whose members differ on who accumulates the index, what success spends, and how the index becomes picks, and none has been measured against the others. We measure them, and the answer turns on a part of the lottery no reform has touched.
+Carry-Over Lottery Allocation (\textsc{Cola}) takes another route. Each team carries a waiting number that rises every year it misses the playoffs and falls when it succeeds, and draft priority follows that number. One bad season barely moves it. \textsc{Cola} is a family of rules, and no version has been tested against the others. We tested them, and found the reward for losing in a part of the lottery nobody argues about.
 
 \section{Methods}
 
-We formalize the family as seven design dials and evaluate nine mechanisms across 14{,}004 league-seasons of ZenGM Basketball-GM, an open-source simulator that plays every game with generated rosters and automated general managers. Each runs 48 independent leagues of 15 seasons, with uncertainty at the replicate level. Each is scored on one statistic read twice, the gap in draft position between the first- and fifth-ranked team, ranked by this season's record and by the mechanism's own priority metric. A paired counterfactual then moves one team's record with the season held fixed.
+We describe the family with seven settings and test nine draft rules in ZenGM Basketball-GM, an open-source simulator that plays out every game, roster, and trade. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule is then scored on one question asked two ways. How many places earlier does the team ranked first draft than the team ranked fifth? Table 2 gives both rankings.
 
 \begin{center}
 \small
 \setlength{\tabcolsep}{10pt}
-\renewcommand{\arraystretch}{1.05}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{l r r}
 \toprule
-\textbf{What the rule reads} & \textbf{Reward for losing} & \textbf{Share} \\
+\textbf{What the rule reads} & \textbf{Reward for losing} & \textbf{Vs.\ 2026 rule} \\
+ & \textit{draft places} & \\
 \midrule
-Both components read record (rule through 2026) & $1.30$ & $100\%$ \\
-Draw made record-blind, queue by record & $1.98$ & $152\%$ \\
-Queue made record-blind, draw unchanged & $0.61$ & $47\%$ \\
-Neither component reads record & $-0.16$ & noise floor \\
+Both parts read record (rule through 2026) & $1.30$ & baseline \\
+Draw ignores record, later picks by record & $1.98$ & $1.52\times$ \\
+Later picks ignore record, draw unchanged & $0.61$ & $0.47\times$ \\
+Neither part reads record & $-0.16$ & noise floor \\
 \bottomrule
-\end{tabular}\\[2pt]
-\begin{minipage}{0.94\linewidth}\centering\small
-\textbf{Table 1.} Where the reward for losing lives. Through the 2026 draft four picks were drawn and picks 5 through 14 followed reverse record, and each row switches one component to a record-blind rule. Values are places of draft position gained by the worst-record team over the fifth-worst.
+\end{tabular}\\[1pt]
+\begin{minipage}{0.99\linewidth}\centering\small
+\textbf{Table 1.} Where the reward for losing comes from. Each number is how many places earlier the worst team drafts than the fifth-worst, on average, which is what finishing last buys. Through 2026 the lottery drew four picks and handed out the rest in order of record. Each row below the first makes one part ignore record. The two parts work against each other, so the ratios do not add up. A weighted draw pulls the worst teams out of the record-ordered picks, hiding how much those picks are worth.
 \end{minipage}
 \end{center}
 
 \section{Results}
 
-The reward for losing sits mostly in the ten picks awarded after the televised draw, and making the draw record-blind raises it. The adopted format confirms this. Holding a 3-2-1-shaped ball allocation fixed and drawing only four picks leaves $+1.76$, worse than the rule it replaced; drawing all sixteen, as adopted, takes it to $-1.22$. Its whole gain against tanking comes from how deep it draws.
+Most of the reward for losing came from picks 5 through 14, which went in order of who lost most. Flattening the odds while leaving those picks alone makes tanking pay better. The league's new rule confirms it, because 3-2-1 draws all sixteen places, so no pick is handed out by record. Its new odds table alone would have made tanking pay more than the old rule.
 
-Wherever a rule treats the worst record as most deserving, the two readings in Table 2 are one number, the impossibility made visible. One configuration separates them, and we name it \emph{Waitlist} \textsc{Cola}. Dropping a team from fifth-worst to worst record buys $1.87$ places under Classic \textsc{Cola} and $1.32$ under the 2026 rule. Under Waitlist \textsc{Cola} it buys exactly zero across 720 seasons. The pattern repeats on 26 seasons of actual NBA results.
+Table 2 shows why rules built on record are stuck. Ranked by record or by their own standard they post the same number, so they cannot help the teams they mean to help without also paying teams to lose. Waitlist \textsc{Cola} breaks that. Dropping a team from fifth-worst to worst gains $1.87$ places under the original \textsc{Cola} and $1.32$ under the 2026 rule, and nothing at all under Waitlist \textsc{Cola} across 720 seasons. The pattern repeats on 26 seasons of real NBA results.
 
 \begin{center}
 \small
 \setlength{\tabcolsep}{10pt}
-\renewcommand{\arraystretch}{1.05}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{l r r}
 \toprule
-\textbf{Mechanism} & \textbf{Ranked by record} & \textbf{Ranked by own metric} \\
- & \textit{want} $0$ & \textit{want wide} \\
+\textbf{Mechanism} & \textbf{Ranked by record} & \textbf{Ranked by own standard} \\
+ & \textit{draft places; want} $0$ & \textit{draft places; want wide} \\
 \midrule
 NBA lottery, 2019 rules & $+1.09 \pm 0.12$ & $+1.09 \pm 0.12$ \\
 3-2-1 as adopted & $-1.22 \pm 0.25$ & $-1.22 \pm 0.25$ \\
@@ -99,14 +100,14 @@ Classic \textsc{Cola} (original) & $+1.88 \pm 0.11$ & $+1.38 \pm 0.24$ \\
 \rowcolor{accent}
 \textbf{Waitlist \textsc{Cola}} & $\mathbf{-0.12 \pm 0.22}$ & $\mathbf{+1.71 \pm 0.13}$ \\
 \bottomrule
-\end{tabular}\\[2pt]
-\begin{minipage}{0.94\linewidth}\centering\small
-\textbf{Table 2.} One statistic under two rankings. Waitlist \textsc{Cola} draws four picks by index, orders the rest by index, and breaks ties at random. Record-based rules post identical columns by construction, so they cannot aim help without paying for losing.
+\end{tabular}\\[1pt]
+\begin{minipage}{0.99\linewidth}\centering\small
+\textbf{Table 2.} The same measurement under two rankings. Rank the fourteen lottery teams, take the first and the fifth, and compare the picks they get. Ranked by record, the number is what losing buys, and zero is the goal. Ranked by the rule's own standard of who deserves help, a big positive number means the rule delivers. When a rule's standard is record, both rankings give the same list, so the two columns must match. A negative number flips the reading, so 3-2-1 gives its worst teams the latest picks.
 \end{minipage}
 \end{center}
 
 \section{Conclusion}
 
-Waitlist \textsc{Cola} changes one thing about the original variant, and only the picks awarded after the televised draw. The format the league adopted removes the reward by pushing its worst records down the order. Waitlist \textsc{Cola} removes it while drafting the longest-waiting teams earliest, and the seven dials cover the rest of the design space. The adopted format expires after the 2029 draft, when a fresh vote reopens the question.
+Waitlist \textsc{Cola} changes one thing. Keep the four-pick lottery as it is, then hand out the remaining picks by waiting number. Losing on purpose stops paying. The league's new rule also stops it, but by pushing its worst teams further down the order, while Waitlist \textsc{Cola} gives the longest-suffering teams the earliest picks. Nothing a broadcast shows would change. The 3-2-1 format expires after the 2029 draft, when a fresh vote reopens the question.
 
 \end{document}
