@@ -51,13 +51,13 @@ With No Tanking Reward}\\[7pt]
 
 \section{Introduction}
 
-National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this in the 2025-26 season. The league has answered with ten years of odds adjustments, most recently the sixteen-team 3-2-1 format adopted in May 2026. Banchio and Munro (SSAC 2020) proved that odds alone cannot fix it, because any rule giving worse records better odds still rewards losing.
+National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this in the 2025-26 season. The league has answered with ten years of odds adjustments, most recently the sixteen-team 3-2-1 format adopted in May 2026. Banchio and Munro (SSAC 2020) proved that odds alone cannot fix it, because any rule giving worse records better odds still rewards losing. The lottery decides only four picks, and the reward for losing sits mostly in the ten handed out behind it.
 
-Carry-Over Lottery Allocation (\textsc{Cola}) gives each team a waiting number that rises every year it misses the playoffs and falls when it succeeds, and sets draft priority by that number, so one bad season barely moves a team. \textsc{Cola} is a family of versions, and we compared them all. The lottery decides only four picks, and the reward for losing sits mostly in the ten handed out behind it.
+Carry-Over Lottery Allocation (\textsc{Cola}) gives each team a waiting number that rises every year it misses the playoffs and falls when it succeeds, and sets draft priority by that number, so one bad season barely moves a team.
 
 \section{Methods}
 
-We describe the family with seven settings and run nine draft rules through ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule faces three tests. Does losing pay? Does help reach the longest-waiting teams? Can a team game the pool another way? Table 2 reports the first two.
+We describe \textsc{Cola}'s versions with seven settings and run nine draft rules through ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule faces three tests. Does losing pay? Does help reach the longest-waiting teams? Can a team game the pool another way? Table 2 reports the first two.
 
 Six of the nine rules are \textsc{Cola} versions. One is new. Waitlist \textsc{Cola} keeps the four-pick televised draw exactly as the original runs it, then fills picks 5 through 14 by waiting number, longest wait first, ties broken at random.
 
