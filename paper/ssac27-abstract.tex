@@ -19,7 +19,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{times}
-\usepackage[margin=0.72in]{geometry}
+\usepackage[margin=0.7in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[table]{xcolor}
@@ -33,7 +33,7 @@
 \definecolor{rule}{RGB}{120,130,140}
 
 \titleformat{\section}{\normalfont\bfseries}{}{0pt}{}
-\titlespacing*{\section}{0pt}{6pt}{3pt}
+\titlespacing*{\section}{0pt}{5pt}{2pt}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2pt}
@@ -72,7 +72,7 @@ Draw made record-blind, queue by record & $1.98$ & $152\%$ \\
 Queue made record-blind, draw unchanged & $0.61$ & $47\%$ \\
 Neither component reads record & $-0.16$ & noise floor \\
 \bottomrule
-\end{tabular}\\[3pt]
+\end{tabular}\\[2pt]
 \begin{minipage}{0.94\linewidth}\centering\small
 \textbf{Table 1.} Where the reward for losing lives. Through the 2026 draft four picks were drawn and picks 5 through 14 followed reverse record, and each row switches one component to a record-blind rule. Values are places of draft position gained by the worst-record team over the fifth-worst.
 \end{minipage}
@@ -80,9 +80,9 @@ Neither component reads record & $-0.16$ & noise floor \\
 
 \section{Results}
 
-The reward for losing sits mostly in the ten picks awarded after the televised draw, and making the draw record-blind raises it. The format the league adopted confirms this. Holding a 3-2-1-shaped ball allocation fixed and drawing only four picks leaves $+1.76$, worse than the rule it replaced; drawing all sixteen, as adopted, takes it to $-1.22$. Its whole gain against tanking comes from how deep it draws.
+The reward for losing sits mostly in the ten picks awarded after the televised draw, and making the draw record-blind raises it. The adopted format confirms this. Holding a 3-2-1-shaped ball allocation fixed and drawing only four picks leaves $+1.76$, worse than the rule it replaced; drawing all sixteen, as adopted, takes it to $-1.22$. Its whole gain against tanking comes from how deep it draws.
 
-Wherever a rule treats the worst record as most deserving, the two readings in Table 2 are one number, the impossibility made visible. One configuration separates them, and we name it \emph{Waitlist} \textsc{Cola}. Dropping a team from fifth-worst to worst record buys $1.87$ places under Classic \textsc{Cola} and $1.32$ under the 2026 rule. Under Waitlist \textsc{Cola} it buys exactly zero across 720 seasons.
+Wherever a rule treats the worst record as most deserving, the two readings in Table 2 are one number, the impossibility made visible. One configuration separates them, and we name it \emph{Waitlist} \textsc{Cola}. Dropping a team from fifth-worst to worst record buys $1.87$ places under Classic \textsc{Cola} and $1.32$ under the 2026 rule. Under Waitlist \textsc{Cola} it buys exactly zero across 720 seasons. The pattern repeats on 26 seasons of actual NBA results.
 
 \begin{center}
 \small
@@ -99,7 +99,7 @@ Classic \textsc{Cola} (original) & $+1.88 \pm 0.11$ & $+1.38 \pm 0.24$ \\
 \rowcolor{accent}
 \textbf{Waitlist \textsc{Cola}} & $\mathbf{-0.12 \pm 0.22}$ & $\mathbf{+1.71 \pm 0.13}$ \\
 \bottomrule
-\end{tabular}\\[3pt]
+\end{tabular}\\[2pt]
 \begin{minipage}{0.94\linewidth}\centering\small
 \textbf{Table 2.} One statistic under two rankings. Waitlist \textsc{Cola} draws four picks by index, orders the rest by index, and breaks ties at random. Record-based rules post identical columns by construction, so they cannot aim help without paying for losing.
 \end{minipage}
@@ -107,6 +107,6 @@ Classic \textsc{Cola} (original) & $+1.88 \pm 0.11$ & $+1.38 \pm 0.24$ \\
 
 \section{Conclusion}
 
-Waitlist \textsc{Cola} asks one change of the original variant, and it falls entirely on the picks awarded after the televised draw. The format the league adopted removes the reward by pushing its worst records down the order. Waitlist \textsc{Cola} removes it while drafting the longest-waiting teams earliest, and the seven dials cover the rest of the design space. The adopted format expires after the 2029 draft, when a fresh vote reopens the question.
+Waitlist \textsc{Cola} changes one thing about the original variant, and only the picks awarded after the televised draw. The format the league adopted removes the reward by pushing its worst records down the order. Waitlist \textsc{Cola} removes it while drafting the longest-waiting teams earliest, and the seven dials cover the rest of the design space. The adopted format expires after the 2029 draft, when a fresh vote reopens the question.
 
 \end{document}
