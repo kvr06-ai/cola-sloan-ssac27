@@ -19,7 +19,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{times}
-\usepackage[margin=0.65in]{geometry}
+\usepackage[margin=0.62in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[table]{xcolor}
@@ -33,7 +33,7 @@
 \definecolor{rule}{RGB}{120,130,140}
 
 \titleformat{\section}{\normalfont\bfseries}{}{0pt}{}
-\titlespacing*{\section}{0pt}{5pt}{2pt}
+\titlespacing*{\section}{0pt}{4pt}{2pt}
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2pt}
@@ -51,15 +51,19 @@ With No Tanking Reward}\\[7pt]
 
 \section{Introduction}
 
-National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this in the 2025-26 season. The league has answered with ten years of odds adjustments, most recently the sixteen-team 3-2-1 format adopted in May 2026. Banchio and Munro (SSAC 2020) proved that odds alone cannot fix it, because any rule giving worse records better odds still rewards losing. The lottery decides only four picks, and the reward for losing sits mostly in the ten handed out behind it.
+National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this in the 2025-26 season. The league has answered with ten years of odds adjustments, most recently the sixteen-team 3-2-1 format adopted in May 2026. Banchio and Munro (SSAC 2020) proved that odds alone cannot fix it, because any rule giving worse records better odds still rewards losing.
 
-Carry-Over Lottery Allocation (\textsc{Cola}) gives each team a waiting number that rises every year it misses the playoffs and falls when it succeeds, and sets draft priority by that number, so one bad season barely moves a team.
+Carry-Over Lottery Allocation (\textsc{Cola}) gives each team a waiting number that rises every year it misses the playoffs and falls when it succeeds, and sets draft priority by that number, so one bad season barely moves a team. It has many versions. Which one ends the reward for losing, and where in a draft does that reward live?
 
 \section{Methods}
 
-We describe \textsc{Cola}'s versions with seven settings and run nine draft rules through ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule faces three tests. Does losing pay? Does help reach the longest-waiting teams? Can a team game the pool another way? Table 2 reports the first two.
+We describe \textsc{Cola}'s versions with seven settings and run nine draft rules through ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule faces three tests. Does losing pay? Does help reach the longest-waiting teams? Can a team game the pool another way?
 
 Six of the nine rules are \textsc{Cola} versions. One is new. Waitlist \textsc{Cola} keeps the four-pick televised draw exactly as the original runs it, then fills picks 5 through 14 by waiting number, longest wait first, ties broken at random.
+
+\section{Results}
+
+Most of the reward for losing came from picks 5 through 14. Table 1 switches each part of the old rule off in turn. Making the draw ignore record while leaving those ten alone raises the reward from $1.30$ draft places to $1.98$. Making the ten ignore record instead cuts it to $0.61$.
 
 \begin{center}
 \small
@@ -81,11 +85,9 @@ Neither part reads record & $-0.16$ & noise floor \\
 \end{minipage}
 \end{center}
 
-\section{Results}
+The league's new format confirms this. 3-2-1 draws all sixteen places, so no pick goes by record, and that change carries its whole gain against tanking. Its ball allocation with a four-pick draw behind it would have left $1.76$.
 
-Those ten went in order of who lost most. Flattening the odds and leaving them alone makes tanking pay better. The league's new rule confirms it. 3-2-1 draws all sixteen places, so no pick goes by record, and that change carries its whole effect. Its new odds alone would have paid tanking more.
-
-Waitlist \textsc{Cola} is the simplest version that clears all three tests, and it does so while leaving the lottery fans watch untouched. Dropping a team from fifth-worst to worst gains $1.87$ places under the original \textsc{Cola} and $1.32$ under the 2026 rule, and exactly zero under Waitlist \textsc{Cola} across 720 seasons. It concedes no more to pool-gaming than today's lottery does. The pattern repeats on 26 seasons of real NBA results.
+Waitlist \textsc{Cola} is the simplest version that clears all three tests. Dropping a team from fifth-worst to worst gains $1.87$ places under the original \textsc{Cola} and $1.32$ under the 2026 rule, and exactly zero under Waitlist \textsc{Cola} across 720 seasons. It concedes no more to pool-gaming than today's lottery does. The pattern repeats on 26 seasons of real NBA results.
 
 \begin{center}
 \small
