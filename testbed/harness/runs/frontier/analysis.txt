@@ -1,0 +1,93 @@
+
+===== Four criteria per mechanism: paired leagues, 30 leagues x 25 seasons per arm (gaps from season 4) =====
+
+mechanism                     targeted help        help, 1st vs rest   help, common         parity: max drought  team mean max     never won   tanking reward     robust.
+                              1st vs 5th, own      (draft places)      places/drought-yr    (seasons, any team)  drought (seasons) (teams)     rank by record     max(gap,0)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Classic COLA                  +1.19 +/- 0.21       +2.02 +/- 0.14      +0.10 +/- 0.01       +24.10 +/- 0.27      +11.37 +/- 0.14     0.93      +1.87 +/- 0.11     1.87
+Waitlist COLA                 +1.92 +/- 0.11       +4.14 +/- 0.07      +0.13 +/- 0.01       +24.37 +/- 0.26      +11.43 +/- 0.11     1.10      +0.50 +/- 0.20     0.50
+Simple COLA                   +5.55 +/- 0.05       +10.11 +/- 0.04     +0.24 +/- 0.02       +23.27 +/- 0.40      +11.36 +/- 0.10     0.60      +0.65 +/- 0.34     0.65
+COLA, full-depth lottery      +1.80 +/- 0.19       +2.91 +/- 0.11      +0.09 +/- 0.01       +23.77 +/- 0.28      +11.26 +/- 0.13     0.83      +0.12 +/- 0.23     0.12
+Uniform lottery (flat COLA)   +0.14 +/- 0.26       +0.05 +/- 0.21      +0.00 +/- 0.01       +23.73 +/- 0.31      +11.50 +/- 0.14     0.93      +0.23 +/- 0.23     0.23
+Countdown COLA                +4.88 +/- 0.16       +8.99 +/- 0.08      +0.19 +/- 0.01       +24.60 +/- 0.15      +11.52 +/- 0.09     1.33      -3.35 +/- 0.26     0.00
+Beckett COLA                  +2.08 +/- 0.13       +5.36 +/- 0.07      +0.28 +/- 0.01       +23.67 +/- 0.35      +11.09 +/- 0.10     0.83      -1.12 +/- 0.22     0.00
+NBA lottery, 2019 rules       +1.20 +/- 0.12       +4.10 +/- 0.06      +0.07 +/- 0.01       +23.33 +/- 0.31      +11.27 +/- 0.11     0.63      +1.20 +/- 0.12     1.20
+3-2-1 as adopted              -0.55 +/- 0.22       +0.15 +/- 0.14      +0.02 +/- 0.01       +24.37 +/- 0.17      +11.60 +/- 0.13     1.20      -0.55 +/- 0.22     0.00
+
+Own standard: carry-over index (Classic, Waitlist, Simple, full-depth, uniform); McCarty number, drought x wins,
+replayed from the log (Countdown, Beckett); record (NBA lottery, 3-2-1), whose two columns coincide by construction.
+Common yardstick: seasons since the team's last playoff-series win, the same clock for every mechanism; the value is
+draft places gained per extra drought season among the fourteen pool teams (an OLS slope, sign flipped).
+
+===== Dominance, help on each mechanism's OWN standard (help higher, max drought lower, tanking reward lower) =====
+
+Classic COLA                  dominated by Simple COLA [help,parity,robust; point estimate only]; COLA, full-depth lottery [help,parity,robust; point estimate only]; Beckett COLA [help,parity,robust; point estimate only]; NBA lottery, 2019 rules [help,parity,robust; point estimate only]
+Waitlist COLA                 dominated by Beckett COLA [help,parity,robust; point estimate only]
+Simple COLA                   UNDOMINATED (on the frontier before simplicity)
+COLA, full-depth lottery      dominated by Beckett COLA [help,parity,robust; point estimate only]
+Uniform lottery (flat COLA)   dominated by Beckett COLA [help,parity,robust; point estimate only]
+Countdown COLA                UNDOMINATED (on the frontier before simplicity)
+Beckett COLA                  UNDOMINATED (on the frontier before simplicity)
+NBA lottery, 2019 rules       dominated by Simple COLA [help,parity,robust; point estimate only]
+3-2-1 as adopted              dominated by Beckett COLA [help,parity; point estimate only]
+
+Frontier (3): Simple COLA; Countdown COLA; Beckett COLA
+Mechanisms dominating NBA lottery, 2019 rules: 1 on point estimates (Simple COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating 3-2-1 as adopted: 1 on point estimates (Beckett COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating BOTH baselines: 0 (none); with intervals clearing: 0 (none).
+
+===== Dominance, help on the COMMON yardstick, series-win drought (help higher, max drought lower, tanking reward lower) =====
+
+Classic COLA                  dominated by Simple COLA [help,parity,robust; point estimate only]; Beckett COLA [help,parity,robust; point estimate only]
+Waitlist COLA                 dominated by Beckett COLA [help,parity,robust; point estimate only]
+Simple COLA                   UNDOMINATED (on the frontier before simplicity)
+COLA, full-depth lottery      dominated by Beckett COLA [help,parity,robust; point estimate only]
+Uniform lottery (flat COLA)   dominated by Beckett COLA [help,parity,robust; point estimate only]
+Countdown COLA                dominated by Beckett COLA [help,parity; clears]
+Beckett COLA                  UNDOMINATED (on the frontier before simplicity)
+NBA lottery, 2019 rules       dominated by Simple COLA [help,parity,robust; point estimate only]
+3-2-1 as adopted              dominated by Beckett COLA [help,parity; point estimate only]
+
+Frontier (2): Simple COLA; Beckett COLA
+Mechanisms dominating NBA lottery, 2019 rules: 1 on point estimates (Simple COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating 3-2-1 as adopted: 1 on point estimates (Beckett COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating BOTH baselines: 0 (none); with intervals clearing: 0 (none).
+
+===== Differences against NBA lottery, 2019 rules (mechanism minus reference; paired by league; * = interval includes 0) =====
+
+mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       tanking gap by record
+--------------------------------------------------------------------------------------------------------------------------------------------
+Classic COLA                  -0.00 [-0.56, 0.55]*        +0.03 [-0.00, 0.05]*        +0.77 [-0.11, 1.65]*        +0.67 [0.30, 1.04] 
+Waitlist COLA                 +0.72 [0.34, 1.11]          +0.06 [0.03, 0.08]          +1.03 [0.14, 1.92]          -0.70 [-1.15, -0.24] 
+Simple COLA                   +4.35 [4.09, 4.61]          +0.17 [0.13, 0.21]          -0.07 [-1.06, 0.93]*        -0.55 [-1.35, 0.25]*
+COLA, full-depth lottery      +0.60 [0.14, 1.07]          +0.02 [-0.01, 0.05]*        +0.43 [-0.24, 1.10]*        -1.07 [-1.65, -0.50] 
+Uniform lottery (flat COLA)   -1.06 [-1.67, -0.45]        -0.07 [-0.09, -0.04]        +0.40 [-0.57, 1.37]*        -0.97 [-1.50, -0.43] 
+Countdown COLA                +3.68 [3.29, 4.07]          +0.12 [0.09, 0.15]          +1.27 [0.61, 1.92]          -4.54 [-5.10, -3.98] 
+Beckett COLA                  +0.88 [0.52, 1.24]          +0.21 [0.18, 0.24]          +0.33 [-0.74, 1.40]*        -2.32 [-2.76, -1.88] 
+3-2-1 as adopted              -1.75 [-2.24, -1.25]        -0.06 [-0.09, -0.03]        +1.03 [0.30, 1.76]          -1.75 [-2.24, -1.25] 
+
+===== Differences against 3-2-1 as adopted (mechanism minus reference; paired by league; * = interval includes 0) =====
+
+mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       tanking gap by record
+--------------------------------------------------------------------------------------------------------------------------------------------
+Classic COLA                  +1.74 [1.07, 2.41]          +0.08 [0.05, 0.11]          -0.27 [-0.92, 0.38]*        +2.42 [1.88, 2.95] 
+Waitlist COLA                 +2.47 [1.94, 2.99]          +0.12 [0.09, 0.14]          +0.00 [-0.68, 0.68]*        +1.05 [0.52, 1.58] 
+Simple COLA                   +6.09 [5.63, 6.56]          +0.22 [0.19, 0.26]          -1.10 [-2.01, -0.19]        +1.19 [0.31, 2.08] 
+COLA, full-depth lottery      +2.35 [1.72, 2.97]          +0.07 [0.05, 0.10]          -0.60 [-1.31, 0.11]*        +0.67 [0.01, 1.33] 
+Uniform lottery (flat COLA)   +0.69 [-0.08, 1.46]*        -0.01 [-0.04, 0.01]*        -0.63 [-1.40, 0.14]*        +0.78 [0.22, 1.34] 
+Countdown COLA                +5.43 [4.79, 6.06]          +0.18 [0.15, 0.21]          +0.23 [-0.27, 0.74]*        -2.80 [-3.47, -2.13] 
+Beckett COLA                  +2.63 [2.08, 3.17]          +0.27 [0.24, 0.30]          -0.70 [-1.52, 0.12]*        -0.57 [-1.26, 0.11]*
+NBA lottery, 2019 rules       +1.75 [1.25, 2.24]          +0.06 [0.03, 0.09]          -1.03 [-1.76, -0.30]        +1.75 [1.25, 2.24] 
+
+===== Differences against Waitlist COLA (mechanism minus reference; paired by league; * = interval includes 0) =====
+
+mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       tanking gap by record
+--------------------------------------------------------------------------------------------------------------------------------------------
+Classic COLA                  -0.73 [-1.19, -0.27]        -0.03 [-0.05, -0.01]        -0.27 [-1.06, 0.52]*        +1.37 [0.85, 1.88] 
+Simple COLA                   +3.62 [3.37, 3.88]          +0.11 [0.08, 0.14]          -1.10 [-2.18, -0.02]        +0.14 [-0.71, 1.00]*
+COLA, full-depth lottery      -0.12 [-0.49, 0.25]*        -0.04 [-0.07, -0.02]        -0.60 [-1.34, 0.14]*        -0.38 [-0.88, 0.12]*
+Uniform lottery (flat COLA)   -1.78 [-2.32, -1.24]        -0.13 [-0.15, -0.11]        -0.63 [-1.36, 0.10]*        -0.27 [-0.86, 0.32]*
+Countdown COLA                +2.96 [2.59, 3.32]          +0.06 [0.03, 0.09]          +0.23 [-0.35, 0.82]*        -3.85 [-4.55, -3.15] 
+Beckett COLA                  +0.16 [-0.13, 0.44]*        +0.15 [0.12, 0.19]          -0.70 [-1.62, 0.22]*        -1.62 [-2.31, -0.94] 
+NBA lottery, 2019 rules       -0.72 [-1.11, -0.34]        -0.06 [-0.08, -0.03]        -1.03 [-1.92, -0.14]        +0.70 [0.24, 1.15] 
+3-2-1 as adopted              -2.47 [-2.99, -1.94]        -0.12 [-0.14, -0.09]        +0.00 [-0.68, 0.68]*        -1.05 [-1.58, -0.52] 

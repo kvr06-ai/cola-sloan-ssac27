@@ -123,12 +123,39 @@ function anchorPriorities(seasonLog, variant) {
 	return out;
 }
 
+// Ordinary least squares slope of y on x.
+function ols(xs, ys) {
+	const n = xs.length;
+	if (n < 2) return NaN;
+	const mx = mean(xs);
+	const my = mean(ys);
+	let sxy = 0;
+	let sxx = 0;
+	for (let i = 0; i < n; i++) {
+		sxy += (xs[i] - mx) * (ys[i] - my);
+		sxx += (xs[i] - mx) ** 2;
+	}
+	return sxx === 0 ? NaN : sxy / sxx;
+}
+
 function perLeague(seasonLog, own) {
 	const anchor = own === "countdown" || own === "beckett" ? anchorPriorities(seasonLog, own) : null;
 	const help5 = [];
 	const helpAll = [];
 	const tank = [];
+	// Common yardstick for help, the same for every mechanism: seasons since the
+	// team last won a playoff series (the parity criterion's own clock). Among
+	// the fourteen pool teams, the slope of draft pick on that drought, sign
+	// flipped so a positive value means a longer drought earns an earlier pick.
+	// A slope handles the many ties a drought count produces; the first-vs-fifth
+	// gap does not.
+	const cx = [];
+	const cy = [];
+	const sinceWin = {};
 	seasonLog.forEach((e, s) => {
+		for (const t of e.teams) {
+			sinceWin[t.tid] = t.playoffRoundsWon >= 1 ? 0 : (sinceWin[t.tid] ?? 0) + 1;
+		}
 		if (s < STEADY_FROM) return;
 		const pool = e.teams.filter((t) => t.playoffRoundsWon < 0 && t.draftPick != null);
 		if (pool.length !== 14) return;
@@ -140,7 +167,12 @@ function perLeague(seasonLog, own) {
 		else byOwn = pool.slice().sort((x, y) => (y.colaPre ?? 0) - (x.colaPre ?? 0));
 		help5.push(byOwn[4].draftPick - byOwn[0].draftPick);
 		helpAll.push(mean(byOwn.slice(1).map((t) => t.draftPick)) - byOwn[0].draftPick);
+		for (const t of pool) {
+			cx.push(sinceWin[t.tid]);
+			cy.push(t.draftPick);
+		}
 	});
+	const helpCommon = -ols(cx, cy);
 	// Parity: longest run without a playoff-series win, any team; never-winners.
 	const runNow = {};
 	const runMax = {};
@@ -166,6 +198,7 @@ function perLeague(seasonLog, own) {
 	return {
 		help5: mean(help5),
 		helpAll: mean(helpAll),
+		helpCommon,
 		tank: mean(tank),
 		maxDrought,
 		meanTeamMax,
@@ -228,28 +261,30 @@ console.log(
 		`${nOf(tags[0])} leagues x ${seasonsOf(tags[0])} seasons per arm (gaps from season ${STEADY_FROM + 1}) =====\n`,
 );
 console.log(
-	"mechanism                     targeted help        help, 1st vs rest   parity: max drought  team mean max     never won   tanking reward     robust.",
+	"mechanism                     targeted help        help, 1st vs rest   help, common         parity: max drought  team mean max     never won   tanking reward     robust.",
 );
 console.log(
-	"                              1st vs 5th, own      (draft places)      (seasons, any team)  drought (seasons) (teams)     rank by record     max(gap,0)",
+	"                              1st vs 5th, own      (draft places)      places/drought-yr    (seasons, any team)  drought (seasons) (teams)     rank by record     max(gap,0)",
 );
-console.log("-".repeat(150));
+console.log("-".repeat(171));
 const summary = {};
 for (const t of tags) {
 	const help5 = col(t, "help5");
 	const helpAll = col(t, "helpAll");
+	const hc = col(t, "helpCommon");
 	const md = col(t, "maxDrought");
 	const tm = col(t, "meanTeamMax");
 	const nw = col(t, "neverWon");
 	const tk = col(t, "tank");
 	summary[t] = {
 		help: mean(help5),
+		helpCommon: mean(hc),
 		parity: mean(md),
 		tankMean: mean(tk),
 		robust: Math.max(mean(tk), 0),
 	};
 	console.log(
-		`${label[t].padEnd(29)} ${pm(help5).padEnd(20)} ${pm(helpAll).padEnd(19)} ` +
+		`${label[t].padEnd(29)} ${pm(help5).padEnd(20)} ${pm(helpAll).padEnd(19)} ${pm(hc).padEnd(20)} ` +
 			`${pm(md).padEnd(20)} ${pm(tm).padEnd(17)} ${mean(nw).toFixed(2).padStart(6)}      ${pm(tk).padEnd(18)} ${summary[t].robust.toFixed(2)}`,
 	);
 }
@@ -259,87 +294,102 @@ console.log(
 console.log(
 	"replayed from the log (Countdown, Beckett); record (NBA lottery, 3-2-1), whose two columns coincide by construction.",
 );
+console.log(
+	"Common yardstick: seasons since the team's last playoff-series win, the same clock for every mechanism; the value is",
+);
+console.log(
+	"draft places gained per extra drought season among the fourteen pool teams (an OLS slope, sign flipped).",
+);
 
 // --- dominance -------------------------------------------------------------------
-// Criteria as (key on perLeague, better direction, mechanism-level transform).
-const CRIT = [
-	{ name: "help", key: "help5", better: "high" },
-	{ name: "parity", key: "maxDrought", better: "low" },
-	{ name: "robust", key: "tank", better: "low", floor: true },
-];
+// Run twice: once with help scored on each mechanism's OWN standard (which is
+// self-graded and rewards the steepest priority), once on the common yardstick.
 const EPS = 1e-9;
-function pointValue(t, c) {
-	const v = c.key === "tank" ? summary[t].tankMean : c.key === "help5" ? summary[t].help : summary[t].parity;
-	return c.floor ? Math.max(v, 0) : v;
-}
-// A at least as good as B on c; strict if strictly better.
-function compare(a, b, c) {
-	const va = pointValue(a, c);
-	const vb = pointValue(b, c);
-	const better = c.better === "high" ? va - vb : vb - va;
-	return better > EPS ? "strict" : better >= -EPS ? "tie" : "worse";
-}
-function dominates(a, b) {
-	let anyStrict = false;
-	const strictCrits = [];
-	for (const c of CRIT) {
-		const r = compare(a, b, c);
-		if (r === "worse") return null;
-		if (r === "strict") {
-			anyStrict = true;
-			strictCrits.push(c);
+function runDominance(helpKey, helpLabel) {
+	const CRIT = [
+		{ name: "help", key: helpKey, better: "high" },
+		{ name: "parity", key: "maxDrought", better: "low" },
+		{ name: "robust", key: "tank", better: "low", floor: true },
+	];
+	const pointValue = (t, c) => {
+		const v =
+			c.key === "tank"
+				? summary[t].tankMean
+				: c.key === "help5"
+					? summary[t].help
+					: c.key === "helpCommon"
+						? summary[t].helpCommon
+						: summary[t].parity;
+		return c.floor ? Math.max(v, 0) : v;
+	};
+	// A at least as good as B on c; strict if strictly better.
+	const compare = (a, b, c) => {
+		const va = pointValue(a, c);
+		const vb = pointValue(b, c);
+		const better = c.better === "high" ? va - vb : vb - va;
+		return better > EPS ? "strict" : better >= -EPS ? "tie" : "worse";
+	};
+	const dominates = (a, b) => {
+		const strictCrits = [];
+		for (const c of CRIT) {
+			const r = compare(a, b, c);
+			if (r === "worse") return null;
+			if (r === "strict") strictCrits.push(c);
+		}
+		if (strictCrits.length === 0) return null;
+		// clears: every strictly-better criterion's interval on the difference excludes 0
+		const clears = strictCrits.every((c) => excludesZero(diff(a, b, c.key)));
+		return { strictCrits: strictCrits.map((c) => c.name), clears };
+	};
+
+	console.log(
+		`\n===== Dominance, help on ${helpLabel} (help higher, max drought lower, tanking reward lower) =====\n`,
+	);
+	const dominatedBy = {};
+	for (const b of tags) {
+		dominatedBy[b] = [];
+		for (const a of tags) {
+			if (a === b) continue;
+			const d = dominates(a, b);
+			if (d) dominatedBy[b].push({ a, ...d });
 		}
 	}
-	if (!anyStrict) return null;
-	// clears: every strictly-better criterion's interval on the difference excludes 0
-	const clears = strictCrits.every((c) => {
-		const d = diff(a, b, c.key);
-		return excludesZero(d);
-	});
-	return { strictCrits: strictCrits.map((c) => c.name), clears };
-}
-
-console.log("\n===== Dominance on the three numeric criteria (help higher, max drought lower, tanking reward lower) =====\n");
-const dominatedBy = {};
-for (const b of tags) {
-	dominatedBy[b] = [];
-	for (const a of tags) {
-		if (a === b) continue;
-		const d = dominates(a, b);
-		if (d) dominatedBy[b].push({ a, ...d });
+	for (const b of tags) {
+		if (dominatedBy[b].length === 0) {
+			console.log(`${label[b].padEnd(29)} UNDOMINATED (on the frontier before simplicity)`);
+		} else {
+			const by = dominatedBy[b]
+				.map((d) => `${label[d.a]} [${d.strictCrits.join(",")}${d.clears ? "; clears" : "; point estimate only"}]`)
+				.join("; ");
+			console.log(`${label[b].padEnd(29)} dominated by ${by}`);
+		}
+	}
+	const frontier = tags.filter((t) => dominatedBy[t].length === 0);
+	console.log(`\nFrontier (${frontier.length}): ${frontier.map((t) => label[t]).join("; ")}`);
+	for (const base of ["nba", "t321"]) {
+		if (!data[base]) continue;
+		const all = dominatedBy[base];
+		const clear = all.filter((d) => d.clears);
+		console.log(
+			`Mechanisms dominating ${label[base]}: ${all.length} on point estimates (${all.map((d) => label[d.a]).join(", ") || "none"}); ` +
+				`${clear.length} with every strict criterion clearing its interval (${clear.map((d) => label[d.a]).join(", ") || "none"}).`,
+		);
+	}
+	if (data.nba && data.t321) {
+		const both = tags.filter(
+			(t) => dominatedBy.nba.some((d) => d.a === t) && dominatedBy.t321.some((d) => d.a === t),
+		);
+		const bothClear = both.filter(
+			(t) => dominatedBy.nba.find((d) => d.a === t).clears && dominatedBy.t321.find((d) => d.a === t).clears,
+		);
+		console.log(
+			`Mechanisms dominating BOTH baselines: ${both.length} (${both.map((t) => label[t]).join(", ") || "none"}); ` +
+				`with intervals clearing: ${bothClear.length} (${bothClear.map((t) => label[t]).join(", ") || "none"}).`,
+		);
 	}
 }
-for (const b of tags) {
-	if (dominatedBy[b].length === 0) {
-		console.log(`${label[b].padEnd(29)} UNDOMINATED (on the frontier before simplicity)`);
-	} else {
-		const by = dominatedBy[b]
-			.map((d) => `${label[d.a]} [${d.strictCrits.join(",")}${d.clears ? "; clears" : "; point estimate only"}]`)
-			.join("; ");
-		console.log(`${label[b].padEnd(29)} dominated by ${by}`);
-	}
-}
-const frontier = tags.filter((t) => dominatedBy[t].length === 0);
-console.log(`\nFrontier (${frontier.length}): ${frontier.map((t) => label[t]).join("; ")}`);
-for (const base of ["nba", "t321"]) {
-	if (!data[base]) continue;
-	const all = dominatedBy[base];
-	const clear = all.filter((d) => d.clears);
-	console.log(
-		`Mechanisms dominating ${label[base]}: ${all.length} on point estimates (${all.map((d) => label[d.a]).join(", ") || "none"}); ` +
-			`${clear.length} with every strict criterion clearing its interval (${clear.map((d) => label[d.a]).join(", ") || "none"}).`,
-	);
-}
-if (data.nba && data.t321) {
-	const both = tags.filter((t) => dominatedBy.nba.some((d) => d.a === t) && dominatedBy.t321.some((d) => d.a === t));
-	const bothClear = both.filter(
-		(t) => dominatedBy.nba.find((d) => d.a === t).clears && dominatedBy.t321.find((d) => d.a === t).clears,
-	);
-	console.log(
-		`Mechanisms dominating BOTH baselines: ${both.length} (${both.map((t) => label[t]).join(", ") || "none"}); ` +
-			`with intervals clearing: ${bothClear.length} (${bothClear.map((t) => label[t]).join(", ") || "none"}).`,
-	);
-}
+runDominance("help5", "each mechanism's OWN standard");
+runDominance("helpCommon", "the COMMON yardstick, series-win drought");
 
 // --- pairwise differences against the reference rules ------------------------------
 const fmtD = (d) =>
@@ -347,12 +397,15 @@ const fmtD = (d) =>
 for (const ref of ["nba", "t321", "waitlist"]) {
 	if (!data[ref]) continue;
 	console.log(`\n===== Differences against ${label[ref]} (mechanism minus reference; ${PAIRED ? "paired by league" : "Welch"}; * = interval includes 0) =====\n`);
-	console.log("mechanism                     help 1st vs 5th             max drought (seasons)       tanking gap by record");
-	console.log("-".repeat(112));
+	console.log(
+		"mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       tanking gap by record",
+	);
+	console.log("-".repeat(140));
 	for (const t of tags) {
 		if (t === ref) continue;
 		console.log(
-			`${label[t].padEnd(29)} ${fmtD(diff(t, ref, "help5")).padEnd(27)} ${fmtD(diff(t, ref, "maxDrought")).padEnd(27)} ${fmtD(diff(t, ref, "tank"))}`,
+			`${label[t].padEnd(29)} ${fmtD(diff(t, ref, "help5")).padEnd(27)} ${fmtD(diff(t, ref, "helpCommon")).padEnd(27)} ` +
+				`${fmtD(diff(t, ref, "maxDrought")).padEnd(27)} ${fmtD(diff(t, ref, "tank"))}`,
 		);
 	}
 }
