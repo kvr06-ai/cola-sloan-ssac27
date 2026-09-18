@@ -17,7 +17,8 @@
 %%%%   1. the four required headings;
 %%%%   2. the numbers in the last paragraph, from the 25-season run
 %%%%      (30 leagues x 25 seasons x 9 mechanisms = 6,750 seasons);
-%%%%   3. the table, with its footnotes in the caption (outside the count).
+%%%%   3. the table (outside the count); the column and mechanism notes went to
+%%%%      the delivery email, for Tim to add back if he wants them.
 %%%% The last paragraph's counts use two measurement choices, both open to
 %%%% revision: parity scored by the number of teams that never win a playoff
 %%%% series in the run, and robustness scored by the exact counterfactual
@@ -38,7 +39,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{times}
-\usepackage[margin=0.6in]{geometry}
+\usepackage[margin=0.6in,top=0.4in,bottom=0.4in]{geometry}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[table]{xcolor}
@@ -111,7 +112,7 @@ Each mechanism ran on the same 30 simulated leagues for 25 seasons, 6,750 season
 \begin{center}
 \small
 \setlength{\tabcolsep}{7pt}
-\renewcommand{\arraystretch}{1.05}
+\renewcommand{\arraystretch}{1.0}
 \begin{tabular}{l r r r r}
 \toprule
 \textbf{Mechanism} & \textbf{Help to} & \textbf{Reward for} & \textbf{Teams never} & \textbf{Longest} \\
@@ -119,33 +120,20 @@ Each mechanism ran on the same 30 simulated leagues for 25 seasons, 6,750 season
  & \textit{draft places per} & \textit{draft places gained} & \textit{in 25 years,} & \textit{seasons,} \\
  & \textit{drought season} & \textit{by finishing last} & \textit{per league} & \textit{of 25} \\
 \midrule
-Current NBA lottery (2019 to 2026)$^{1}$ & $0.07$ & $1.32$ & $0.63$ & $23.3$ \\
-New NBA lottery, 3-2-1 (from 2027)$^{2}$ & $0.02$ & losing costs picks & $1.20$ & $24.4$ \\
-Equal-odds lottery$^{3}$ & $0.00$ & $0$ & $0.93$ & $23.7$ \\
-Classic COLA, the original version$^{4}$ & $0.10$ & $1.85$ & $0.93$ & $24.1$ \\
-Waitlist COLA$^{5}$ & $0.13$ & $0$ & $1.10$ & $24.4$ \\
+Current NBA lottery (2019 to 2026) & $0.07$ & $1.32$ & $0.63$ & $23.3$ \\
+New NBA lottery, 3-2-1 (from 2027) & $0.02$ & losing costs picks & $1.20$ & $24.4$ \\
+Equal-odds lottery & $0.00$ & $0$ & $0.93$ & $23.7$ \\
+Classic COLA, the original version & $0.10$ & $1.85$ & $0.93$ & $24.1$ \\
+Waitlist COLA & $0.13$ & $0$ & $1.10$ & $24.4$ \\
 \rowcolor{accent}
-Simple COLA$^{6}$ & $0.24$ & $0$ & $0.60$ & $23.3$ \\
-Full-lottery COLA$^{7}$ & $0.09$ & $0$ & $0.83$ & $23.8$ \\
-Countdown COLA$^{8}$ & $0.19$ & losing costs picks & $1.33$ & $24.6$ \\
-Beckett COLA$^{9}$ & $0.28$ & losing costs picks & $0.83$ & $23.7$ \\
+Simple COLA & $0.24$ & $0$ & $0.60$ & $23.3$ \\
+Full-lottery COLA & $0.09$ & $0$ & $0.83$ & $23.8$ \\
+Countdown COLA & $0.19$ & losing costs picks & $1.33$ & $24.6$ \\
+Beckett COLA & $0.28$ & losing costs picks & $0.83$ & $23.7$ \\
 \bottomrule
 \end{tabular}\\[2pt]
 \begin{minipage}{0.99\linewidth}\footnotesize
-\textbf{Table 1.} Nine mechanisms on 30 simulated leagues of 25 seasons each, every mechanism on the same 30 starting leagues.\\[2pt]
-\emph{Help to long-drought teams}: among the fourteen teams that missed the playoffs, how many draft places earlier a team picks for each additional season since it last won a playoff series (a regression slope; the same clock for every mechanism).\\
-\emph{Reward for losing}: take a season as played, drop the fifth-worst team to worst with everything else held, and measure how much its pick improves; zero for any rule that never reads record, and ``losing costs picks'' where losing pushes a team down the order.\\
-\emph{Teams never winning a series}: of thirty teams, how many go all 25 seasons without a playoff series win, averaged over leagues.\\
-\emph{Longest drought}: the longest stretch any one team goes without a series win.\\[2pt]
-$^{1}$The rule in force through the 2026 draft: the fourteen teams that miss the playoffs enter a lottery, four picks are drawn with worse records getting more chances, and picks 5 through 14 go in order of record, worst first.\\
-$^{2}$The rule adopted in May 2026 for the 2027 to 2029 drafts: sixteen teams, all sixteen picks drawn, the three worst records given fewer chances than the seven above them and never falling past pick 12.\\
-$^{3}$Every team that misses the playoffs has the same chance at every pick.\\
-$^{4}$Every team carries a waiting number that rises each season it misses the playoffs and falls when it succeeds; the top four picks are drawn with chances proportional to the waiting number, and picks 5 through 14 go by record.\\
-$^{5}$Classic COLA with one change: picks 5 through 14 go by waiting number, so no pick depends on record.\\
-$^{6}$No draw at all; the 22 teams that did not win a playoff series pick in order of waiting number.\\
-$^{7}$Every pick among the fourteen non-playoff teams is drawn, with chances proportional to the waiting number.\\
-$^{8}$Priority is the waiting number multiplied by wins, so a team out of the race gains by winning games; picks are assigned through a sequence of small elimination draws.\\
-$^{9}$Same priority as Countdown, open only to teams two or more seasons into a drought, with the top four picks drawn and the rest in priority order.
+\textbf{Table 1.} Nine mechanisms on the same 30 simulated leagues of 25 seasons each.
 \end{minipage}
 \end{center}
 
