@@ -141,7 +141,7 @@ console.log(
 console.log(`losing moves the team EARLIER in the draft.\n`);
 
 console.log(`The fifth-worst team drops to worst:`);
-console.log(`mechanism    mean     p95      max      per-league mean (n=48)`);
+console.log(`mechanism    mean     p95      max      per-league mean (n=leagues)`);
 console.log("-".repeat(76));
 for (const mech of MECHS) {
 	const r = results[mech];

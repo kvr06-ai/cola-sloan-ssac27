@@ -1,0 +1,39 @@
+
+===== Sim 3, the tanking agent: what a losing streak buys, 750 engine seasons per mechanism =====
+
+The same league in both arms. Only the tanking team's record moves; rosters, indices, and every
+other team's record are held at what the engine produced. Gains are in draft picks, positive when
+losing moves the team EARLIER in the draft.
+
+The fifth-worst team drops to worst:
+mechanism    mean     p95      max      per-league mean (n=48)
+----------------------------------------------------------------------------
+nba           1.317   1.654   1.856      1.3169 +/- 0.0047  CI[1.3075, 1.3263]
+classic       1.853   2.576   3.171      1.8526 +/- 0.0125  CI[1.8274, 1.8777]
+waitlist      0.000   0.000   0.000      0.0000 +/- 0.0000  CI[0.0000, 0.0000]
+
+Every starting rank drops to worst (mean picks gained; rank 1 is already worst):
+mechanism        2     3     4     5     6     7     8     9    10    11    12    13    14
+------------------------------------------------------------------------------------------
+nba           0.21  0.41  0.80  1.32  1.90  2.56  3.41  4.40  5.56  6.67  7.71  8.80  9.96
+classic       0.45  0.89  1.37  1.85  2.33  2.89  3.37  3.89  4.45  4.98  5.56  6.14  6.81
+waitlist      0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+
+One more rank of losing, the incentive at the margin (mean picks gained):
+mechanism        2     3     4     5     6     7     8     9    10    11    12    13    14
+------------------------------------------------------------------------------------------
+nba           0.21  0.24  0.46  0.68  0.87  1.05  1.33  1.57  1.91  2.04  1.99  1.90  1.84
+classic       0.45  0.53  0.63  0.66  0.73  0.79  0.83  0.87  0.93  0.91  0.93  0.93  0.88
+waitlist      0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00  0.00
+
+Largest absolute gain found anywhere (all ranks, all seasons, both interventions):
+  nba        1.006e+1 picks
+  classic    8.073e+0 picks
+  waitlist   0.000e+0 picks
+
+Waitlist COLA reads only the carry-over index, which a within-season tank cannot move, so its
+zero is structural rather than statistical: not a small effect that failed to reach significance,
+but an identity that holds in every season at every rank. The measurement's job is to confirm the
+implementation carries no leak, and to price what the record-based mechanisms pay for the same act.
+
+node tank_counterfactual.js "$S/cf"  57.37s user 0.13s system 100% cpu 57.359 total
