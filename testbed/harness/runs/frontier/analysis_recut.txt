@@ -19,39 +19,39 @@ replayed from the log (Countdown, Beckett); record (NBA lottery, 3-2-1), whose t
 Common yardstick: seasons since the team's last playoff-series win, the same clock for every mechanism; the value is
 draft places gained per extra drought season among the fourteen pool teams (an OLS slope, sign flipped).
 
-===== Dominance, help on each mechanism's OWN standard; parity = max drought; robustness = record-ranked gap (help higher, others lower) =====
+===== Dominance, help on each mechanism's OWN standard; parity = never-winners; robustness = counterfactual reward (help higher, others lower) =====
 
 Classic COLA                  dominated by Simple COLA [help,parity,robust; point estimate only]; COLA, full-depth lottery [help,parity,robust; point estimate only]; Beckett COLA [help,parity,robust; point estimate only]; NBA lottery, 2019 rules [help,parity,robust; point estimate only]
-Waitlist COLA                 dominated by Beckett COLA [help,parity,robust; point estimate only]
+Waitlist COLA                 dominated by Simple COLA [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
 Simple COLA                   UNDOMINATED (on the frontier before simplicity)
-COLA, full-depth lottery      dominated by Beckett COLA [help,parity,robust; point estimate only]
-Uniform lottery (flat COLA)   dominated by Beckett COLA [help,parity,robust; point estimate only]
-Countdown COLA                UNDOMINATED (on the frontier before simplicity)
-Beckett COLA                  UNDOMINATED (on the frontier before simplicity)
+COLA, full-depth lottery      dominated by Simple COLA [help,parity; point estimate only]; Beckett COLA [help; point estimate only]
+Uniform lottery (flat COLA)   dominated by Simple COLA [help,parity; point estimate only]; COLA, full-depth lottery [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
+Countdown COLA                dominated by Simple COLA [help,parity; clears]
+Beckett COLA                  dominated by Simple COLA [help,parity; point estimate only]
 NBA lottery, 2019 rules       dominated by Simple COLA [help,parity,robust; point estimate only]
-3-2-1 as adopted              dominated by Beckett COLA [help,parity; point estimate only]
+3-2-1 as adopted              dominated by Waitlist COLA [help,parity; point estimate only]; Simple COLA [help,parity; point estimate only]; COLA, full-depth lottery [help,parity; point estimate only]; Uniform lottery (flat COLA) [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
 
-Frontier (3): Simple COLA; Countdown COLA; Beckett COLA
+Frontier (1): Simple COLA
 Mechanisms dominating NBA lottery, 2019 rules: 1 on point estimates (Simple COLA); 0 with every strict criterion clearing its interval (none).
-Mechanisms dominating 3-2-1 as adopted: 1 on point estimates (Beckett COLA); 0 with every strict criterion clearing its interval (none).
-Mechanisms dominating BOTH baselines: 0 (none); with intervals clearing: 0 (none).
+Mechanisms dominating 3-2-1 as adopted: 5 on point estimates (Waitlist COLA, Simple COLA, COLA, full-depth lottery, Uniform lottery (flat COLA), Beckett COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating BOTH baselines: 1 (Simple COLA); with intervals clearing: 0 (none).
 
-===== Dominance, help on the COMMON yardstick, series-win drought; parity = max drought; robustness = record-ranked gap (help higher, others lower) =====
+===== Dominance, help on the COMMON yardstick, series-win drought; parity = never-winners; robustness = counterfactual reward (help higher, others lower) =====
 
 Classic COLA                  dominated by Simple COLA [help,parity,robust; point estimate only]; Beckett COLA [help,parity,robust; point estimate only]
-Waitlist COLA                 dominated by Beckett COLA [help,parity,robust; point estimate only]
+Waitlist COLA                 dominated by Simple COLA [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
 Simple COLA                   UNDOMINATED (on the frontier before simplicity)
-COLA, full-depth lottery      dominated by Beckett COLA [help,parity,robust; point estimate only]
-Uniform lottery (flat COLA)   dominated by Beckett COLA [help,parity,robust; point estimate only]
-Countdown COLA                dominated by Beckett COLA [help,parity; clears]
+COLA, full-depth lottery      dominated by Simple COLA [help,parity; point estimate only]; Beckett COLA [help; clears]
+Uniform lottery (flat COLA)   dominated by Simple COLA [help,parity; point estimate only]; COLA, full-depth lottery [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
+Countdown COLA                dominated by Simple COLA [help,parity; clears]; Beckett COLA [help,parity; point estimate only]
 Beckett COLA                  UNDOMINATED (on the frontier before simplicity)
 NBA lottery, 2019 rules       dominated by Simple COLA [help,parity,robust; point estimate only]
-3-2-1 as adopted              dominated by Beckett COLA [help,parity; point estimate only]
+3-2-1 as adopted              dominated by Waitlist COLA [help,parity; point estimate only]; Simple COLA [help,parity; point estimate only]; COLA, full-depth lottery [help,parity; point estimate only]; Beckett COLA [help,parity; point estimate only]
 
 Frontier (2): Simple COLA; Beckett COLA
 Mechanisms dominating NBA lottery, 2019 rules: 1 on point estimates (Simple COLA); 0 with every strict criterion clearing its interval (none).
-Mechanisms dominating 3-2-1 as adopted: 1 on point estimates (Beckett COLA); 0 with every strict criterion clearing its interval (none).
-Mechanisms dominating BOTH baselines: 0 (none); with intervals clearing: 0 (none).
+Mechanisms dominating 3-2-1 as adopted: 4 on point estimates (Waitlist COLA, Simple COLA, COLA, full-depth lottery, Beckett COLA); 0 with every strict criterion clearing its interval (none).
+Mechanisms dominating BOTH baselines: 1 (Simple COLA); with intervals clearing: 0 (none).
 
 ===== Differences against NBA lottery, 2019 rules (mechanism minus reference; paired by league; * = interval includes 0) =====
 
