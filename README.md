@@ -29,7 +29,9 @@ from generated rosters and contracts under automated general managers. League
 generation and every draw are seeded per replicate, so a given configuration and
 seed reproduce a run exactly.
 
-Requirements: Node.js 18 or later.
+Requirements: Node.js 18 or later. The Overleaf sync drops the executable bit
+on the shell scripts, so after cloning run `chmod +x testbed/harness/*.sh`
+before any of the runners below.
 
 From `testbed/harness`, each script prints one reported result:
 
