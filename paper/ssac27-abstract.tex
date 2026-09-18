@@ -4,13 +4,30 @@
 %%%% SUBMISSION SPEC (verified at sloansportsconference.com, 2026-08-19):
 %%%%   - Due Oct 1, 2026 11:59pm EST via Google Form.
 %%%%   - Under 500 words INCLUDING title and body. Tables sit outside that count.
-%%%%   - At most two tables and figures combined. We use exactly two tables.
+%%%%   - At most two tables and figures combined. We use one table.
 %%%%   - Required sections: Introduction, Methods, Results, Conclusion.
 %%%%   - Judged on novelty, academic rigor, reproducibility, and application.
 %%%%   - Accepted manuscripts carry NO abstract section, so this document is a
 %%%%     standalone selection artifact and must read without the paper.
 %%%%   - Finalist title blocks show track and Paper ID with no author names; an
 %%%%     ID is assigned after acceptance, so only the track appears here.
+%%%%
+%%%% THIS VERSION (2026-09-19): Tim's draft of 2026-09-15, typeset as written,
+%%%% with three additions and nothing else changed:
+%%%%   1. the four required headings;
+%%%%   2. the numbers in the last paragraph, from the 25-season run
+%%%%      (30 leagues x 25 seasons x 9 mechanisms = 6,750 seasons);
+%%%%   3. the table, with its footnotes in the caption (outside the count).
+%%%% The last paragraph's counts use two measurement choices, both open to
+%%%% revision: parity scored by the number of teams that never win a playoff
+%%%% series in the run, and robustness scored by the exact counterfactual
+%%%% (fifth-worst team dropped to worst, everything else held). Under those,
+%%%% Simple COLA dominates both baselines on point estimates and the frontier
+%%%% is Simple and Beckett. Every number regenerates from the public repo:
+%%%%   node testbed/harness/frontier_analysis.js --parity=neverWon --robust=causal
+%%%% Tim's closing sentence about the frontier was moved under Conclusion so the
+%%%% required heading is not empty; the one or two closing sentences he planned
+%%%% go there.
 %%%%
 %%%% Word count: python3 wordcount_abstract.py
 
@@ -23,95 +40,108 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage[table]{xcolor}
-\usepackage[font=small,skip=3pt,justification=centering]{caption}
+\usepackage[font=small,skip=3pt,justification=raggedright]{caption}
 \usepackage{titlesec}
+\usepackage{enumitem}
 \usepackage[hidelinks]{hyperref}
 \usepackage{url}
 \urlstyle{same}
 
 \definecolor{accent}{RGB}{234,240,247}
-\definecolor{rule}{RGB}{120,130,140}
 
 \titleformat{\section}{\normalfont\bfseries}{}{0pt}{}
-\titlespacing*{\section}{0pt}{4pt}{2pt}
+\titlespacing*{\section}{0pt}{5pt}{2pt}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{1.5pt}
+\setlength{\parskip}{2pt}
+\setlist[itemize]{nosep, leftmargin=1.2em, topsep=1pt}
 
 \pagestyle{empty}
 
 \begin{document}
 
 \begin{center}
-{\LARGE\bfseries Waitlist COLA: A Record-Blind NBA Draft Order\\[2pt]
-With No Tanking Reward}\\[7pt]
+{\LARGE\bfseries Carry-Over Lottery Allocation:\\[2pt] Practical Incentive-Compatible Drafts}\\[7pt]
 {\normalsize Paper Track: Basketball}\\[2pt]
 {\small Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}}
 \end{center}
 
 \section{Introduction}
 
-National Basketball Association (NBA) teams that fall out of the playoff race often stop trying to win, because finishing worse earns a better draft pick. Roughly a third of the league's teams were openly doing this in the 2025-26 season. The league has answered with ten years of odds adjustments, most recently the sixteen-team 3-2-1 format adopted in May 2026. Banchio and Munro (SSAC 2020) proved that odds alone cannot fix it, because any rule giving worse records better odds still rewards losing.
+How can a league help weak teams through the draft without encouraging teams to tank? Carry-Over Lottery Allocation (COLA), presented here, is a family of draft mechanisms that all simultaneously discourage tanking and help the weakest teams.
 
-Carry-Over Lottery Allocation (\textsc{Cola}) gives each team a waiting number that rises every year it misses the playoffs and falls when it succeeds, and sets draft priority by that number, so one bad season barely moves a team. It has many versions. Which one ends the reward for losing, and where in a draft does that reward live?
+Under any mechanism in the COLA framework, each team has a draft priority that rises and falls over time, but it does not rise based on more losses. That eliminates the tanking incentive. Draft priority carries over from year to year, being reduced when a team has playoff success or makes a high draft pick. That directs the most help to the weakest teams over time.
+
+For 40 years, the NBA has navigated the tradeoff between helping weak teams and discouraging tanking. COLA solves that primary dilemma, but there are other tradeoffs worth considering among the COLA variants. After demonstrating COLA's incentive compatibility, this paper discusses the tradeoffs between mechanisms within the framework.
 
 \section{Methods}
 
-We describe \textsc{Cola}'s versions with seven settings and run nine draft rules through ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. Each rule ran 48 separate leagues of 15 seasons, 14{,}004 league-seasons in all. Every rule faces three tests. Does losing pay? Does help reach the longest-waiting teams? Can a team game the pool another way?
+We identify several tunable dials for mechanisms within the COLA framework:
+\begin{itemize}
+\item Which teams are eligible for the lottery?
+\item How does a team's lottery priority increase?
+\item How does the priority decrease?
+\item How does the priority determine lottery odds and draft positions?
+\end{itemize}
 
-Six of the nine rules are \textsc{Cola} versions. One is new. Waitlist \textsc{Cola} keeps the four-pick televised draw exactly as the original runs it, then fills picks 5 through 14 by waiting number, longest wait first, ties broken at random.
+We consider different COLA variants plus other draft mechanisms, including 3-2-1 Lottery, and compare them using ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. We measure the mechanisms against these criteria:
+\begin{itemize}
+\item \textbf{Targeted help.} Does help reach the weakest teams, as measured by the difference between the help received by the highest priority team and other teams?
+\item \textbf{Long-term parity.} Can all teams be competitive, as measured by the longest drought any team has between playoff series wins?
+\item \textbf{Simplicity.} How complicated is the mechanism? Though measured subjectively, it is not difficult to identify complexity.
+\item \textbf{Robustness.} Does the mechanism admit tanking incentives at the margin? COLA variants are incentive-compatible under reasonable assumptions. Further relaxation of those assumptions may entail a choice between extra complexity or allowing potential tanking incentives in rare cases.
+\end{itemize}
 
 \section{Results}
 
-Most of the reward for losing came from picks 5 through 14. Table 1 switches each part of the old rule off in turn. Making the draw ignore record while leaving those ten alone raises the reward from $1.30$ draft places to $1.98$. Making the ten ignore record instead cuts it to $0.61$.
+Many mechanisms are dominated under these criteria, meaning there is another mechanism that is better on all four.
+
+Using 30 simulations of 25 seasons for each of 9 mechanisms (6,750 seasons total), we identified a frontier of two viable mechanisms. Notably, one mechanism directly dominates both 3-2-1 Lottery and the 2019--2026 NBA Lottery on point estimates. The table summarizes the results.
+% Filled from the 25-season run. "2019--2026": the June 2026 draft also ran under
+% the old rules; 3-2-1 first applies to the 2027 draft. "On point estimates": the
+% help and tanking differences clear their paired 95% intervals, the never-winner
+% differences do not.
 
 \begin{center}
 \small
-\setlength{\tabcolsep}{10pt}
-\renewcommand{\arraystretch}{1.0}
-\begin{tabular}{l r r}
+\setlength{\tabcolsep}{7pt}
+\renewcommand{\arraystretch}{1.05}
+\begin{tabular}{l r r r r}
 \toprule
-\textbf{What the rule reads} & \textbf{Reward for losing} & \textbf{Vs.\ 2026 rule} \\
- & \textit{draft places} & \\
+\textbf{Mechanism} & \textbf{Help to} & \textbf{Reward for} & \textbf{Teams never} & \textbf{Longest} \\
+ & \textbf{long-drought teams} & \textbf{losing} & \textbf{winning a series} & \textbf{drought} \\
+ & \textit{draft places per} & \textit{draft places gained} & \textit{in 25 years,} & \textit{seasons,} \\
+ & \textit{drought season} & \textit{by finishing last} & \textit{per league} & \textit{of 25} \\
 \midrule
-Both parts read record (rule through 2026) & $1.30$ & baseline \\
-Draw ignores record, later picks by record & $1.98$ & $1.52\times$ \\
-Later picks ignore record, draw unchanged & $0.61$ & $0.47\times$ \\
-Neither part reads record & $-0.16$ & noise floor \\
-\bottomrule
-\end{tabular}\\[1pt]
-\begin{minipage}{0.99\linewidth}\centering\small
-\textbf{Table 1.} Where the reward for losing comes from. Each number is how many places earlier the worst team drafts than the fifth-worst, on average, which is what finishing last buys. Through 2026 the lottery drew four picks and handed out the rest in order of record. Each row below the first makes one part ignore record. The two parts work against each other, so the ratios do not add up. A weighted draw pulls the worst teams out of the record-ordered picks, hiding how much those picks are worth.
-\end{minipage}
-\end{center}
-
-The league's new format confirms this. 3-2-1 draws all sixteen places, so no pick goes by record, and that change carries its whole gain against tanking. Its ball allocation with a four-pick draw behind it would have left $1.76$.
-
-Waitlist \textsc{Cola} is the simplest version that clears all three tests. Dropping a team from fifth-worst to worst gains $1.87$ places under the original \textsc{Cola} and $1.32$ under the 2026 rule, and exactly zero under Waitlist \textsc{Cola} across 720 seasons. It concedes no more to pool-gaming than today's lottery does. The pattern repeats on 26 seasons of real NBA results.
-
-\begin{center}
-\small
-\setlength{\tabcolsep}{10pt}
-\renewcommand{\arraystretch}{1.0}
-\begin{tabular}{l r r}
-\toprule
-\textbf{Mechanism} & \textbf{Ranked by record} & \textbf{Ranked by own standard} \\
- & \textit{draft places; want} $0$ & \textit{draft places; want wide} \\
-\midrule
-NBA lottery, 2019 rules & $+1.09 \pm 0.12$ & $+1.09 \pm 0.12$ \\
-3-2-1 as adopted & $-1.22 \pm 0.25$ & $-1.22 \pm 0.25$ \\
-Classic \textsc{Cola} (original) & $+1.88 \pm 0.11$ & $+1.38 \pm 0.24$ \\
+Current NBA lottery (2019 to 2026)$^{1}$ & $0.07$ & $1.32$ & $0.63$ & $23.3$ \\
+New NBA lottery, 3-2-1 (from 2027)$^{2}$ & $0.02$ & losing costs picks & $1.20$ & $24.4$ \\
+Equal-odds lottery$^{3}$ & $0.00$ & $0$ & $0.93$ & $23.7$ \\
+Classic COLA, the original version$^{4}$ & $0.10$ & $1.85$ & $0.93$ & $24.1$ \\
+Waitlist COLA$^{5}$ & $0.13$ & $0$ & $1.10$ & $24.4$ \\
 \rowcolor{accent}
-\textbf{Waitlist \textsc{Cola}} & $\mathbf{-0.12 \pm 0.22}$ & $\mathbf{+1.71 \pm 0.13}$ \\
+Simple COLA$^{6}$ & $0.24$ & $0$ & $0.60$ & $23.3$ \\
+Full-lottery COLA$^{7}$ & $0.09$ & $0$ & $0.83$ & $23.8$ \\
+Countdown COLA$^{8}$ & $0.19$ & losing costs picks & $1.33$ & $24.6$ \\
+Beckett COLA$^{9}$ & $0.28$ & losing costs picks & $0.83$ & $23.7$ \\
 \bottomrule
-\end{tabular}\\[1pt]
-\begin{minipage}{0.99\linewidth}\centering\small
-\textbf{Table 2.} The same measurement under two rankings. Rank the fourteen lottery teams, take the first and the fifth, and compare the picks they get. Ranked by record, the number is what losing buys, and zero is the goal. Ranked by the rule's own standard of who deserves help, a big positive number means the rule delivers. When a rule's standard is record, both rankings give the same list, so the two columns must match. A negative number flips the reading, so 3-2-1 gives its worst teams the latest picks. The original \textsc{Cola} fills picks 5 through 14 in order of record, which is the one setting Waitlist \textsc{Cola} changes.
+\end{tabular}\\[2pt]
+\begin{minipage}{0.99\linewidth}\footnotesize
+\textbf{Table 1.} Nine mechanisms on 30 simulated leagues of 25 seasons each, every mechanism on the same 30 starting leagues. \emph{Help to long-drought teams}: among the fourteen teams that missed the playoffs, how many draft places earlier a team picks for each additional season since it last won a playoff series (a regression slope; the same clock for every mechanism). \emph{Reward for losing}: take a season as played, drop the fifth-worst team to worst with everything else held, and measure how much its pick improves; zero for any rule that never reads record, and ``losing costs picks'' where losing pushes a team down the order. \emph{Teams never winning a series}: of thirty teams, how many go all 25 seasons without a playoff series win, averaged over leagues. \emph{Longest drought}: the longest stretch any one team goes without a series win.
+$^{1}$The rule in force through the 2026 draft: the fourteen teams that miss the playoffs enter a lottery, four picks are drawn with worse records getting more chances, and picks 5 through 14 go in order of record, worst first.
+$^{2}$The rule adopted in May 2026 for the 2027 to 2029 drafts: sixteen teams, all sixteen picks drawn, the three worst records given fewer chances than the seven above them and never falling past pick 12.
+$^{3}$Every team that misses the playoffs has the same chance at every pick.
+$^{4}$Every team carries a waiting number that rises each season it misses the playoffs and falls when it succeeds; the top four picks are drawn with chances proportional to the waiting number, and picks 5 through 14 go by record.
+$^{5}$Classic COLA with one change: picks 5 through 14 go by waiting number, so no pick depends on record.
+$^{6}$No draw at all; the 22 teams that did not win a playoff series pick in order of waiting number.
+$^{7}$Every pick among the fourteen non-playoff teams is drawn, with chances proportional to the waiting number.
+$^{8}$Priority is the waiting number multiplied by wins, so a team out of the race gains by winning games; picks are assigned through a sequence of small elimination draws.
+$^{9}$Same priority as Countdown, open only to teams two or more seasons into a drought, with the top four picks drawn and the rest in priority order.
 \end{minipage}
 \end{center}
 
 \section{Conclusion}
 
-Ending the reward for losing needs one change. Keep the draw, order the picks behind it by waiting number, and a team gains nothing from losing while the longest-suffering teams still pick earliest, more than the rule the league just adopted manages. Lottery night would look the same to fans. A league weighing these goals differently can move the seven settings and score the result on the same three tests.
+We identify a frontier of mechanisms that are not dominated and therefore viable options for implementation, depending on the league's goals.
+% One or two closing sentences to add here (Tim, 2026-09-15).
 
 \end{document}
