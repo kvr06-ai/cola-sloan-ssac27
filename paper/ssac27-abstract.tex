@@ -22,8 +22,10 @@
 %%%% revision: parity scored by the number of teams that never win a playoff
 %%%% series in the run, and robustness scored by the exact counterfactual
 %%%% (fifth-worst team dropped to worst, everything else held). Under those,
-%%%% Simple COLA dominates both baselines on point estimates and the frontier
-%%%% is Simple and Beckett. Every number regenerates from the public repo:
+%%%% Simple and Beckett are undominated; Simple's help gains clear their paired
+%%%% intervals against both baselines, its parity differences do not (except the
+%%%% longest drought against 3-2-1), and the text says so. Every number
+%%%% regenerates from the public repo:
 %%%%   node testbed/harness/frontier_analysis.js --parity=neverWon --robust=causal
 %%%% Tim's closing sentence about the frontier was moved under Conclusion so the
 %%%% required heading is not empty; the one or two closing sentences he planned
@@ -96,11 +98,15 @@ We consider different COLA variants plus other draft mechanisms, including 3-2-1
 
 Many mechanisms are dominated under these criteria, meaning there is another mechanism that is better on all four.
 
-Using 30 simulations of 25 seasons for each of 9 mechanisms (6,750 seasons total), we identified a frontier of two viable mechanisms. Notably, one mechanism directly dominates both 3-2-1 Lottery and the 2019--2026 NBA Lottery on point estimates. The table summarizes the results.
+Each mechanism ran on the same 30 simulated leagues for 25 seasons, 6,750 seasons in all, and we report paired differences with 95\% confidence intervals. Under the measures in Table~1, Simple COLA and Beckett COLA are undominated. Simple COLA helps long-drought teams more than the 2019--2026 NBA lottery or 3-2-1 (intervals exclude zero), is at least level with both on parity, and never reads a record, so it offers no reward for losing. Every mechanism fell short on parity, however. The longest drought ran near 25 seasons in every arm, and no reduction in never-winners cleared its interval.
 % Filled from the 25-season run. "2019--2026": the June 2026 draft also ran under
-% the old rules; 3-2-1 first applies to the 2027 draft. "On point estimates": the
-% help and tanking differences clear their paired 95% intervals, the never-winner
-% differences do not.
+% the old rules; 3-2-1 first applies to the 2027 draft. Sources for each claim
+% (runs/frontier/analysis_recut.txt, --parity=neverWon --robust=causal):
+%   help vs 2019 lottery +0.17 [0.13, 0.21] places per drought season, vs 3-2-1
+%   +0.22 [0.19, 0.26]; longest drought vs 2019 lottery -0.07 [-1.06, 0.93] and
+%   never-winners -0.03 [-0.56, 0.49]; longest drought vs 3-2-1 -1.10 [-2.01,
+%   -0.19] and never-winners -0.60 [-1.21, 0.01]; reward for losing 0 by
+%   construction (tank_counterfactual.js gives the 2019 lottery 1.32).
 
 \begin{center}
 \small
