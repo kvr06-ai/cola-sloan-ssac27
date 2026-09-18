@@ -77,6 +77,16 @@ type Config = {
 	// drawn by balls. The public 3-2-1 description does not pin this down,
 	// so the sweep runs both. Ignored for other variants ("nba" is always 4).
 	drawDepth?: number;
+	// The 3-2-1 format as ADOPTED by the Board of Governors (29-1, 2026-05-28;
+	// first applied to the 2027 draft). With variant "t321" and adopted=true the
+	// tiers of four give way to the adopted roles: the three worst records hold
+	// 2 balls each, the other seven non-play-in teams 3 each, the four 9/10
+	// play-in seeds 2 each, the two 7v8 play-in losers 1 each (37 balls); all
+	// sixteen positions are drawn; the three worst records cannot fall past
+	// pick 12; no team takes the #1 pick in consecutive seasons; no team takes a
+	// third consecutive top-five pick. drawDepth is ignored (always 16).
+	// Sources: ESPN, Bontemps 2026-05-28; Yahoo Sports, O'Connor 2026-05-29.
+	adopted?: boolean;
 	// Behavioral tanking agent (Sim 3). When set, one team shuts down its best
 	// players at the trade deadline of the named season and plays out the rest of
 	// the year without them, which is what a team that has decided to lose on
@@ -552,6 +562,7 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 
 	const records: SeasonRec[] = [];
 	const droughtState: Record<number, number> = {}; // anchors only
+	const pickHistory: Record<number, number[]> = {}; // t321 adopted: consecutive-season rules
 	let pendingTeams: TeamRec[] | null = null;
 	let pendingSeason = START;
 	let priorChampionTid: number | null = null;
@@ -716,35 +727,68 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				//            (140/140/140/125/105/90/75/60/45/30/20/15/10/5 per
 				//            1000); top-4 drawn without replacement; picks 5-14 by
 				//            record among the rest of the pool.
-				//   "t321" : the 2026 3-2-1 proposal. Pool = 16 teams (per
+				//   "t321" : the 2026 3-2-1 reform. Pool = 16 teams (per
 				//            conference the bottom 8 by record, matching the
-				//            16-tiered eligibility approximation); four record
-				//            tiers of 4 get ball counts 2/3/2/1 (the bottom tier
-				//            deliberately below tier 2); the top drawDepth picks
-				//            drawn without replacement, remainder by record.
+				//            16-tiered eligibility approximation). Two forms:
+				//            the PROPOSAL arms (adopted unset) use four record
+				//            tiers of 4 at ball counts 2/3/2/1 and draw the top
+				//            drawDepth picks, remainder by record; the ADOPTED
+				//            form (adopted=true) assigns balls by role
+				//            (2/3/2/1 over groups of 3/7/4/2), draws all sixteen,
+				//            floors the three worst records at pick 12, and bars
+				//            a repeat #1 or a third straight top-five pick.
 				const colaByTid: Record<number, number> = {};
 				for (const t of teamsNow as any[]) colaByTid[t.tid] = t.cola ?? 0;
 				let pool: any[];
+				// Each pool team's role under the adopted 3-2-1, by conference seed.
+				type T321Role = "bottom3" | "nonPlayIn" | "seed910" | "seed8";
+				const role: Record<number, T321Role> = {};
 				if (config.variant === "nba") {
 					pool = tss.filter((ts: any) => ts.playoffRoundsWon < 0);
 				} else {
 					const byConf: Record<number, any[]> = {};
 					for (const ts of tss) (byConf[ts.cid] ??= []).push(ts);
-					pool = Object.values(byConf).flatMap((c: any[]) =>
-						c.slice().sort((a, b) => a.won - b.won).slice(0, 8),
-					);
+					pool = Object.values(byConf).flatMap((c: any[]) => {
+						const worst8 = c.slice().sort((a, b) => a.won - b.won).slice(0, 8);
+						// Conference seeds by record: indices 0-4 are seeds 15 through
+						// 11 (the non-play-in teams), 5-6 are seeds 10 and 9, and 7 is
+						// seed 8, the proxy for the 7v8 play-in loser (ASSUMPTIONS).
+						worst8.forEach((ts, i) => {
+							role[ts.tid] = i < 5 ? "nonPlayIn" : i < 7 ? "seed910" : "seed8";
+						});
+						return worst8;
+					});
+					if (config.adopted) {
+						// The three worst records league-wide, all non-play-in teams.
+						pool
+							.filter((ts: any) => role[ts.tid] === "nonPlayIn")
+							.sort((a: any, b: any) => a.won - b.won)
+							.slice(0, 3)
+							.forEach((ts: any) => {
+								role[ts.tid] = "bottom3";
+							});
+					}
 				}
 				pool.sort((a: any, b: any) => a.won - b.won); // worst record first
 				const NBA_BALLS = [140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, 5];
 				const TIER_BALLS = [2, 3, 2, 1];
-				const weightOf = (rank: number) =>
+				const ADOPTED_BALLS: Record<T321Role, number> = {
+					bottom3: 2,
+					nonPlayIn: 3,
+					seed910: 2,
+					seed8: 1,
+				};
+				const weightOf = (ts: any, rank: number) =>
 					config.variant === "nba"
 						? NBA_BALLS[rank] ?? 5
-						: TIER_BALLS[Math.min(3, Math.floor(rank / 4))]!;
-				const drawDepth = config.variant === "nba" ? 4 : (config.drawDepth ?? 4);
+						: config.adopted
+							? ADOPTED_BALLS[role[ts.tid]!]
+							: TIER_BALLS[Math.min(3, Math.floor(rank / 4))]!;
+				const drawDepth =
+					config.variant === "nba" ? 4 : config.adopted ? 16 : (config.drawDepth ?? 4);
 				const remaining = pool.map((ts: any, i: number) => ({
 					tid: ts.tid,
-					w: weightOf(i),
+					w: weightOf(ts, i),
 					won: ts.won,
 				}));
 				const order: Record<number, number> = {};
@@ -756,19 +800,47 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 						for (const r of remaining) order[r.tid] = pickNum++;
 						break;
 					}
-					const total = remaining.reduce((s, x) => s + x.w, 0);
+					// Candidates for this pick. The adopted format restricts them three
+					// ways: no #1 pick in consecutive seasons; no third consecutive
+					// top-five pick; and the three worst records cannot fall past pick
+					// 12, so once the picks left through 12 equal the bottom-three
+					// teams still undrawn, those teams take them, drawn among
+					// themselves by balls. Each filter yields to the unrestricted set
+					// if it would empty the candidates.
+					let cands = remaining;
+					if (config.adopted) {
+						const past = (tid: number, back: number): number | null => {
+							const h = pickHistory[tid] ?? [];
+							return h.length >= back ? h[h.length - back]! : null;
+						};
+						if (pickNum === 1) {
+							const f = cands.filter((x) => past(x.tid, 1) !== 1);
+							if (f.length > 0) cands = f;
+						}
+						if (pickNum <= 5) {
+							const f = cands.filter(
+								(x) => !((past(x.tid, 1) ?? 99) <= 5 && (past(x.tid, 2) ?? 99) <= 5),
+							);
+							if (f.length > 0) cands = f;
+						}
+						if (pickNum <= 12) {
+							const b3 = cands.filter((x) => role[x.tid] === "bottom3");
+							if (b3.length > 0 && b3.length >= 13 - pickNum) cands = b3;
+						}
+					}
+					const total = cands.reduce((s, x) => s + x.w, 0);
 					const roll = Math.random() * total;
 					let cum = 0;
-					let idx = 0;
-					for (let i = 0; i < remaining.length; i++) {
-						cum += remaining[i]!.w;
+					let chosen = cands[0]!;
+					for (let i = 0; i < cands.length; i++) {
+						cum += cands[i]!.w;
 						if (roll < cum) {
-							idx = i;
+							chosen = cands[i]!;
 							break;
 						}
 					}
-					order[remaining[idx]!.tid] = pickNum++;
-					remaining.splice(idx, 1);
+					order[chosen.tid] = pickNum++;
+					remaining.splice(remaining.indexOf(chosen), 1);
 				}
 				// Tail: teams outside the pool pick after it, worst record first.
 				const poolTids = new Set(pool.map((ts: any) => ts.tid));
@@ -778,6 +850,8 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 					.sort((a: any, b: any) => a.won - b.won)) {
 					order[ts.tid] = pickNum++;
 				}
+				// Pick history feeds the adopted format's consecutive-season rules.
+				for (const ts of tss) (pickHistory[ts.tid] ??= []).push(order[ts.tid]!);
 				await phase.newPhase(PHASE.DRAFT, NO_COND); // engine draws + decays ITS winners
 				await injectDraftOrder(pendingSeason, order); // override the order
 				// Evolve the index under the SAME law as the weighted arms: restore

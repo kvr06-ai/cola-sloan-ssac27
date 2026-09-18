@@ -68,6 +68,48 @@ COLA_FULL_ENGINE=1) adds, beyond the cola dial mechanics:
   stated we would implement Beckett uncapped unless Highley flagged a cap; he did
   not reply, so per the opt-out posture uncapped is confirmed for the sweep.
 
+**Frontier run additions (2026-09-18).** The 25-season frontier run
+(`frontier_run.sh`, analyzed by `frontier_analysis.js`) adds:
+
+- **FE-4. 3-2-1 AS ADOPTED (`variant: "t321", adopted: true`).** The Board of
+  Governors format (29-1 vote, 2026-05-28; first applied to the 2027 draft), as
+  reported by ESPN (Bontemps, 2026-05-28) and Yahoo Sports (O'Connor,
+  2026-05-29): balls by role rather than by tiers of four. The three worst
+  records league-wide hold 2 balls each, the other seven non-play-in teams 3
+  each, the four 9/10 play-in seeds 2 each, the two 7v8 play-in losers 1 each
+  (37 balls; pick-one odds 5.4 / 8.1 / 5.4 / 2.7 percent). All sixteen positions
+  are drawn. The three worst records cannot fall past pick 12: once the picks
+  left through 12 equal the bottom-three teams still undrawn, those teams take
+  them, drawn among themselves by balls. No team takes the #1 pick in
+  consecutive seasons and no team takes a third consecutive top-five pick; both
+  are enforced by removing the team from the candidate set for the affected
+  pick, using the pick history the driver keeps per league. Roles come from
+  conference seed by regular-season record; the 7v8 loser is still proxied by
+  the 8-seed (FE-1), so the two 1-ball teams are the record-8 seeds rather than
+  the actual losers of the 7v8 game. `t321_adopted_check.js` verifies a run
+  against every rule above and rejects a record-ordered tail (the signature of
+  the proposal arm). The earlier proposal arms (`t321a`, `t321b`: tiers of four
+  at 2/3/2/1, no floor, no consecutive-season rules) are unchanged.
+
+- **FE-5. Shared config id across mechanisms.** Every mechanism in the frontier
+  run uses `id: 900`, so for a given seed the league generation and the first
+  season are identical under every mechanism (the replicate seed is a hash of
+  the config id and the seed); the histories separate at the first draw. This
+  is the common-random-numbers design stats_tests.js noted as a future
+  refinement: cross-mechanism differences are computed per seed and their
+  intervals are paired. The paper's 48 x 15 runs used distinct ids and are
+  unpaired.
+
+- **FE-6. Simple COLA and Capped COLA in the frontier run.** Simple COLA is run
+  as the weighted variant with `lotteryDepth: 0` over the 22-team pool: the
+  pool is ordered by the carry-over index with no draw, under Classic's index
+  dynamics (increment and playoff diminishment), which is the paper's dial
+  reading of the variant. Capped COLA is NOT run: `applyCapClamp` clamps the
+  engine index in engine units (increment 1000 per season), so a cap of 150
+  flattens every accrued index to the cap and does not reproduce the
+  wins-based increment of the published variant; a faithful implementation is
+  a separate ticket.
+
 ---
 
 ## 1. ZenGM Engine Assumptions
