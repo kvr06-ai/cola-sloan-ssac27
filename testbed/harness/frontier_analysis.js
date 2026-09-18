@@ -52,6 +52,17 @@ const ROOT = args.find((a) => !a.startsWith("--")) ?? "runs/frontier";
 const LEGACY = flags.has("--legacy");
 const PAIRED = !flags.has("--unpaired") && !LEGACY;
 const STEADY_FROM = 3; // 0-based: drop seasons 1-3 from the two gaps
+// --parity=neverWon scores long-term parity by the number of teams that never
+// win a series in the run (the "can ALL teams be competitive" reading) in place
+// of the league-max drought, which saturates at the horizon.
+const PARITY_KEY = flags.has("--parity=neverWon") ? "neverWon" : "maxDrought";
+// --robust=causal scores robustness by the exact counterfactual reward (the
+// fifth-worst team dropped to worst, everything else held; tank_counterfactual.js
+// on runs/frontier, see counterfactual.txt) in place of the record-ranked gap,
+// which is an association. Rules that never read record are zero by
+// construction; rules under which losing costs picks floor at zero.
+const ROBUST_CAUSAL = flags.has("--robust=causal");
+const CAUSAL = { classic: 1.853, nba: 1.317 }; // measured; every other tag 0
 
 // [tag, label, own standard]
 const MECHS = [
@@ -308,18 +319,16 @@ const EPS = 1e-9;
 function runDominance(helpKey, helpLabel) {
 	const CRIT = [
 		{ name: "help", key: helpKey, better: "high" },
-		{ name: "parity", key: "maxDrought", better: "low" },
+		{ name: "parity", key: PARITY_KEY, better: "low" },
 		{ name: "robust", key: "tank", better: "low", floor: true },
 	];
 	const pointValue = (t, c) => {
-		const v =
-			c.key === "tank"
-				? summary[t].tankMean
-				: c.key === "help5"
-					? summary[t].help
-					: c.key === "helpCommon"
-						? summary[t].helpCommon
-						: summary[t].parity;
+		let v;
+		if (c.key === "tank") v = ROBUST_CAUSAL ? (CAUSAL[t] ?? 0) : summary[t].tankMean;
+		else if (c.key === "help5") v = summary[t].help;
+		else if (c.key === "helpCommon") v = summary[t].helpCommon;
+		else if (c.key === "neverWon") v = mean(col(t, "neverWon"));
+		else v = summary[t].parity;
 		return c.floor ? Math.max(v, 0) : v;
 	};
 	// A at least as good as B on c; strict if strictly better.
@@ -337,13 +346,19 @@ function runDominance(helpKey, helpLabel) {
 			if (r === "strict") strictCrits.push(c);
 		}
 		if (strictCrits.length === 0) return null;
-		// clears: every strictly-better criterion's interval on the difference excludes 0
-		const clears = strictCrits.every((c) => excludesZero(diff(a, b, c.key)));
+		// clears: every strictly-better criterion's interval on the difference excludes 0.
+		// A causal robustness contrast involves a structural zero on one side, so it
+		// clears when the measured side's own counterfactual interval excludes zero
+		// (both measured values do; see counterfactual.txt).
+		const clears = strictCrits.every((c) =>
+			c.key === "tank" && ROBUST_CAUSAL ? true : excludesZero(diff(a, b, c.key)),
+		);
 		return { strictCrits: strictCrits.map((c) => c.name), clears };
 	};
 
 	console.log(
-		`\n===== Dominance, help on ${helpLabel} (help higher, max drought lower, tanking reward lower) =====\n`,
+		`\n===== Dominance, help on ${helpLabel}; parity = ${PARITY_KEY === "neverWon" ? "never-winners" : "max drought"}; ` +
+			`robustness = ${ROBUST_CAUSAL ? "counterfactual reward" : "record-ranked gap"} (help higher, others lower) =====\n`,
 	);
 	const dominatedBy = {};
 	for (const b of tags) {
@@ -398,14 +413,14 @@ for (const ref of ["nba", "t321", "waitlist"]) {
 	if (!data[ref]) continue;
 	console.log(`\n===== Differences against ${label[ref]} (mechanism minus reference; ${PAIRED ? "paired by league" : "Welch"}; * = interval includes 0) =====\n`);
 	console.log(
-		"mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       tanking gap by record",
+		"mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       never-winners (teams)       tanking gap by record",
 	);
-	console.log("-".repeat(140));
+	console.log("-".repeat(168));
 	for (const t of tags) {
 		if (t === ref) continue;
 		console.log(
 			`${label[t].padEnd(29)} ${fmtD(diff(t, ref, "help5")).padEnd(27)} ${fmtD(diff(t, ref, "helpCommon")).padEnd(27)} ` +
-				`${fmtD(diff(t, ref, "maxDrought")).padEnd(27)} ${fmtD(diff(t, ref, "tank"))}`,
+				`${fmtD(diff(t, ref, "maxDrought")).padEnd(27)} ${fmtD(diff(t, ref, "neverWon")).padEnd(27)} ${fmtD(diff(t, ref, "tank"))}`,
 		);
 	}
 }
