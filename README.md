@@ -20,6 +20,8 @@ earliest picks to the longest-waiting teams.
       wordcount_abstract.py   checks the abstract against the 500-word cap
     testbed/harness/          the engine driver, sweep runners, and analysis
     simulator/                source of the public interactive results page
+    original-study/           the original COLA paper's Python simulation,
+                              NBA data, results, and figures (arXiv:2602.02487)
 
 ## Reproducing the numbers
 
@@ -62,6 +64,12 @@ within memory and disk on its own.
     tectonic paper/main.tex
 
 ## Related
+
+COLA was introduced in Highley, Duncan, and Volkov (2026), "Carry-Over Lottery
+Allocation: Practical Incentive-Compatible Drafts"
+(<https://arxiv.org/abs/2602.02487>). The code and data behind that paper are
+in `original-study/`, merged with their full commit history from
+<https://github.com/vilka-9999/carry_over_lotter_allocation_research>.
 
 The published interactive backtester covering 26 NBA seasons lives at
 <https://kvr06-ai.github.io/cola-manipulation-bound/>, with a results and
