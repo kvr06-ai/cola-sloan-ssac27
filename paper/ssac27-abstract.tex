@@ -71,35 +71,36 @@
 
 \section{Introduction}
 
-How can a league help weak teams through the draft without encouraging teams to tank? Carry-Over Lottery Allocation (COLA), presented here, is a family of draft mechanisms that all simultaneously discourage tanking and help the weakest teams.
+For decades, the NBA has navigated the tradeoff between helping weak teams via the draft and the tanking that ensues. Carry-Over Lottery Allocation (COLA) solves the dilemma. COLA redefines weakness, using multi-season playoff results instead of a single season's record. Thus, tanking need not be rewarded. Draft priority carries over between seasons, being reduced when a team has playoff success or makes a high draft pick. Over time, more help is directed to weaker teams. 
 
-Under any mechanism in the COLA framework, each team has a draft priority that rises and falls over time, but it does not rise based on more losses. That eliminates the tanking incentive. Draft priority carries over from year to year, being reduced when a team has playoff success or makes a high draft pick. That directs the most help to the weakest teams over time.
+The COLA framework allows flexibility in how draft priority changes. Its definition includes the NBA's own new 3-2-1 lottery, which has a minimal carry-over exclusion and no reward for losing.
 
-For 40 years, the NBA has navigated the tradeoff between helping weak teams and discouraging tanking. COLA solves that primary dilemma, but there are other tradeoffs worth considering among the COLA variants. After demonstrating COLA's incentive compatibility, this paper discusses the tradeoffs between mechanisms within the framework.
+We prove that, under reasonable assumptions, COLA can be incentive-compatible while helping the weakest team, circumventing Banchio and Munro's SSAC 2020 impossibility result for record-based lotteries. Only one assumption requires justification: teams prefer winning games over manipulating the pool of lottery teams. Others are standard assumptions.
 
 \section{Methods}
 
-We identify several tunable dials for mechanisms within the COLA framework:
+Our incentive-compatibility proof is routine; the novelty is the reframe that makes it possible.
+
+To discuss tradeoffs, we identify tunable dials within the COLA framework:
 \begin{itemize}
-\item Which teams are eligible for the lottery?
-\item How does a team's lottery priority increase?
+\item How does a team's draft priority increase?
 \item How does the priority decrease?
-\item How does the priority determine lottery odds and draft positions?
+\item How does priority map to lottery odds and draft positions?
 \end{itemize}
 
-We consider different COLA variants plus other draft mechanisms, including 3-2-1 Lottery, and compare them using ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move. We measure the mechanisms against these criteria:
+ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move of realistic fictional leagues, lets us compare different draft mechanisms on these criteria:
 \begin{itemize}
-\item \textbf{Targeted help.} Does help reach the weakest teams, as measured by the difference between the help received by the highest priority team and other teams?
-\item \textbf{Long-term parity.} Can all teams be competitive, as measured by the longest drought any team has between playoff series wins?
-\item \textbf{Simplicity.} How complicated is the mechanism? Though measured subjectively, it is not difficult to identify complexity.
-\item \textbf{Robustness.} Does the mechanism admit tanking incentives at the margin? COLA variants are incentive-compatible under reasonable assumptions. Further relaxation of those assumptions may entail a choice between extra complexity or allowing potential tanking incentives in rare cases.
+\item \textbf{Targeted help.} To what extent do the highest priority teams receive draft help?
+\item \textbf{Long-term parity.} Can all teams be competitive, as measured by long playoff droughts?
+\item \textbf{Simplicity.} Is the mechanism easy to explain?
+\item \textbf{Incentive compatibility.} Does the mechanism reward losing? Is it still anti-tanking if the model's assumptions fail?
 \end{itemize}
 
 \section{Results}
 
-Many mechanisms are dominated under these criteria, meaning there is another mechanism that is better on all four.
+We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each. We compare mechanisms by paired differences with 95\% confidence intervals. 
 
-We ran every mechanism on the same 30 simulated leagues for 25 seasons each, 6,750 seasons in all. Because the leagues are shared, we compare mechanisms by paired differences with 95\% confidence intervals. Simple COLA helps long-drought teams more than the current NBA lottery does, and more than 3-2-1 does. Both gains clear their confidence intervals. On parity, Simple COLA does at least as well as both. It never reads a team's record, so it offers no reward for losing. Simple COLA or Beckett COLA matches or beats every other mechanism in every column of Table~1. Parity is where every mechanism fell short. In every league some team went close to 25 seasons without winning a playoff series. No mechanism cut the number of never-winners by more than chance could explain.
+Simple COLA matches or beats 3-2-1 and the old NBA lottery on each criterion. On simplicity, it orders teams by most years without a playoff series win or a top-3 draft pick, with the tiebreaker being most wins this season. No lottery is used. Unlike 3-2-1, it helps the weakest teams, where weakness is measured by drought length. Unlike the old NBA lottery, it is incentive-compatible. There are statistically significant improvements on both measures. All three are similar on parity. 
 % Filled from the 25-season run. "2019--2026": the June 2026 draft also ran under
 % the old rules; 3-2-1 first applies to the 2027 draft. Sources for each claim
 % (runs/frontier/analysis_recut.txt, --parity=neverWon --robust=causal):
@@ -139,7 +140,9 @@ Beckett COLA & $0.28$ & losing costs picks & $0.83$ & $23.7$ \\
 
 \section{Conclusion}
 
-We identify a frontier of mechanisms that are not dominated and therefore viable options for implementation, depending on the league's goals.
+COLA can end tanking incentives while giving the most help to the weakest teams, which record-based lotteries cannot do. The NBA's 3-2-1 lottery, an edge case of the framework, ends tanking incentives but gives almost no help to the weakest teams. Stronger carry-over delivers far more targeted help, and COLA's dials let the league trade off targeted help, parity, simplicity, and incentive compatibility.
+
+
 % One or two closing sentences to add here (Prof. Highley, 2026-09-15).
 
 \end{document}
