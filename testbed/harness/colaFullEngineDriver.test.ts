@@ -58,7 +58,8 @@ type Config = {
 	// permutation of picks across all teams (the draft-to-outcome channel probe,
 	// and the uniform-lottery baseline for the equity leg); "weighted" draws the
 	// full draft order over the eligible pool by cola^gamma (the W dial family).
-	variant?: "countdown" | "beckett" | "random" | "weighted" | "nba" | "t321";
+	// "simplerule" is Simple COLA as the abstract words it (a third anchor).
+	variant?: "countdown" | "beckett" | "simplerule" | "random" | "weighted" | "nba" | "t321";
 	// Weighting exponent for the "weighted" variant (0 = flat among eligible,
 	// 1 = proportional to the multi-year index, >1 = steep). Distinct from
 	// COLA_ALPHA, the per-season increment. Ignored for other variants.
@@ -405,6 +406,10 @@ async function captureSeasonRecord(
 //     win; eligible = drought >= 2; entries = drought x wins; top-4 raffled by
 //     entries, rest by entries DESC. Uncapped (cap pending Highley).
 //     Source: Highley & Sanderson Substack 2026-04-10.
+//   Simple rule: drought = years since a playoff series win OR top-3 pick
+//     (Countdown's drought); eligible = no series win this season; order by
+//     drought DESC, then most wins this season, then a seeded coin flip. No
+//     draw. Source: the SSAC27 abstract's Results, Highley 2026-09-28.
 
 type AnchorTeam = { tid: number; wins: number; playoffRoundsWon: number; cid: number };
 
@@ -489,7 +494,7 @@ function top6ByConf(tss: AnchorTeam[]): Set<number> {
 // Updates droughtState in place (Phase A: post-playoff, pre-draft). Phase B
 // (post-draft pick reset) is applied by the caller after injection.
 function computeAnchorOrder(
-	variant: "countdown" | "beckett",
+	variant: "countdown" | "beckett" | "simplerule",
 	tss: AnchorTeam[],
 	droughtState: Record<number, number>,
 ): Record<number, number> {
@@ -498,14 +503,29 @@ function computeAnchorOrder(
 	for (const ts of tss) {
 		const wonSeries = ts.playoffRoundsWon >= 1;
 		const reset =
-			variant === "countdown"
-				? wonSeries
-				: wonSeries || top6!.has(ts.tid); // #1-pick reset is Phase B
+			variant === "beckett"
+				? wonSeries || top6!.has(ts.tid) // #1-pick reset is Phase B
+				: wonSeries; // Countdown and the simple rule: top-3 reset is Phase B
 		droughtState[ts.tid] = reset ? 0 : (droughtState[ts.tid] ?? 0) + 1;
 	}
 
 	let assignment: Record<number, number>;
-	if (variant === "countdown") {
+	if (variant === "simplerule") {
+		// Eligible = no playoff series win (14 non-playoff + 8 R1 losers). The
+		// seeded shuffle settles ties the two keys leave, since sort is stable.
+		const eligible = tss
+			.filter((ts) => ts.playoffRoundsWon < 1)
+			.map((ts) => ({ tid: ts.tid, drought: droughtState[ts.tid] ?? 0, wins: ts.wins }));
+		for (let i = eligible.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[eligible[i], eligible[j]] = [eligible[j]!, eligible[i]!];
+		}
+		eligible.sort((a, b) => b.drought - a.drought || b.wins - a.wins);
+		assignment = {};
+		eligible.forEach((e, i) => {
+			assignment[e.tid] = i + 1;
+		});
+	} else if (variant === "countdown") {
 		// Eligible = no playoff series win (14 non-playoff + 8 R1 losers).
 		const eligible = tss
 			.filter((ts) => ts.playoffRoundsWon < 1)
@@ -879,12 +899,14 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				await phase.newPhase(PHASE.DRAFT, NO_COND); // engine sets a lottery order...
 				await injectDraftOrder(pendingSeason, order); // ...which we overwrite
 				pendingTeams = await captureSeasonRecord(pendingSeason, colaPreByTid);
-				// Phase B drought reset (post-draft): Countdown on top-3, Beckett on #1.
+				// Phase B drought reset (post-draft): Countdown and the simple rule on
+				// top-3, Beckett on #1.
 				for (const ts of anchorTss) {
 					const pick = order[ts.tid];
 					if (
 						pick !== undefined &&
-						((config.variant === "countdown" && pick <= 3) ||
+						(((config.variant === "countdown" || config.variant === "simplerule") &&
+							pick <= 3) ||
 							(config.variant === "beckett" && pick === 1))
 					) {
 						droughtState[ts.tid] = 0;
