@@ -19,6 +19,9 @@
 #   simple     Simple COLA, 22-team pool ordered by index, no draw (Classic's index dynamics)
 #   full       full-depth lottery by index over the 14-team pool (gamma 1)
 #   uniform    uniform lottery over the 14-team pool (gamma 0), the no-tanking benchmark
+#   simplerule Simple COLA as the abstract words it: the 22 teams without a series
+#              win, ordered by years since a series win or top-3 pick, ties to most
+#              wins, no draw (added 2026-09-28; existing chunks are skipped)
 # Capped COLA is NOT in this run: the harness cap clamps the engine index in
 # engine units, which does not reproduce the wins-based increment of the
 # published variant.
@@ -72,10 +75,11 @@ run_config beckett   '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"'
 run_config simple    '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":1,"lotteryDepth":0}'
 run_config full      '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":1}'
 run_config uniform   '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":0}'
+run_config simplerule '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"simplerule"}'
 wait
 
 echo "concatenating chunks into one file per config..."
-for tag in classic waitlist nba t321 countdown beckett simple full uniform; do
+for tag in classic waitlist nba t321 countdown beckett simple full uniform simplerule; do
   TAG="$tag" OUTDIR="$OUT" node -e '
     const fs=require("fs"), dir=process.env.OUTDIR, tag=process.env.TAG;
     const files=fs.readdirSync(dir).filter(f=>f.startsWith(tag+"_s")&&f.endsWith(".json")).sort();

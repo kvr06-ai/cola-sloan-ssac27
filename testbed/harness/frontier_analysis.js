@@ -63,6 +63,14 @@ const PARITY_KEY = flags.has("--parity=neverWon") ? "neverWon" : "maxDrought";
 // construction; rules under which losing costs picks floor at zero.
 const ROBUST_CAUSAL = flags.has("--robust=causal");
 const CAUSAL = { classic: 1.853, nba: 1.317 }; // measured; every other tag 0
+// --bar=playoffs moves the parity bar from winning a playoff series to making
+// the playoffs (the sixteen-team bracket, so a play-in loser has not made it).
+// The same event sets the clock of the common help yardstick, so "drought"
+// means one thing in every column. The Countdown and Beckett reset rules are
+// mechanism definitions and keep their series-win resets.
+const BAR_PLAYOFFS = flags.has("--bar=playoffs");
+const reached = (t) => t.playoffRoundsWon >= (BAR_PLAYOFFS ? 0 : 1);
+const BAR_NOUN = BAR_PLAYOFFS ? "playoff appearance" : "playoff-series win";
 
 // [tag, label, own standard]
 const MECHS = [
@@ -73,6 +81,7 @@ const MECHS = [
 	["uniform", "Uniform lottery (flat COLA)", "index"],
 	["countdown", "Countdown COLA", "countdown"],
 	["beckett", "Beckett COLA", "beckett"],
+	["simplerule", "Simple COLA, abstract rule", "simplerule"],
 	["nba", "NBA lottery, 2019 rules", "record"],
 	["t321", "3-2-1 as adopted", "record"],
 ];
@@ -98,8 +107,9 @@ const sem = (a) => Math.sqrt(variance(a) / a.length);
 const tcrit = (df) => (df >= 47 ? 2.012 : df >= 29 ? 2.045 : df >= 11 ? 2.201 : 2.571);
 
 // --- own-standard priorities ---------------------------------------------------
-// Replays the driver's drought bookkeeping for the two named anchors so their
-// McCarty numbers can be recovered season by season from the log.
+// Replays the driver's drought bookkeeping for the named anchors so their
+// priorities can be recovered season by season from the log. The simple rule
+// ranks by drought, then wins; drought * 1000 + wins encodes that order.
 function anchorPriorities(seasonLog, variant) {
 	const drought = {};
 	const out = []; // out[s][tid] = priority used for season s's draw
@@ -118,15 +128,19 @@ function anchorPriorities(seasonLog, variant) {
 		const pri = {};
 		for (const t of e.teams) {
 			const won = t.playoffRoundsWon >= 1;
-			const reset = variant === "countdown" ? won : won || top6.has(t.tid);
+			const reset = variant === "beckett" ? won || top6.has(t.tid) : won;
 			drought[t.tid] = reset ? 0 : (drought[t.tid] ?? 0) + 1;
-			pri[t.tid] = drought[t.tid] * t.wins;
+			pri[t.tid] =
+				variant === "simplerule" ? drought[t.tid] * 1000 + t.wins : drought[t.tid] * t.wins;
 		}
 		out.push(pri);
 		for (const t of e.teams) {
 			const pk = t.draftPick;
 			if (pk == null) continue;
-			if ((variant === "countdown" && pk <= 3) || (variant === "beckett" && pk === 1)) {
+			if (
+				((variant === "countdown" || variant === "simplerule") && pk <= 3) ||
+				(variant === "beckett" && pk === 1)
+			) {
 				drought[t.tid] = 0;
 			}
 		}
@@ -150,7 +164,10 @@ function ols(xs, ys) {
 }
 
 function perLeague(seasonLog, own) {
-	const anchor = own === "countdown" || own === "beckett" ? anchorPriorities(seasonLog, own) : null;
+	const anchor =
+		own === "countdown" || own === "beckett" || own === "simplerule"
+			? anchorPriorities(seasonLog, own)
+			: null;
 	const help5 = [];
 	const helpAll = [];
 	const tank = [];
@@ -165,7 +182,7 @@ function perLeague(seasonLog, own) {
 	const sinceWin = {};
 	seasonLog.forEach((e, s) => {
 		for (const t of e.teams) {
-			sinceWin[t.tid] = t.playoffRoundsWon >= 1 ? 0 : (sinceWin[t.tid] ?? 0) + 1;
+			sinceWin[t.tid] = reached(t) ? 0 : (sinceWin[t.tid] ?? 0) + 1;
 		}
 		if (s < STEADY_FROM) return;
 		const pool = e.teams.filter((t) => t.playoffRoundsWon < 0 && t.draftPick != null);
@@ -190,7 +207,7 @@ function perLeague(seasonLog, own) {
 	const everWon = {};
 	for (const e of seasonLog) {
 		for (const t of e.teams) {
-			if (t.playoffRoundsWon >= 1) {
+			if (reached(t)) {
 				runNow[t.tid] = 0;
 				everWon[t.tid] = true;
 			} else {
@@ -271,8 +288,9 @@ console.log(
 	`\n===== Four criteria per mechanism: ${PAIRED ? "paired leagues" : "unpaired leagues"}, ` +
 		`${nOf(tags[0])} leagues x ${seasonsOf(tags[0])} seasons per arm (gaps from season ${STEADY_FROM + 1}) =====\n`,
 );
+if (BAR_PLAYOFFS) console.log("Parity bar and common-yardstick clock: a playoff appearance (--bar=playoffs).\n");
 console.log(
-	"mechanism                     targeted help        help, 1st vs rest   help, common         parity: max drought  team mean max     never won   tanking reward     robust.",
+	`mechanism                     targeted help        help, 1st vs rest   help, common         parity: max drought  team mean max     ${BAR_PLAYOFFS ? "never made " : "never won  "} tanking reward     robust.`,
 );
 console.log(
 	"                              1st vs 5th, own      (draft places)      places/drought-yr    (seasons, any team)  drought (seasons) (teams)     rank by record     max(gap,0)",
@@ -306,7 +324,7 @@ console.log(
 	"replayed from the log (Countdown, Beckett); record (NBA lottery, 3-2-1), whose two columns coincide by construction.",
 );
 console.log(
-	"Common yardstick: seasons since the team's last playoff-series win, the same clock for every mechanism; the value is",
+	`Common yardstick: seasons since the team's last ${BAR_NOUN}, the same clock for every mechanism; the value is`,
 );
 console.log(
 	"draft places gained per extra drought season among the fourteen pool teams (an OLS slope, sign flipped).",
@@ -357,7 +375,7 @@ function runDominance(helpKey, helpLabel) {
 	};
 
 	console.log(
-		`\n===== Dominance, help on ${helpLabel}; parity = ${PARITY_KEY === "neverWon" ? "never-winners" : "max drought"}; ` +
+		`\n===== Dominance, help on ${helpLabel}; parity = ${PARITY_KEY === "neverWon" ? (BAR_PLAYOFFS ? "never-made-playoffs" : "never-winners") : "max drought"}; ` +
 			`robustness = ${ROBUST_CAUSAL ? "counterfactual reward" : "record-ranked gap"} (help higher, others lower) =====\n`,
 	);
 	const dominatedBy = {};
@@ -404,7 +422,7 @@ function runDominance(helpKey, helpLabel) {
 	}
 }
 runDominance("help5", "each mechanism's OWN standard");
-runDominance("helpCommon", "the COMMON yardstick, series-win drought");
+runDominance("helpCommon", `the COMMON yardstick, ${BAR_PLAYOFFS ? "playoff" : "series-win"} drought`);
 
 // --- pairwise differences against the reference rules ------------------------------
 const fmtD = (d) =>
@@ -413,7 +431,7 @@ for (const ref of ["nba", "t321", "waitlist"]) {
 	if (!data[ref]) continue;
 	console.log(`\n===== Differences against ${label[ref]} (mechanism minus reference; ${PAIRED ? "paired by league" : "Welch"}; * = interval includes 0) =====\n`);
 	console.log(
-		"mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       never-winners (teams)       tanking gap by record",
+		`mechanism                     help 1st vs 5th, own        help, common yardstick      max drought (seasons)       ${BAR_PLAYOFFS ? "never made (teams)   " : "never-winners (teams)"}       tanking gap by record`,
 	);
 	console.log("-".repeat(168));
 	for (const t of tags) {
