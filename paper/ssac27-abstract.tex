@@ -82,11 +82,11 @@ ZenGM Basketball-GM, an open-source simulator that plays out every game and rost
 \item \textbf{Incentive compatibility.} Does the mechanism reward losing?
 \end{itemize}
 
-Simplicity is assessed qualitatively. In the paper, we analyze the impact if model assumptions are violated, and how to mitigate issues, at a cost of complexity.
+Simplicity is assessed qualitatively. In the paper, we analyze the impact of violating model assumptions (e.g. a team preferring the lottery over the playoffs), and how to mitigate issues, at a cost of complexity.
 
 \section{Results}
 
-We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each. We compare mechanisms by paired differences with 95\% confidence intervals. 
+We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each. We compare mechanisms by paired differences with 95\% confidence intervals (Table 1). 
 
 The old NBA lottery rewards losing, causing tanking, which disqualified it. 3-2-1 removes that reward but does not help weak teams. Simple COLA also removes the reward for losing and, unlike 3-2-1, directs significant help to weak teams, where weakness is measured by drought length. Parity is statistically indistinguishable across all three. On simplicity, Simple COLA wins outright: no lottery is needed at all. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. Simple COLA is just one example among many in the family that all solve the core dilemma.
 
