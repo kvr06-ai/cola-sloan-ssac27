@@ -12,11 +12,10 @@
 %%%%   - Finalist title blocks show track and Paper ID with no author names; an
 %%%%     ID is assigned after acceptance, so only the track appears here.
 %%%%
-%%%% THIS VERSION (2026-09-29): Prof. Highley's text of 2026-09-29 with the Results
-%%%% paragraph in his wording (parity split by bar so it agrees with Table 1, his rule
-%%%% sentence moved into Table 2, one sentence for Full-lottery COLA) and two tables:
-%%%% Table 1, four rules on the three criteria; Table 2, the four rules on the three
-%%%% dials. Every number regenerates from the public repo:
+%%%% THIS VERSION (2026-09-29, second pass at Prof. Highley's direction): one table, three
+%%%% rules on the three criteria (the wait-to-return column and Full-lottery COLA dropped,
+%%%% Table 2 dropped, his rule sentence back in the Results). Every number regenerates
+%%%% from the public repo:
 %%%%   node testbed/harness/abstract_table.js --table1
 %%%%
 %%%% Word count: python3 wordcount_abstract.py
@@ -88,69 +87,39 @@ Simplicity is assessed qualitatively. In the paper, we analyze the impact of vio
 
 We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each and compare them by paired differences with 95\% confidence intervals.
 
-The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA removes it too and directs the most help to the teams that have waited longest (Table~1). Parity holds on the wait for a series win; on the wait to return to the playoffs, the NBA lotteries keep a small but clear edge. On simplicity, Simple COLA wins outright: no lottery is needed (Table~2). It is one example in a family that all solve the core dilemma; Full-lottery COLA matches 3-2-1 on parity while still helping more.
-
-% From the 25-season run (node testbed/harness/abstract_table.js). "2019 to 2026":
-% the June 2026 draft also ran under the old rules; 3-2-1 first applies to the
-% 2027 draft. Simple COLA against 3-2-1, paired, 95% CI: longest stretch with
-% neither a series win nor a top-3 pick -10.8 [-12.1, -9.4]; longest drought
-% between series wins -0.1 [-0.7, 0.5]; average team's longest playoff drought
-% +0.34 [0.09, 0.59]. Full-lottery COLA against 3-2-1: -4.3 [-5.8, -2.9];
-% -0.6 [-1.3, 0.1]; -0.07 [-0.34, 0.21]. Reward for losing: 1.32 for the 2019
-% lottery (tank_counterfactual.js); 0 for Full-lottery by construction; under
-% Simple COLA losing never gains a pick from any position (-0.94 from fifth-worst).
+The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA removes it too and directs the most help to the teams that have waited longest (Table~1). All three are level on parity. On simplicity, Simple COLA wins outright: no lottery is needed. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. It is one example in a family that all solve the core dilemma.
 
 % Sources (node testbed/harness/abstract_table.js --table1, on runs/frontier): the two help
 % columns are exact expectations per season except 3-2-1's reward, which is priced by
-% simulating its draw 2,000 times per season. Paired against 3-2-1 over the 30 leagues:
-% Simple COLA's wait to return +0.18 [0.08, 0.28], wait for the next series win +0.11
-% [-0.10, 0.32], longest wait -10.8 [-12.1, -9.4]; Full-lottery -0.06 [-0.17, 0.06],
-% +0.04 [-0.18, 0.26], -4.3 [-5.8, -2.9]. Old lottery against 3-2-1: -0.06 [-0.16, 0.04]
-% and +0.18 [-0.06, 0.42].
+% simulating its draw 2,000 times per season. Paired against 3-2-1 over the 30 leagues,
+% Simple COLA's wait for the next series win is +0.11 [-0.10, 0.32] and the old lottery's
+% +0.18 [-0.06, 0.42]; Simple's longest wait is -10.8 [-12.1, -9.4]. The wait to return to
+% the playoffs, dropped from the table at the first author's direction, is where Simple
+% trails (3.13 against 2.94 for 3-2-1, +0.18 [0.08, 0.28]); the manuscript reports it.
 \begin{center}
 \footnotesize
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.0}
-\begin{tabular}{l r r r r r}
+\begin{tabular}{l r r r r}
 \toprule
- & \textbf{Incentive compatibility} & \multicolumn{2}{c}{\textbf{Targeted help}} & \multicolumn{2}{c}{\textbf{Long-term parity}} \\
-\cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
-\textbf{Rule} & \textbf{Help for a} & \textbf{Help for a} & \textbf{Longest wait for a} & \textbf{Wait to return} & \textbf{Wait for the} \\
- & \textbf{worse record} & \textbf{longer wait} & \textbf{series win or top-3 pick} & \textbf{to the playoffs} & \textbf{next series win} \\
- & \textit{places gained,} & \textit{places gained,} & \textit{seasons} & \textit{seasons, average} & \textit{seasons, average} \\
- & \textit{5th-worst to worst} & \textit{5th-longest to longest} & & & \\
+ & \textbf{Incentive compatibility} & \multicolumn{2}{c}{\textbf{Targeted help}} & \textbf{Long-term parity} \\
+\cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-5}
+\textbf{Rule} & \textbf{Help for a} & \textbf{Help for a} & \textbf{Longest wait for a} & \textbf{Wait for the} \\
+ & \textbf{worse record} & \textbf{longer wait} & \textbf{series win or top-3 pick} & \textbf{next series win} \\
+ & \textit{places gained,} & \textit{places gained,} & \textit{seasons} & \textit{seasons, average} \\
+ & \textit{5th-worst to worst} & \textit{5th-longest to longest} & & \\
 \midrule
-Old NBA lottery & $+1.32$ & $0$ & $16.4$ & $2.89$ & $4.65$ \\
-New lottery, 3-2-1 & $-0.63$ & $0$ & $16.3$ & $2.94$ & $4.47$ \\
+Old NBA lottery & $+1.32$ & $0$ & $16.4$ & $4.65$ \\
+New lottery, 3-2-1 & $-0.63$ & $0$ & $16.3$ & $4.47$ \\
 \rowcolor{accent}
-Simple COLA & $-0.94$ & $6.3$ & $5.5$ & $3.13$ & $4.58$ \\
-Full-lottery COLA & $0$ & $1.6$ & $11.9$ & $2.89$ & $4.51$ \\
+Simple COLA & $-0.94$ & $6.3$ & $5.5$ & $4.58$ \\
 \bottomrule
 \end{tabular}\\[1pt]
 \begin{minipage}{0.99\linewidth}\scriptsize
-\textbf{Table 1.} Four rules on the three criteria, on the same 30 simulated leagues of 25 seasons (means over leagues). Help counts the draft places one team gains when only its record, or only its wait, changes, so a positive number is an earlier pick. The full paper prices the reward for losing from every starting position, for all nine rules we ran.
+\textbf{Table 1.} Three rules on the three criteria, on the same 30 simulated leagues of 25 seasons (means over leagues). Help counts the draft places one team gains when only its record, or only its wait, changes, so a positive number is an earlier pick. The full paper prices the reward for losing from every starting position, for all nine rules we ran.
 \end{minipage}
 \end{center}
 
-\begin{center}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\renewcommand{\arraystretch}{1.0}
-\begin{tabular}{l p{1.65in} p{1.85in} p{2.5in}}
-\toprule
-\textbf{Rule} & \textbf{How priority increases} & \textbf{How it decreases} & \textbf{How it maps to picks} \\
-\midrule
-Old NBA lottery & With a worse record this season & Nothing carries over & Top four drawn by record odds; 5 to 14 by record \\
-New lottery, 3-2-1 & With a worse record this season & No repeat \#1 or third straight top-5 & All 16 drawn by 2/3/2/1 balls; worst three pick by 12 \\
-\rowcolor{accent}
-Simple COLA & $+1$ each season without a series win & To zero after a series win or a top-3 pick & In priority order, no lottery; ties to most wins \\
-Full-lottery COLA & $+1$ each season without a series win & Cut by a quarter to all, the deeper the run or the higher the pick & All 14 picks drawn, odds proportional to priority \\
-\bottomrule
-\end{tabular}\\[1pt]
-\begin{minipage}{0.99\linewidth}\scriptsize
-\textbf{Table 2.} The four rules on the three dials above, one setting per row. Keeping a lottery night is one of the settings; the full paper turns every dial across nine rules.
-\end{minipage}
-\end{center}
 
 \section{Conclusion}
 
