@@ -59,13 +59,13 @@
 
 For decades, the NBA has navigated the tradeoff between helping weak teams via the draft and the tanking that ensues. Carry-Over Lottery Allocation (COLA) solves the dilemma. COLA defines weakness using multi-season playoff results, not single-season records. Thus, tanking need not be rewarded. Draft priority carries over between seasons, being reduced when teams have playoff success or make high draft picks. Over time, more help is directed to weaker teams. 
 
-COLA is a framework of mechanisms where each may have different rules on how draft priority changes. COLA's definition includes the NBA's own 3-2-1 lottery as an edge case: minimal carry-over exclusions and no reward for losing.
+COLA is a framework where each mechanism may have different rules on how draft priority changes. COLA's definition includes the NBA's own 3-2-1 lottery as an edge case: minimal carry-over exclusions and no reward for losing.
 
-We prove that, under reasonable assumptions, COLA can be incentive-compatible while helping the weakest team, circumventing Banchio and Munro's SSAC 2020 impossibility result for record-based lotteries. Only one assumption requires justification: teams prefer winning games over manipulating the pool of lottery teams. Others are standard assumptions.
+We prove that, under reasonable assumptions, COLA can be incentive-compatible while helping the weakest team, circumventing Munro and Banchio's SSAC 2020 impossibility result for draft mechanisms based on end-of-season records. Only one assumption requires justification: teams prefer winning games over manipulating the pool of lottery teams. Others are standard assumptions.
 
 \section{Methods}
 
-The incentive-compatibility proof is standard; novelty comes from the reframe that makes it possible.
+The incentive-compatibility proof is conventional; novelty comes from the reframe that makes it possible.
 
 We discuss tradeoffs within the COLA framework by identifying tunable dials:
 \begin{itemize}
@@ -77,17 +77,17 @@ We discuss tradeoffs within the COLA framework by identifying tunable dials:
 ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move of realistic fictional leagues, lets us compare different draft mechanisms using these criteria:
 \begin{itemize}
 \item \textbf{Targeted help.} How much help do the highest priority teams receive?
-\item \textbf{Long-term parity.} Can all teams be competitive, as measured by long playoff droughts?
+\item \textbf{Long-term parity.} Can all teams be competitive, as measured by playoff success?
 \item \textbf{Incentive compatibility.} Does the mechanism reward losing?
 \end{itemize}
 
-Simplicity is assessed qualitatively. In the paper, we analyze the impact of violating model assumptions (e.g. a team preferring the lottery over the playoffs), and how to mitigate issues, at a cost of complexity.
+Simplicity is assessed qualitatively. In the paper, we analyze the impact of violating model assumptions (e.g. a team preferring the lottery over the playoffs), and how to mitigate issues. Generally, the mitigation cost is more complexity.
 
 \section{Results}
 
-We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each and compare them by paired differences with 95\% confidence intervals.
+We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each and compared them by paired differences with 95\% confidence intervals.
 
-The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA removes it too and directs the most help to the teams that have waited longest (Table~1). All three are level on parity. On simplicity, Simple COLA wins outright: no lottery is needed. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. It is one example in a family that all solve the core dilemma.
+The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA also eliminates tanking, and it directs the most help to teams that have waited longest (Table~1). All three are level on parity. On simplicity, Simple COLA wins outright: no lottery is needed. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. It is one example of many COLA mechanisms that solve the core dilemma.
 
 % Sources (node testbed/harness/abstract_table.js --table1, on runs/frontier): the two help
 % columns are exact expectations per season except 3-2-1's reward, which is priced by
@@ -116,13 +116,13 @@ Simple COLA & $-0.94$ & $6.3$ & $5.5$ & $4.58$ \\
 \bottomrule
 \end{tabular}\\[1pt]
 \begin{minipage}{0.99\linewidth}\scriptsize
-\textbf{Table 1.} Three rules on the three criteria, on the same 30 simulated leagues of 25 seasons (means over leagues). Help counts the draft places one team gains when only its record, or only its wait, changes, so a positive number is an earlier pick. The full paper prices the reward for losing from every starting position, for all nine rules we ran.
+\textbf{Table 1.} Three mechansims on the same 30 simulated leagues of 25 seasons (means over leagues). Help counts the draft places one team gains when only its record, or only its wait, changes, so a positive number is an earlier pick. The full paper provides a fuller analysis, including rewards for losing from other starting positions and simulation results for six additional mechanisms.
 \end{minipage}
 \end{center}
 
 
 \section{Conclusion}
 
-COLA shows that helping the weakest teams and ending tanking are not mutually exclusive. It only looked that way because "weakest" was measured by record. Simple COLA resolves the dilemma without complexity, and the wider family lets a league choose its own balance of targeted help, parity, simplicity, and robustness.
+COLA shows that helping the weakest teams and ending tanking are not mutually exclusive. It only looked that way because "weakest" was measured by end-of-season record. Simple COLA resolves the dilemma without complexity, and the wider family lets a league choose its own balance of targeted help, parity, simplicity, and robustness.
 
 \end{document}
