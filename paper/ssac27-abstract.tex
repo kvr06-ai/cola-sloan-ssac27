@@ -42,7 +42,7 @@
 \titlespacing*{\section}{0pt}{4pt}{1pt}
 
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{1pt}
+\setlength{\parskip}{4pt}
 \setlist[itemize]{nosep, leftmargin=1.2em, topsep=0pt}
 
 \pagestyle{empty}
@@ -50,7 +50,7 @@
 \begin{document}
 
 \begin{center}
-{\Large\bfseries Carry-Over Lottery Allocation:\\[2pt] Practical Incentive-Compatible Drafts}\\[4pt]
+{\Large\bfseries Practical Incentive-Compatible Drafts:\\[2pt] Carry-Over Lottery Allocation}\\[4pt]
 {\normalsize Paper Track: Basketball}\\[2pt]
 {\small Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}}
 \end{center}
@@ -59,7 +59,7 @@
 
 For decades, the NBA has navigated the tradeoff between helping weak teams via the draft and the tanking that ensues. Carry-Over Lottery Allocation (COLA) solves the dilemma. COLA defines weakness using multi-season playoff results, not single-season records. Thus, tanking need not be rewarded. Draft priority carries over between seasons, being reduced when teams have playoff success or make high draft picks. Over time, more help is directed to weaker teams. 
 
-COLA is a framework where each mechanism may have different rules on how draft priority changes. COLA's definition includes the NBA's own 3-2-1 lottery as an edge case: minimal carry-over exclusions and no reward for losing.
+COLA is a framework where each mechanism may have different rules on how draft priority changes. COLA's definition includes the NBA's own 3-2-1 lottery as an edge case: minimal carry-over exclusions and no reward for losing. COLA principles could also inform credit allocation in auction-based drafts. 
 
 We prove that, under reasonable assumptions, COLA can be incentive-compatible while helping the weakest team, circumventing Munro and Banchio's SSAC 2020 impossibility result for draft mechanisms based on end-of-season records. Only one assumption requires justification: teams prefer winning games over manipulating the pool of lottery teams. Others are standard assumptions.
 
@@ -81,13 +81,13 @@ ZenGM Basketball-GM, an open-source simulator that plays out every game and rost
 \item \textbf{Incentive compatibility.} Does the mechanism reward losing?
 \end{itemize}
 
-Simplicity is assessed qualitatively. In the paper, we analyze the impact of violating model assumptions (e.g. a team preferring the lottery over the playoffs), and how to mitigate issues. Generally, the mitigation cost is more complexity.
+Simplicity is assessed qualitatively. In the paper, we analyze the impact of violating model assumptions (e.g., a team preferring the lottery over the playoffs) and how to mitigate issues. Generally, mitigation increases complexity.
 
 \section{Results}
 
 We ran nine mechanisms on the same 30 simulated leagues for 25 seasons each and compared them by paired differences with 95\% confidence intervals.
 
-The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA also eliminates tanking, and it directs the most help to teams that have waited longest (Table~1). All three are level on parity. On simplicity, Simple COLA wins outright: no lottery is needed. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. It is one example of many COLA mechanisms that solve the core dilemma.
+The old NBA lottery rewards losing, which caused tanking. 3-2-1 removes that reward but does not help weak teams. Simple COLA also eliminates tanking, and it directs the most help to teams that have waited longest (Table~1). All three are level on parity. On simplicity, Simple COLA wins outright: no lottery is used. Teams are ordered by most years without a playoff series win or a top-3 pick; ties are broken by most wins this season. It is one example of many COLA mechanisms that solve the core dilemma.
 
 % Sources (node testbed/harness/abstract_table.js --table1, on runs/frontier): the two help
 % columns are exact expectations per season except 3-2-1's reward, which is priced by
