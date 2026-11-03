@@ -1,0 +1,197 @@
+%%%% outline.tex
+%%%% Outline of the SSAC27 full paper, worked backwards from the submitted abstract.
+%%%% Each section names the abstract promise it keeps, the evidence already on hand,
+%%%% and what is still open. A planning document for the team; the paper itself is
+%%%% written in main.tex and converted to SSAC's Word template at the end.
+
+\documentclass[10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\urlstyle{same}
+
+\titleformat{\section}{\normalfont\large\bfseries}{}{0pt}{}
+\titleformat{\subsection}{\normalfont\bfseries}{}{0pt}{}
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{7pt}{2pt}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+\setlist[itemize]{nosep, leftmargin=1.3em, topsep=2pt}
+\setlist[enumerate]{nosep, leftmargin=1.5em, topsep=2pt}
+
+\newcommand{\keeps}[1]{\textit{Keeps:} #1\par}
+\newcommand{\has}[1]{\textit{On hand:} #1\par}
+\newcommand{\open}[1]{\textit{Open:} #1\par}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries Full paper outline}\\[3pt]
+{\large Practical Incentive-Compatible Drafts: Carry-Over Lottery Allocation}\\[3pt]
+SSAC27 Research Paper Competition, Basketball track, Paper ID 100\\
+Draft for the team, 3 November 2026
+\end{center}
+
+\section{Deadline and format}
+
+\begin{itemize}
+\item The full paper is due at 11:59 PM EST on Tuesday, 1 December 2026, and late submissions are not accepted. Prof.\ Highley submits it through SSAC's form with Paper ID 100 (SSAC email of 31 October).
+\item SSAC requires its Word template and does not accept LaTeX: ``As conference policy, we do not support LaTeX, so we ask that you use this template instead'' (SSAC paper template).
+\item The template sets no page limit and notes that papers are typically under 8 pages. An appendix is allowed, headings are free, and any mainstream citation style works.
+\item The body is Cambria 11 pt, single-spaced with 11 pt after each paragraph, with 1-inch side margins, a 1.1-inch top margin and a 1.2-inch bottom margin. The title block carries the title, the track and the Paper ID, with no author names.
+\item We draft here in Overleaf and convert to the Word template with pandoc, using the template as the reference document. A dry run on the current manuscript by 10 November shows what the conversion breaks while there is time to fix it.
+\end{itemize}
+
+\section{Shape}
+
+The main text targets about 8 template pages, roughly 4{,}000 words with three tables and one figure, and the appendix holds the proofs, the rule definitions and the full tables. The current manuscript (\texttt{main.tex}) runs to about 12{,}700 words over 26 pages, so the main text keeps about a third of it. Every number in the paper regenerates from the public repository.
+
+\begin{center}
+\small
+\begin{tabular}{l l r l}
+\toprule
+\textbf{\S} & \textbf{Section} & \textbf{Words} & \textbf{Abstract promise it keeps} \\
+\midrule
+1 & Introduction & 500 & The dilemma, the reframe, the contributions \\
+2 & Background & 350 & Munro and Banchio's impossibility result; 3-2-1 \\
+3 & The COLA framework & 600 & Three dials; 3-2-1 as an edge case \\
+4 & Incentive compatibility & 550 & The proof and its one assumption that needs justification \\
+5 & When the assumptions fail & 450 & ``The impact of violating model assumptions and how to mitigate'' \\
+6 & Simulation design & 450 & Nine mechanisms, 30 leagues, 25 seasons, paired intervals \\
+7 & Results & 700 & Table 1; other starting positions; six more mechanisms \\
+8 & Discussion and adoption & 300 & ``One example of many''; auction credit \\
+9 & Conclusion & 100 & The dilemma resolved \\
+\midrule
+ & Main text & 4{,}000 & \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Sections}
+
+\subsection{1. Introduction (500 words)}
+\keeps{the abstract's Introduction.}
+\begin{itemize}
+\item The tradeoff between helping weak teams and the tanking that follows, with the NBA's history of lottery changes up to 3-2-1.
+\item The reframe: weakness measured by multi-season playoff results, so losing more games buys nothing.
+\item The contributions: the COLA framework with 3-2-1 inside it; an incentive-compatibility proof under stated assumptions; nine mechanisms simulated on the same leagues; Simple COLA as a one-line rule with no lottery.
+\end{itemize}
+\has{\texttt{main.tex} \S1 (1{,}929 words, to be cut to 500).}
+
+\subsection{2. Background (350 words)}
+\keeps{``circumventing Munro and Banchio's SSAC 2020 impossibility result.''}
+\begin{itemize}
+\item Evidence that teams tank.
+\item Munro and Banchio: any mechanism based on end-of-season records can reward losing.
+\item 3-2-1, adopted by the Board of Governors on 28 May 2026, and the prior proposals (the Gold plan, elimination-date rules, auctions).
+\end{itemize}
+\has{\texttt{main.tex} \S2 (680 words).}
+
+\subsection{3. The COLA framework (600 words)}
+\keeps{``a framework where each mechanism may have different rules on how draft priority changes,'' and ``3-2-1 as an edge case.''}
+\begin{itemize}
+\item The waiting number, and the three dials from the abstract: how priority increases, how it decreases, and how it maps to picks. The manuscript's seven-dial parameterization moves to Appendix B.
+\item One line per rule for the mechanisms in Table 1 and the six others.
+\item 3-2-1 as an edge case: record sets priority, and the only carry-over is the bar on repeat top picks.
+\end{itemize}
+\has{\texttt{main.tex} \S3 (1{,}933 words, including the variant map and the 3-2-1 configuration).}
+\open{The abstract says 3-2-1 has ``no reward for losing.'' Measured on our runs, losing costs 0.63 places from fifth-worst but gains 0.37 from eleventh-worst and 2.02 from fourteenth-worst, because a play-in team that sinks out of the play-in gains lottery balls. The paper should state the reward where it exists.}
+
+\subsection{4. Incentive compatibility (550 words)}
+\keeps{``We prove that, under reasonable assumptions, COLA can be incentive-compatible while helping the weakest team,'' and ``the proof is conventional; novelty comes from the reframe.''}
+\begin{itemize}
+\item The theorem and its assumptions, with a proof sketch in the text and the full proof in Appendix A.
+\item The one assumption that needs justification: teams prefer winning games to manipulating the pool of lottery teams.
+\end{itemize}
+\has{\texttt{main.tex} \S3.5 states the proof for Classic COLA under five assumptions.}
+\open{Restate the theorem for Simple COLA, whose order uses drought length with ties broken by most wins. On our runs, losing never gained a team a pick under Simple COLA across 158{,}325 counterfactuals, which supports the claim but does not replace the proof.}
+
+\subsection{5. When the assumptions fail (450 words)}
+\keeps{``we analyze the impact of violating model assumptions (e.g., a team preferring the lottery over the playoffs) and how to mitigate issues. Generally, mitigation increases complexity.''}
+\begin{itemize}
+\item Staying eligible. The draft places a team with the longest wait gains by staying on the lottery side of the boundary: 1.4 under the old lottery, 5.0 under 3-2-1, 9.6 under Full-lottery COLA, and 22 under Simple COLA, where the boundary is a first-round loss. In 47\% of simulated seasons Simple COLA's first pick went to a team that lost in the first round.
+\item Longer rebuilds after a reset. A team that took a top-3 pick and missed the playoffs again picked 6.6th the next season under the old lottery, 8.6th under 3-2-1, 9.4th under Full-lottery COLA and 21.0th under Simple COLA.
+\item Draft-class strength, which none of the rules condition on.
+\item Mitigations and their cost in complexity: a cap on the waiting number, a reset on playoff appearance, and a lottery over the top picks.
+\end{itemize}
+\has{\texttt{main.tex} \S4 (the pool-manipulation bound and the per-series bound for Capped COLA); the measured prizes and post-reset picks above.}
+\open{No mitigation has been run in the full simulator. Decide between an analytic treatment and one simulation run (about 75 minutes of compute, after the wins-based cap is implemented).}
+
+\subsection{6. Simulation design (450 words)}
+\keeps{``ZenGM Basketball-GM \dots\ lets us compare different draft mechanisms,'' and the three criteria.}
+\begin{itemize}
+\item The simulator, 30 leagues of 25 seasons on shared seeds, and paired differences with 95\% intervals.
+\item One measure per criterion: help for a worse record and help for a longer wait (each moves one team and holds everything else), the longest wait for a series win or top-3 pick, and the average wait for the next series win.
+\item Validation against the NBA over 2001-02 to 2025-26: average playoff drought 2.99 seasons in the NBA against 2.89 simulated, wait for the next series win 4.55 against 4.65, and year-to-year win-percentage correlation 0.60 against 0.62.
+\end{itemize}
+\has{\texttt{main.tex} \S5.1--5.2; \texttt{testbed/harness/sim\_vs\_real.js}.}
+
+\subsection{7. Results (700 words)}
+\keeps{Table 1, ``rewards for losing from other starting positions,'' and ``simulation results for six additional mechanisms.''}
+\begin{itemize}
+\item Table: all nine rules on the four measures, with paired intervals against 3-2-1.
+\item Table: the reward for losing by starting position. From fifth-worst it is $+1.32$ places under the old lottery, $-0.63$ under 3-2-1 and $-0.94$ under Simple COLA; from fourteenth-worst it is $+9.96$, $+2.02$ and $-3.50$.
+\item Help: Simple COLA cuts the longest wait for a series win or top-3 pick from 16.3 seasons under 3-2-1 to 5.5.
+\item Parity: the rules are level on the wait for the next series win. Drought endings per league run from 80 to 87 across the nine rules, against 88 in the NBA over the same 25 seasons, so the draft changes which teams end their droughts and barely changes how often droughts end.
+\item The one parity cost: Simple COLA's wait to return to the playoffs is 0.18 seasons longer than 3-2-1's (95\% interval 0.08 to 0.28), because 39\% of its top-3 picks go to teams that lost in the first round.
+\end{itemize}
+\has{\texttt{runs/frontier} (all ten arms); \texttt{abstract\_table.js -{}-table1}; \texttt{tank\_counterfactual.js}.}
+\open{The by-position pricing for 3-2-1 and the measures in \S5 come from one-off scripts. They go into the repository so every number regenerates.}
+
+\subsection{8. Discussion and adoption (300 words)}
+\keeps{``one example of many COLA mechanisms,'' and ``COLA principles could also inform credit allocation in auction-based drafts.''}
+\begin{itemize}
+\item Choosing a member of the family: Simple COLA for the most help and a one-line rule, Full-lottery COLA where parity matters more or a lottery night is wanted.
+\item 3-2-1 as a stopgap and COLA as the next step.
+\item Auction drafts: carry-over credits that grow with waiting and reset with success allocate the currency without rewarding a worse record.
+\item Limitations: one simulator, tanking measured by counterfactual, and draft-class strength.
+\end{itemize}
+\has{\texttt{main.tex} \S6, including the section on auctions and the currency they allocate.}
+
+\subsection{9. Conclusion (100 words)}
+\keeps{the abstract's Conclusion.}
+
+\subsection{Appendix}
+\begin{enumerate}[label=\Alph*.]
+\item The incentive-compatibility proof.
+\item The seven dials and the definition of every rule.
+\item The pool-manipulation bound.
+\item Full results tables with intervals.
+\item The validation table against the NBA.
+\item Reproducibility: the repository and the script behind each number.
+\end{enumerate}
+
+\section{Decisions for the team}
+\begin{enumerate}
+\item Section leads. Proposed: Prof.\ Highley for \S1, \S4 and \S9; Kaushik for \S6, \S7, the appendix tables and the Word conversion; Tannah and Ilia for \S2 and the material from the original study; Kibur for the assumptions in \S4 and \S5.
+\item Author order for the final paper.
+\item Mitigation evidence in \S5: an analytic treatment, or one simulation run.
+\item Drafting tool: Overleaf with a pandoc conversion at the end (proposed), or the Word template from the start.
+\end{enumerate}
+
+\section{Schedule}
+\begin{center}
+\small
+\begin{tabular}{l l}
+\toprule
+\textbf{Date} & \textbf{Milestone} \\
+\midrule
+Friday 6 November & Outline agreed, leads set \\
+Tuesday 10 November & Word conversion dry run; all paper numbers regenerate from the repository \\
+Tuesday 17 November & Complete first draft in Overleaf \\
+Friday 20 November & Comments back from everyone \\
+Tuesday 24 November & Final draft in the Word template (Thanksgiving is Thursday 26 November) \\
+Tuesday 1 December, 11:59 PM EST & Prof.\ Highley submits, Paper ID 100 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\end{document}
