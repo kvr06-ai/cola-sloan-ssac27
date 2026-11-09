@@ -15,14 +15,17 @@
 \usepackage{caladea}
 \usepackage[left=1in,right=1in,top=1.1in,bottom=1.2in]{geometry}
 \usepackage{titlesec}
-\usepackage[round]{natbib}
-\usepackage{xurl}
+\usepackage{cite}
+\usepackage{footmisc}
+\usepackage[hyphens]{url}
 \usepackage[hidelinks]{hyperref}
 \urlstyle{same}
 
+\linespread{0.955}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{11pt}
 \frenchspacing
+\renewcommand{\footnotelayout}{\normalsize}
 
 \titleformat{\section}{\fontsize{16}{19}\selectfont\bfseries}{\thesection.}{0.4em}{}
 \titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection.}{0.4em}{}
@@ -43,11 +46,11 @@ Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}
 
 \section{Introduction}
 
-On February 7, 2026, the Utah Jazz led the Orlando Magic 94-87 going into the fourth quarter. The Jazz then kept Lauri Markkanen and Jaren Jackson Jr., two of their best players, on the bench for the entire quarter. Orlando outscored them 33-23 and won 120-117 \citep{espn2026jazzmagic}. Five days later, the National Basketball Association (NBA) fined the Jazz \$500,000 over that game and one other \citep{nba2026fines}. The Jazz had company. The Ringer counted eight of the league's thirty teams tanking (losing on purpose) that month to improve their odds of landing a top pick in a class led by AJ Dybantsa and Darryn Peterson \citep{ringer2026tanking}.
+On February 7, 2026, the Utah Jazz led the Orlando Magic 94-87 going into the fourth quarter. The Jazz then kept Lauri Markkanen and Jaren Jackson Jr., two of their best players, on the bench for the entire quarter. Orlando outscored them 33-23 and won 120-117~\cite{espn2026jazzmagic}. Five days later, the National Basketball Association (NBA) fined the Jazz \$500,000 over that game and one other~\cite{nba2026fines}. The Jazz had company. The Ringer counted eight of the league's thirty teams tanking (losing on purpose) that month to improve their odds of landing a top pick in a class led by AJ Dybantsa and Darryn Peterson~\cite{ringer2026tanking}.
 
-Under the lottery the NBA used from 2019 to 2026, the three worst teams each had a 14\% chance at the first pick, against 0.5\% for the fourteenth-worst. Only the first four picks were drawn, and the rest went in reverse order of record \citep{nba2019lotteryreform}. \citet{taylor2002losing} compared three NBA seasons played under different draft rules and found that teams lost more often when the rules rewarded losing.
+Under the lottery the NBA used from 2019 to 2026, the three worst teams each had a 14\% chance at the first pick, against 0.5\% for the fourteenth-worst. Only the first four picks were drawn, and the rest went in reverse order of record~\cite{nba2019lotteryreform}. Taylor and Trogdon~\cite{taylor2002losing} compared three NBA seasons played under different draft rules and found that teams lost more often when the rules rewarded losing.
 
-The draft exists to help weak teams, and that goal creates the problem. At this conference, \citet{munro2020notanking} proved that a lottery based on end-of-season standings gives some teams a reason to lose on purpose unless it treats all non-playoff teams equally. Each NBA reform has traded help for weak teams against that reason to lose. The latest, called 3-2-1, was adopted in May 2026. It gives the three worst records fewer lottery chances than the seven teams just above them, so the bottom teams no longer gain by losing \citep{oconnor2026lottery}. Teams near the play-in tournament, the qualifying round for the teams seeded seventh to tenth in each conference, can still gain by losing. The ninth and tenth seeds hold more lottery chances than the seventh and eighth \citep{oconnor2026lottery}. The new lottery also sets its odds by the current season alone, so a team that has been weak for many years gets no extra help.
+The draft exists to help weak teams, and that goal creates the problem. At this conference in 2020, Banchio and Munro~\cite{munro2020notanking} proved that a lottery based on end-of-season standings gives some teams a reason to lose on purpose unless it treats all non-playoff teams equally. Each NBA reform has traded help for weak teams against that reason to lose. The latest, called 3-2-1, was adopted in May 2026. It gives the three worst records fewer lottery chances than the seven teams just above them, so the bottom teams no longer gain by losing~\cite{oconnor2026lottery}. Teams near the play-in tournament, the qualifying round for the teams seeded seventh to tenth in each conference, can still gain by losing. The ninth and tenth seeds hold more lottery chances than the seventh and eighth~\cite{oconnor2026lottery}. The new lottery also sets its odds by the current season alone, so a team that has been weak for many years gets no extra help.
 
 The impossibility rests on measuring weakness by a single season's standings. We introduce Carry-Over Lottery Allocation (COLA), which measures weakness by playoff results over many seasons. Each team carries a draft priority from one season to the next. Priority grows every season a team goes without playoff success, and it falls when the team wins a playoff series (one best-of-seven round of the playoffs) or receives a top pick. COLA works like a waiting list. One more loss this season leaves a team's place on the list unchanged, so a draft that follows the list need not reward losing. Help still reaches weak teams, because the teams that stay weak are the ones that wait longest.
 
@@ -57,9 +60,9 @@ We focus on Simple COLA. Its waiting list counts the seasons since each team las
 
 We test nine mechanisms, including the NBA's old lottery and 3-2-1, in ZenGM Basketball-GM, an open-source simulator that plays out every game and roster move in realistic fictional leagues. Each runs on the same 30 leagues for 25 seasons. We compare them on the help they give teams that have waited the longest, on long-term parity (how evenly playoff success spreads across teams), and on the reward for losing. Because every mechanism plays the same leagues, we compare them league by league and report 95\% confidence intervals. The leagues are fictional, so we also check whether the reward for losing and the help for long-waiting teams look the same on real NBA standings, one season at a time.
 
-Of the nine mechanisms, Simple COLA does the most for the teams that have waited longest. It cuts the longest wait for a playoff series win or a top-three pick from 16.3 seasons under 3-2-1 to 5.5. No team out of the playoffs ever gains by losing more games, and the average wait for a team's next playoff series win is within about a tenth of a season of 3-2-1's. Simple COLA has two costs, which Sections 5 and 7 measure. Teams wait about 0.2 seasons longer to return to the playoffs, and a team that has waited a long time can gain by losing a first-round playoff series. Every number in this paper comes from scripts in our public repository. The 3-2-1 lottery expires after the 2029 draft unless the league votes to keep it \citep{oconnor2026lottery}, so the league will soon choose a draft mechanism again.
+Of the nine mechanisms, Simple COLA does the most for the teams that have waited longest. It cuts the longest wait for a playoff series win or a top-three pick from 16.3 seasons under 3-2-1 to 5.5. No team out of the playoffs ever gains by losing more games, and the average wait for a team's next playoff series win is within about a tenth of a season of 3-2-1's. Simple COLA has two costs, which Sections 5 and 7 measure. Teams wait about 0.2 seasons longer to return to the playoffs, and a team that has waited a long time can gain by losing a first-round playoff series. Every number in this paper comes from scripts in our public repository. The 3-2-1 lottery expires after the 2029 draft unless the league votes to keep it~\cite{oconnor2026lottery}, so the league will soon choose a draft mechanism again.
 
-\bibliographystyle{plainnat}
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}
