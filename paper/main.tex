@@ -15,6 +15,9 @@
 \usepackage{caladea}
 \usepackage[left=1in,right=1in,top=1.1in,bottom=1.2in]{geometry}
 \usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{array}
 \usepackage{cite}
 \renewcommand{\citepunct}{], [}
 \renewcommand{\citedash}{]--[}
@@ -75,6 +78,62 @@ Most other proposals still judge teams on a single season and change which of it
 A last group drops the lottery. The wheel, designed by Mike Zarren of the Boston Celtics, fixes each team's draft position years in advance. Over thirty years, each team picks first once, second once, and so on down to thirtieth~\cite{lowe2013wheel,lowe2014wheel}. Losing buys nothing, and a weak team gets no extra help. Two other plans use an auction. Nate Silver~\cite{silver2026arc} would replace the draft with player bidding. Each team would get between 25 and 100 units to bid with each year, and the worst records would get the most. A Boston Celtics proposal reported by Quinn~\cite{quinn2026credits} would have teams bid credits for draft positions. Unspent credits carry over to the next year, and a team loses 20 credits for each playoff series it wins.
 
 None of the draft proposals above look beyond the current season to decide which teams need help. The Celtics' credits do, because they carry over and shrink when a team wins in the playoffs, but they work through an auction. COLA uses the same longer view to set the draft order directly, without an auction.
+
+\section{The COLA framework}
+
+\subsection{How a COLA mechanism works}
+
+A COLA mechanism keeps one number for each team, called its priority, and updates that number once a year. After the playoffs, priority rises for the teams that went without success, which in most mechanisms means without a playoff series win. It falls for the teams that had success. The mechanism then sets the draft order from priority, and the teams that receive the best picks give some of their priority back. The next season starts where this one ended. A long run without success therefore builds priority up, and one good season or one high pick spends it.
+
+Simple COLA shows this cycle in its plainest form. A team's priority is its wait, the number of seasons since it last won a playoff series or received one of the first three picks. A team whose last series win came six seasons ago, with no top-three pick since, has a wait of six. When the playoffs end, every team that won a series goes back to a wait of zero, and every other team adds one season. There are 22 such teams: the 14 that missed the playoffs and the 8 that lost in the first round. Those 22 teams pick first, in order of wait, longest first. If two teams have the same wait, the one with more wins this season picks first. The 8 teams that won a series pick after them. After the draft, the three teams that picked first go back to zero.
+
+The mechanisms in the family differ in three choices. We call these choices dials, because a league can set each one separately. The first dial is how priority grows. In every mechanism we study, each team that qualifies gets the same fixed step, whatever its record. A team that already qualifies therefore gains nothing more by losing more games. What a team might gain by losing its way into qualifying is the subject of Section 5. The second dial is how priority falls, meaning how much a playoff run or a high pick costs. The third dial is how priority becomes lottery odds and draft positions. It covers which teams take part, a group we call the pool, and whether their order comes from a drawing, from priority alone, or from both.
+
+\subsection{Six COLA mechanisms}
+
+Simple COLA is the first of the six COLA mechanisms we test. Three others measure priority in lottery tickets, where a ticket is one chance in a drawing. A team gains 1,000 tickets in each season without a playoff series win. Each series it wins takes away a quarter of the tickets it held at the start of the playoffs. A team with 5,000 tickets that wins two series keeps 2,500, and a champion, with four series wins, keeps none. Picks cost tickets too. The first pick takes away all of a team's tickets, and the second, third, and fourth picks take away 75\%, 50\%, and 25\%. In all three mechanisms, the pool is the 14 teams that missed the playoffs.
+
+The three differ only in the third dial. Classic COLA draws the first four picks, giving each team a chance proportional to its tickets, and then hands out picks 5 to 14 in reverse order of record. Waitlist COLA draws the first four picks the same way and hands out picks 5 to 14 in ticket order, most tickets first. Full-lottery COLA draws all 14 picks, one after another, with each team's chance proportional to its tickets.
+
+The last two mechanisms reward both winning and waiting. Countdown COLA uses Simple COLA's wait and its pool of 22 teams. It scores each team by its wait multiplied by its wins this season, so among teams with the same wait, the one that won more scores higher. It then fills the draft order from the last pick to the first. At each step, it draws one team from the five lowest scores not yet placed, and lower scores make a team more likely to be drawn. The teams with the best scores are placed last, so they pick first. Beckett COLA counts the seasons since a team last won a playoff series, finished in the top six of its conference, or received the first pick. Its pool is every team with a count of two or more. Each team gets entries equal to its count multiplied by its wins. The first four picks are drawn with chances proportional to entries, and the remaining pool picks in order of entries, most entries first.
+
+\subsection{Three reference lotteries}
+
+We compare the six COLA mechanisms with three lotteries that set priority from one season alone. The first is the lottery the NBA used from 2019 to 2026, which we call the old lottery. The second is an equal-odds lottery, in which all 14 picks among the teams that missed the playoffs are drawn with equal chances. The third is 3-2-1, as the NBA adopted it.
+
+In the framework's terms, 3-2-1 rebuilds priority from this season's standings every year. Nothing grows with waiting, and success costs nothing in later years. The one thing it remembers is its limit on repeat picks. A team cannot receive the first pick two years in a row or a top-five pick three years in a row~\cite{oconnor2026lottery}. That places 3-2-1 at the edge of the family, with the first two dials set almost to zero. It also explains the two properties noted earlier. Its priority comes from one season's standings, so some teams can still gain by finishing lower. Nothing carries over, so a team that has been weak for years gets no extra help. Section 7 measures both.
+
+Table~\ref{tab:mechanisms} lists the dial settings of all nine mechanisms. Appendix B gives the exact rules, including how ties are broken and where the teams outside each pool pick.
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{The nine mechanisms: the pool of each and its three dial settings.}
+\label{tab:mechanisms}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}p{0.15\linewidth}>{\raggedright\arraybackslash}p{0.19\linewidth}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedright\arraybackslash}p{0.26\linewidth}@{}}
+\toprule
+\textbf{Mechanism} & \textbf{Pool} & \textbf{How priority grows} & \textbf{How priority falls} & \textbf{How priority becomes picks} \\
+\midrule
+Old lottery & The 14 teams that missed the playoffs & Nothing carries over & Nothing carries over & First four picks drawn, with chances set by record. Picks 5 to 14 in reverse order of record. \\
+\addlinespace
+Equal-odds lottery & The same 14 teams & Nothing carries over & Nothing carries over & All 14 picks drawn with equal chances. \\
+\addlinespace
+3-2-1 & 16 teams: the 10 that miss the play-in, the 4 ninth and tenth seeds, and the 2 losers of the seven-eight games & Nothing carries over & Only the limit on repeat picks & All 16 picks drawn. The three worst records hold 2 chances each, the next seven hold 3, the ninth and tenth seeds 2, and the seven-eight losers 1. \\
+\addlinespace
+Classic COLA & The 14 teams that missed the playoffs & 1,000 tickets in each season without a playoff series win & A quarter of its tickets for each series won. Picks 1 to 4 cost 100\%, 75\%, 50\% and 25\%. & First four picks drawn by tickets. Picks 5 to 14 in reverse order of record. \\
+\addlinespace
+Waitlist COLA & The same 14 teams & As Classic COLA & As Classic COLA & First four picks drawn by tickets. Picks 5 to 14 in order of tickets. \\
+\addlinespace
+Full-lottery COLA & The same 14 teams & As Classic COLA & As Classic COLA & All 14 picks drawn by tickets. \\
+\addlinespace
+Simple COLA & The 22 teams without a series win this season & One season in each season without a playoff series win & To zero after a series win or a top-three pick & No drawing. Longest wait first, and ties go to the team with more wins. \\
+\addlinespace
+Countdown COLA & The same 22 teams & As Simple COLA & As Simple COLA & Score is wait times wins. The order is drawn from the last pick to the first, each time among the five lowest scores left. \\
+\addlinespace
+Beckett COLA & Every team with a count of two or more & One in each season without a series win, a top-six finish in its conference or the first pick & To zero after any of those three & Entries are count times wins. First four picks drawn by entries, the rest in order of entries. \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \bibliographystyle{IEEEtran}
 \bibliography{references}
