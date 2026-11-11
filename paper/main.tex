@@ -135,6 +135,45 @@ Beckett COLA & Every team with a count of two or more & One in each season witho
 \end{tabular}
 \end{table}
 
+\section{Incentive compatibility}
+
+Section 1 called a mechanism incentive compatible when no team can improve its pick by losing on purpose. For Simple COLA, we can state that property exactly, prove it, and say what the proof assumes.
+
+\subsection{The result}
+
+Under Simple COLA, a game can change the pool order in two ways. First, it can change which teams win a first-round playoff series. Those eight teams leave the pool and return to a wait of zero, so the list of series winners fixes which teams are in the pool and how long each has waited. The second is the tie-break, the rule that separates teams with the same wait. It uses each team's regular-season win total, and the pool order uses that total for nothing else. The theorem below addresses the second case, and Appendix A proves it.
+
+\textbf{Theorem 1.} Take any season under Simple COLA and any team that finishes it in the pool. Suppose the team loses a regular-season game it could have won, and the same eight teams win a first-round series either way. Then the team's pick in that season's draft is the same as it would have been with the win, or later. It is never earlier.
+
+Suppose two teams have each waited five seasons. One finishes with 30 wins, and the other with 28, so the 30-win team picks first of the two. Had it lost three more games, it would have finished with 27 wins and picked second. Its wait would still be five seasons, so it would still pick after every team that had waited six seasons or more and before every team that had waited four or fewer.
+
+\subsection{Why it holds}
+
+The proof has three steps. First, the loss changes no team's wait. A wait counts the seasons since a team last won a playoff series or received a top-three pick, and with the same series winners, every wait stays the same. Second, the loss changes two win totals. The team has one win fewer, and its opponent has one more. Third, the order compares wins only between teams with the same wait, and the team with more wins picks first. Every team that would have picked ahead of the losing team still does, and a team that was level with it or just behind may now pick ahead too. The number of teams picking before it can rise and cannot fall. A coin flip settles any tie on both wait and wins, so a loss can also turn a lead into a coin flip, or a coin flip into a place behind. The same steps apply one game at a time, so they cover any number of losses.
+
+The impossibility result in Section 1 does not reach Simple COLA. That result covers lotteries that set odds based on final standings alone and give worse records odds at least as good as better ones. Simple COLA reads the standings in one place, the tie-break, and there it favors the team with more wins. Its help for weak teams comes from the wait, which rises by one season for every team in the pool, whatever its record. Simple COLA therefore does what the result rules out for a lottery based on the final standings. It favors the teams that have gone longest without success, and it gives no team in the pool an earlier pick for losing.
+
+\subsection{What the result assumes}
+
+Theorem 1 takes the list of series winners as given, and like the impossibility result, it looks at one season and its draft~\cite{munro2020notanking}. Three assumptions about how teams behave carry it to the claim that no team has a reason to lose a game.
+\begin{enumerate}
+\item A team prefers an earlier pick to a later one.
+\item A team prefers winning a playoff series to going without one.
+\item A team would rather win a game than lose it to change which other teams are in the pool.
+\end{enumerate}
+
+The first two are standard. In Banchio and Munro's model, teams value the first pick and a place in the playoffs at least as much~\cite{munro2020notanking}. Section 5 takes up the cases in which either assumption could fail and how a league can guard against them.
+
+The third assumption needs a defense, because a team's pick does depend on which other teams are in the pool. If a team that would have picked ahead leaves the pool, every team behind it moves up one place. One place is the most a team can gain from any one rival in this way.
+
+Under Simple COLA, a rival leaves the pool only by winning a playoff series. Reaching the playoffs changes nothing in the draft, because a team that loses in the first round stays in the pool. A team that wanted a rival out would have to help it win a series, and the one kind of help that requires losing is a regular-season loss to that rival, which adds one win to the rival's total. In our simulated leagues, 14\% of teams that won 40 to 44 games won a playoff series, and 41\% of teams that won 45 to 49 games did. That is the steepest rise in the data, about five percentage points for each extra win. It overstates what one handed-over win is worth, because stronger teams both win more games and win more series. A deliberate loss therefore buys at most about one-twentieth of a draft place, and only when the rival is ahead in the order. The third assumption asks only that a team value a win more than that.
+
+The loss also has costs inside the draft. It takes one win from the team's own total, and in the simulated leagues one more loss costs a team that missed the playoffs 0.15 places on average through the tie-break. The league also punishes such games, as the \$500,000 fine in Section 1 shows~\cite{nba2026fines}.
+
+\subsection{A check on the simulated leagues}
+
+A proof covers the rule as written, so we also tested the rule as our simulator runs it. We first confirmed that the simulator's draft order followed the rule in all 750 seasons of the Simple COLA run: 25 seasons in each of 30 leagues. Then, in each season, we took every team that missed the playoffs except the one with the fewest wins. We lowered its win total one game at a time until it sat one win below that team, and we held everything else constant. That gave 158,325 cases. Counting each coin-flip tie as half a place, the team's place in the order was later in 98,695 cases and unchanged in the other 59,630. It was earlier in none.
+
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
