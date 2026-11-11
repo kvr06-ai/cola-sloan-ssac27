@@ -72,6 +72,15 @@ type Config = {
 	// tail full-depth closes while keeping a top-`lotteryDepth` lottery. Ignored
 	// for other variants.
 	lotteryDepth?: number;
+	// Order of the pool's picks past `lotteryDepth` in the "weighted" variant.
+	// "index" (default) = by index DESC, which is Waitlist COLA at depth 4.
+	// "record" = by this season's record, worst first, which is Classic COLA at
+	// depth 4: the same pool, index law and top-four draw as Waitlist, differing
+	// only in how picks 5-14 are ordered. Classic ran on the engine's own lottery
+	// until 2026-11-11; that path zeroed a first-round loser's index for good
+	// (the E=14 mask) and gave a traded pick no chance in the draw, so it did not
+	// share Waitlist's index law. Ignored for other variants.
+	tail?: "index" | "record";
 	// Draw depth for the "t321" variant: how many top picks the tiered-ball
 	// draw assigns before the remainder falls back to record order. 4 = an
 	// NBA-style top-four lottery over the tiered balls; 16 = the full pool
@@ -682,14 +691,20 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				for (const t of teamsNow as any[]) colaByTid[t.tid] = t.cola ?? 0;
 				const remaining = tss
 					.filter((ts: any) => inPool(ts.playoffRoundsWon))
-					.map((ts: any) => ({ tid: ts.tid, w: Math.pow(colaByTid[ts.tid] ?? 0, gamma) }));
+					.map((ts: any) => ({
+						tid: ts.tid,
+						w: Math.pow(colaByTid[ts.tid] ?? 0, gamma),
+						won: ts.won,
+					}));
 				const order: Record<number, number> = {};
 				let pickNum = 1;
 				while (remaining.length > 0) {
 					if (pickNum > lotteryDepth) {
 						// Past the lottery depth: order the rest of the pool by index
 						// (cola^gamma) DESC, deterministically -- by drought, not record.
-						remaining.sort((a, b) => b.w - a.w);
+						// tail "record" orders it by record instead, worst first (Classic).
+						if (config.tail === "record") remaining.sort((a, b) => a.won - b.won);
+						else remaining.sort((a, b) => b.w - a.w);
 						for (const r of remaining) order[r.tid] = pickNum++;
 						break;
 					}
@@ -938,6 +953,10 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 				teams: pendingTeams ?? [],
 				tankedTid: config.tank && records.length === config.tank.season ? tankedTid : null,
 			});
+			// One line per finished season, so a long run can report progress.
+			if (process.env.COLA_DRIVER_PROGRESS) {
+				fs.appendFileSync(process.env.COLA_DRIVER_PROGRESS, `${pendingSeason}\n`);
+			}
 			seasonStart = Date.now();
 		} else {
 			throw new Error(`Unexpected phase in driver loop: ${ph}`);
