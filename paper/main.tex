@@ -174,6 +174,62 @@ The loss also has costs inside the draft. It takes one win from the team's own t
 
 A proof covers the rule as written, so we also tested the rule as our simulator runs it. We first confirmed that the simulator's draft order followed the rule in all 750 seasons of the Simple COLA run: 25 seasons in each of 30 leagues. Then, in each season, we took every team that missed the playoffs except the one with the fewest wins. We lowered its win total one game at a time until it sat one win below that team, and we held everything else constant. That gave 158,325 cases. Counting each coin-flip tie as half a place, the team's place in the order was later in 98,695 cases and unchanged in the other 59,630. It was earlier in none.
 
+\section{When the assumptions fail}
+
+Section 4 called two of its assumptions standard. This section takes each in turn, shows where it could fail, measures the failure size in our simulated leagues, and describes what a league could do about it. No team in the simulated leagues loses on purpose, so each figure below measures a temptation and says nothing about how often a real team would act on it.
+
+\subsection{A team that prefers the pool to the playoffs}
+
+The second assumption says a team prefers winning a playoff series to going without one. It matters because every mechanism's pool ends at a line, and a team just inside the pool picks earlier than a team just outside. Table~\ref{tab:limits} shows that line under four mechanisms and what a place on the pool side is worth.
+
+Under the old lottery, the line is the last playoff place. The best team that missed the playoffs picks 13.6th on average, and the first pick outside the pool is the 15th, so staying in the pool is worth 1.4 places. Under 3-2-1, the line is the play-in game between the seventh and eighth teams in a conference. The loser gets one chance in the drawing and picks 11.6th on average; the first pick outside the pool is 17th, a difference of 5.4 places. Under both lotteries, the team on the line holds the worst odds in the pool.
+
+The difference is larger under COLA, because priority does not depend on record. The team on the line can have the highest priority. Under Full-lottery COLA, the team with the most tickets among those that missed the playoffs picks 5.4th on average, 9.6 places ahead of the first pick outside the pool. Under Simple COLA, the line is a first-round series. A playoff team that holds the longest wait picks first if it loses that series and 23rd at best if it wins, a difference of 22 places. This is the second cost named in Section 1.
+
+To collect that difference, a team would have to lose a playoff series on purpose and give up the second round. A league that prefers not to rely on teams refusing that trade has two options. The first is already in our tests. A full-lottery COLA ends its pool at the last playoff place and draws every pick, so the most a team can gain at the line is 9.6 places, and the gain comes with better odds in a drawing. The second is to count any playoff appearance as success. A first-round loss then buys nothing. That change has two costs. Help stops for a team that reaches the playoffs every year and never advances, and the line returns to the end of the regular season, where late losses can move a team across it. We have not simulated that variant.
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{Four mechanisms on this section's measures, from 30 simulated leagues of 25 seasons. For the two COLA mechanisms, the places gained are for the team with the highest priority, which is the most any team on the line can gain.}
+\label{tab:limits}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.21\linewidth}>{\raggedleft\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+\textbf{Mechanism} & \textbf{Where the pool ends} & \textbf{Places gained by staying in the pool} & \textbf{Top-three picks that went to a team with one in the previous two drafts} & \textbf{Next pick after a top-three pick, when the team missed the playoffs again} \\
+\midrule
+Old lottery & Last playoff place & 1.4 & 29\% & 6.6 \\
+\addlinespace
+3-2-1 & Seven-eight play-in game & 5.4 & 20\% & 8.6 \\
+\addlinespace
+Full-lottery COLA & Last playoff place & 9.6 & 16\% & 9.4 \\
+\addlinespace
+Simple COLA & First-round series & 22 & 0\% & 21.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{A team that prefers a later pick}
+
+The first assumption says a team prefers an earlier pick to a later one. Under Simple COLA, it can fail at one line in the order, between the third and fourth picks. A top-three pick returns a team's wait to zero, a step we call a reset, and the fourth pick leaves the wait untouched. When the teams on either side of that line have the same wait, only wins separate them, and the team with fewer wins picks fourth and keeps its wait.
+
+Every league starts with no history, so all its teams share one wait at first. We therefore measured this line in seasons 6 to 25 of each league. The third and fourth teams shared a wait in 410 of 600 seasons, or 68\%. In the following season, the team that had picked third picked 21st on average, and the team that had picked fourth received a top-three pick 89\% of the time. To change places with the fourth team, the third team would have needed a median of six more losses.
+
+The exception is narrow. It concerns the teams tied at one line, about four on average, and it asks a team to trade the third pick now for the chance of a better one a year later. The simplest remedy is to break ties between teams with the same wait by a random draw. Wins then play no part in the order, so the exception disappears, at the price of a small drawing and of the tie-break's reward for winning. We have not simulated that variant. The ticket mechanisms avoid a single line in another way. They draw the first four picks and charge for them on a sliding scale, from all of a team's tickets for the first pick to a quarter for the fourth.
+
+\subsection{The season after a top pick}
+
+The reset behind that line is also what spreads the top picks among teams. Under the old lottery, 29\% of top-three picks went to a team that had received one in the previous two drafts. The share was 20\% under 3-2-1 and 16\% under Full-lottery COLA. Under Simple COLA, it was zero.
+
+The cost falls on a team that takes a top-three pick and stays weak. If it missed the playoffs again the next season, its pick that season averaged 21.0 under Simple COLA, against 6.6 under the old lottery, 8.6 under 3-2-1 and 9.4 under Full-lottery COLA. Such a team then waits. On average, 7.6 seasons pass between one team's top-three picks under Simple COLA, against 4.9 under the old lottery. Section 7 measures how this affects the time teams take to return to the playoffs. A league that wants a shorter wait after a top pick can soften the reset, as the ticket mechanisms do with their sliding scale.
+
+\subsection{Draft classes}
+
+No mechanism we test looks at how strong a draft class is. Under Simple COLA, a team's turn at the front comes when its wait says so, in a strong year or a weak one. A lottery leaves the same question to chance.
+
+\subsection{What a remedy costs}
+
+Each remedy in this section adds a rule to a mechanism whose appeal is that it has so few. Simple COLA keeps one count for each team and holds no drawing. A tie-break by random draw adds a small drawing. Full-lottery COLA adds tickets, percentages, and a drawing for every pick. The choice depends on how much weight a league gives to the exceptions above, and Sections 7 and 8 return to it by comparing all nine mechanisms.
+
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 

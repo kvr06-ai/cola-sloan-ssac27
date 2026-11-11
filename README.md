@@ -60,9 +60,12 @@ From `testbed/harness`, each script prints one reported result:
                                   verifies the Classic COLA run against its rules
     node simple_losing_check.js   Section 4's numbers: the Simple COLA run against
                                   its rule, and what losing does to a team's pick
+                                  (--cutoff adds Section 5's third-and-fourth-pick line)
+    node limits_check.js          Section 5's numbers: where each pool ends, and
+                                  the seasons after a top-three pick
 
 `abstract_table.js`, `metric_screen.js`, `frontier_analysis.js`,
-`simple_losing_check.js` and the two
+`simple_losing_check.js`, `limits_check.js` and the two
 verify scripts work on a fresh clone with no setup, because their inputs are
 committed: one reference run (`testbed/harness/runs/ref/nba.json`) and the
 result files of the 25-season run (`testbed/harness/runs/frontier/*.json`, 30
