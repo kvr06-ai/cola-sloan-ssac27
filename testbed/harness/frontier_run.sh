@@ -9,7 +9,10 @@
 # drought any team has between playoff-series wins, resolves inside the run.
 # Same memory-safe chunked runner as e14_run.sh. Nine configs, in the order the
 # results are needed:
-#   classic    Classic COLA, 14-team pool (engine lottery: top-4 by index, 5-14 by record)
+#   classic    Classic COLA, 14-team pool (top-4 by index, 5-14 by record). Re-run
+#              2026-11-11 on the weighted path with tail "record", so it shares
+#              Waitlist's pool and index law. The engine-lottery run it replaces
+#              is in this repository's history (classic.json before 2026-11-11).
 #   waitlist   Waitlist COLA, 14-team pool (top-4 by index, 5-14 by index)
 #   nba        post-2019 NBA lottery (official ball counts, top-4 draw, 5-14 by record)
 #   t321       3-2-1 AS ADOPTED (roles 3/7/4/2 at 2/3/2/1 balls, all 16 drawn,
@@ -49,6 +52,7 @@ unit() {  # tag lo hi cfgjson
   if [ -f "$out" ]; then echo "skip ${tag}_s${lo}-${hi} (done)"; return; fi
   seeds="[$(seq "$lo" "$hi" | paste -sd, -)]"
   COLA_DRIVER_CONFIG="$cfg" COLA_DRIVER_REPLICATES="$seeds" COLA_DRIVER_OUTPUT="$out" \
+  COLA_DRIVER_PROGRESS="$OUT/${tag}_s${lo}-${hi}.progress" \
     "$VITEST" --run --project basketball src/test/colaFullEngineDriver.test.ts \
     > "$OUT/${tag}_s${lo}-${hi}.log" 2>&1 &
   echo "launch ${tag}_s${lo}-${hi} (pid $!) at $(date +%H:%M:%S)"
@@ -66,7 +70,7 @@ run_config() {  # tag cfgjson
 }
 
 S="$SEASONS"
-run_config classic   '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"'}'
+run_config classic   '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":1,"lotteryDepth":4,"tail":"record"}'
 run_config waitlist  '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":1,"lotteryDepth":4}'
 run_config nba       '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"nba"}'
 run_config t321      '{"id":900,"E":"16-tiered","C":null,"S":"unbounded","seasons":'"$S"',"variant":"t321","adopted":true}'

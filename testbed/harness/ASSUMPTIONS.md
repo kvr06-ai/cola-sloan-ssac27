@@ -110,6 +110,21 @@ COLA_FULL_ENGINE=1) adds, beyond the cola dial mechanics:
   wins-based increment of the published variant; a faithful implementation is
   a separate ticket.
 
+- **FE-7. Classic COLA re-run on the weighted path (2026-11-11).** The first
+  Classic run (2026-09-18) used the engine's own lottery behind the E=14
+  eligibility mask. Measured on that run, the mask left a first-round loser's
+  index at zero for good (5,760 of 5,760 cases), where Waitlist and
+  Full-lottery add 1,000, and the engine gave a traded pick no chance in the
+  top-four draw. Classic therefore differed from Waitlist in more than the
+  order of picks 5 to 14. The accepted abstract settles the rule: priority is
+  reduced "when teams have playoff success or make high draft picks", and a
+  year without a series win counts as waiting. Classic now runs as the weighted
+  variant with `lotteryDepth: 4` and `tail: "record"`: the 14-team pool, the
+  index law and the top-four draw are Waitlist's, and picks 5 to 14 go by
+  record, worst first. `verify_classic.js` checks a run against this rule.
+  The superseded run is in this repository's history (`classic.json` before
+  2026-11-11).
+
 ---
 
 ## 1. ZenGM Engine Assumptions
