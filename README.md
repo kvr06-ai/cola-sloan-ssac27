@@ -58,8 +58,11 @@ From `testbed/harness`, each script prints one reported result:
                                   verifies the adopted 3-2-1 arm against its rules
     node verify_classic.js runs/frontier/classic.json
                                   verifies the Classic COLA run against its rules
+    node simple_losing_check.js   Section 4's numbers: the Simple COLA run against
+                                  its rule, and what losing does to a team's pick
 
-`abstract_table.js`, `metric_screen.js`, `frontier_analysis.js` and the two
+`abstract_table.js`, `metric_screen.js`, `frontier_analysis.js`,
+`simple_losing_check.js` and the two
 verify scripts work on a fresh clone with no setup, because their inputs are
 committed: one reference run (`testbed/harness/runs/ref/nba.json`) and the
 result files of the 25-season run (`testbed/harness/runs/frontier/*.json`, 30
