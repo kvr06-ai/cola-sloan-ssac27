@@ -62,7 +62,7 @@ const PARITY_KEY = flags.has("--parity=neverWon") ? "neverWon" : "maxDrought";
 // which is an association. Rules that never read record are zero by
 // construction; rules under which losing costs picks floor at zero.
 const ROBUST_CAUSAL = flags.has("--robust=causal");
-const CAUSAL = { classic: 1.853, nba: 1.317 }; // measured; every other tag 0
+const CAUSAL = { classic: 1.935, nba: 1.317 }; // measured (counterfactual.txt); every other tag 0
 // --bar=playoffs moves the parity bar from winning a playoff series to making
 // the playoffs (the sixteen-team bracket, so a play-in loser has not made it).
 // The same event sets the clock of the common help yardstick, so "drought"
