@@ -9,6 +9,9 @@ paper/*.synctex*
 paper/*.fls
 paper/*.fdb_latexmk
 
+# SSAC's own paper template, kept locally for the final formatting pass
+paper/SSAC paper template.pdf
+
 # macOS
 .DS_Store
 

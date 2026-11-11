@@ -19,7 +19,7 @@ repo name, and this repo is private), so the page deploys to the public
 ## Update procedure
 
 1. Edit `index.html` here (this copy is canonical).
-2. `./deploy.sh` (copies it to `../../cola-manipulation-bound/docs/sweep/`).
+2. `./deploy.sh` (copies it to `../../context/cola-manipulation-bound/docs/sweep/`).
 3. Commit + push BOTH repos (this one for the source of record, the public one
    to go live).
 
