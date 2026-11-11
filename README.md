@@ -1,27 +1,33 @@
-# Waitlist COLA: a record-blind NBA draft order with no tanking reward
+# Practical Incentive-Compatible Drafts: Carry-Over Lottery Allocation
 
 Paper, simulation harness, and analysis code for our MIT Sloan Sports Analytics
 Conference (SSAC27) submission, in the Basketball track.
 
-Carry-Over Lottery Allocation (COLA) gives every team a waiting number that
-rises each season it misses the playoffs and falls when it succeeds, and sets
-draft priority from that number, so one bad season barely moves a team. This
-work formalizes COLA as a space of seven design settings, evaluates nine draft
-rules inside a full basketball simulator, and identifies the simplest
-configuration that removes the reward for losing while still directing the
-earliest picks to the longest-waiting teams.
+Carry-Over Lottery Allocation (COLA) measures a team's weakness by its playoff
+results over many seasons. Each team carries a draft priority from one season
+to the next. Priority grows while the team goes without playoff success and
+falls when it wins a playoff series or receives a high pick, so losing more
+games this season adds nothing. The paper presents COLA as a family of draft
+mechanisms, proves that a member of the family is incentive compatible under
+stated assumptions, and compares nine mechanisms inside a full basketball
+simulator on help for long-waiting teams, long-term parity, and the reward for
+losing.
 
 ## What is here
 
-    paper/
-      ssac27-abstract.tex     the SSAC27 abstract (under 500 words, two tables)
-      main.tex                the full manuscript
-      references.bib          bibliography
+    abstract-submission/
+      ssac27-abstract.pdf     the abstract as submitted to SSAC27 and accepted
+      ssac27-abstract.tex     its source
       wordcount_abstract.py   checks the abstract against the 500-word cap
+    paper/
+      main.tex                the full paper
+      references.bib          bibliography
+      outline.tex             the outline the paper follows
     testbed/harness/          the engine driver, sweep runners, and analysis
     simulator/                source of the public interactive results page
-    original-study/           the original COLA paper's Python simulation,
-                              NBA data, results, and figures (arXiv:2602.02487)
+    original-study/           the Python simulation, NBA data, results, and
+                              figures behind an earlier COLA preprint
+                              (arXiv:2602.02487)
 
 ## Reproducing the numbers
 
@@ -60,15 +66,15 @@ within memory and disk on its own.
 
 ## Building the documents
 
-    tectonic paper/ssac27-abstract.tex
+    tectonic abstract-submission/ssac27-abstract.tex
     tectonic paper/main.tex
 
 ## Related
 
-COLA was introduced in Highley, Duncan, and Volkov (2026), "Carry-Over Lottery
-Allocation: Practical Incentive-Compatible Drafts"
-(<https://arxiv.org/abs/2602.02487>). The code and data behind that paper are
-in `original-study/`, merged with their full commit history from
+The code and data behind an earlier preprint on COLA, Highley, Duncan, and
+Volkov (2026), "Carry-Over Lottery Allocation: Practical Incentive-Compatible
+Drafts" (<https://arxiv.org/abs/2602.02487>), are in `original-study/`,
+merged with their full commit history from
 <https://github.com/vilka-9999/carry_over_lotter_allocation_research>.
 
 The published interactive backtester covering 26 NBA seasons lives at
