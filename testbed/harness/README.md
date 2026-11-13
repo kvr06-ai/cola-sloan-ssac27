@@ -13,6 +13,7 @@ paper that reports numbers.
     simple_losing_check.js         Section 4 and, with --cutoff, Section 5.2
     limits_check.js                Section 5
     design_check.js                Section 6
+    results_check.js               Section 7
     verify_classic.js              checks the Classic COLA run against its rules
     t321_adopted_check.js          checks the 3-2-1 run against its rules
     colaFullEngineDriver.test.ts   the driver, which runs one mechanism inside the simulator

@@ -375,6 +375,96 @@ Table~\ref{tab:realcheck} shows that all four simulated values lie inside the in
 
 Simple COLA's two values depend on waits, and a simulated league starts with every wait at zero. From the sixth season of each league on, the simulated teams have the same five seasons of history behind them as our data holds for the real teams in 2004-05. Measured over those seasons, the two values are −0.57 and 6.0, and both are inside the intervals too.
 
+\section{Results}
+
+Table~\ref{tab:results} gives the nine mechanisms on the five measures of Section 6. Every figure is an average over the 30 simulated leagues. We compare each mechanism with 3-2-1, the lottery the NBA adopted in 2026. Where the text gives a difference from 3-2-1, the parentheses hold its 95\% interval, and each difference is computed before rounding. The first three subsections take the old lottery, 3-2-1, and Simple COLA through the reward for losing, the help for the teams that wait, and long-term parity. The fourth covers the other six mechanisms.
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.20\linewidth}>{\raggedleft\arraybackslash}p{0.13\linewidth}>{\raggedleft\arraybackslash}p{0.15\linewidth}>{\raggedleft\arraybackslash}p{0.12\linewidth}>{\raggedleft\arraybackslash}p{0.15\linewidth}>{\raggedleft\arraybackslash}p{0.15\linewidth}@{}}
+\toprule
+\textbf{Mechanism} & \textbf{Reward for losing, $R$} & \textbf{Help for a longer wait, $H$} & \textbf{Longest wait, $L$} & \textbf{Wait for the next series win} & \textbf{Wait to return to the playoffs} \\
+\midrule
+Old lottery & +1.32 & 0 & 16.4 & 4.65 & 2.89 \\
+\addlinespace
+Equal-odds lottery & 0 & 0 & 16.0 & 4.67* & 2.96 \\
+\addlinespace
+3-2-1 & −0.63 & 0 & 16.3 & 4.47 & 2.94 \\
+\addlinespace
+Classic COLA & +1.93 & 1.2 & 12.2* & 4.76* & 2.91 \\
+\addlinespace
+Waitlist COLA & 0 & 2.0 & 12.8* & 4.63 & 2.97 \\
+\addlinespace
+Full-lottery COLA & 0 & 1.6 & 11.9* & 4.51 & 2.89 \\
+\addlinespace
+Simple COLA & −0.94 & 6.3 & 5.5* & 4.58 & 3.13* \\
+\addlinespace
+Countdown COLA & −4.51 & 4.7 & 9.3* & 4.64 & 3.11* \\
+\addlinespace
+Beckett COLA & −1.64 & 2.5 & 14.1* & 4.55 & 3.02 \\
+\bottomrule
+\end{tabular}
+\caption{The nine mechanisms on the five measures of Section 6, as averages over the 30 simulated leagues. $R$ and $H$ are in draft places, and the three waits are in seasons. An asterisk marks a wait whose difference from 3-2-1 has a 95\% interval that excludes zero. Appendix C gives each difference with its interval.}
+\label{tab:results}
+\end{table}
+
+\subsection{The reward for losing}
+
+The old lottery rewards losing. A team that dropped from the fifth-worst record to the worst would have gained 1.32 draft places on average. Table~\ref{tab:positions} gives the same measure from every starting position, where a starting position is a team's rank among the 14 records that missed the playoffs, counted from the worst. The old lottery's reward was positive from every position in every season. It reached 9.96 places from the fourteenth-worst record, the best record among the teams that missed the playoffs.
+
+The 3-2-1 lottery removes that reward at the bottom of the standings. From the fifth-worst record, a drop to the worst costs a team 0.63 places, because the three worst records hold fewer chances in the drawing than the seven above them. The reward returns in the middle of the standings, as Section 1 described. It is 0.36 places from the eleventh-worst record and 2.04 from the fourteenth-worst.
+
+Under Simple COLA, losing costs a team places from every position, 0.94 from the fifth-worst record and 3.50 from the fourteenth-worst. The reward was never positive, from any position in any season, as Theorem 1 requires.
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}@{}}
+\toprule
+\textbf{Starting position} & \textbf{Old lottery} & \textbf{3-2-1} & \textbf{Simple COLA} \\
+\midrule
+Second-worst record & +0.21 & 0.00 & −0.27 \\
+Third-worst & +0.41 & −0.02 & −0.49 \\
+Fourth-worst & +0.80 & −0.61 & −0.72 \\
+Fifth-worst & +1.32 & −0.63 & −0.94 \\
+Sixth-worst & +1.90 & −0.61 & −1.22 \\
+Seventh-worst & +2.56 & −0.55 & −1.35 \\
+Eighth-worst & +3.41 & −0.46 & −1.66 \\
+Ninth-worst & +4.40 & −0.29 & −1.98 \\
+Tenth-worst & +5.56 & −0.02 & −2.06 \\
+Eleventh-worst & +6.67 & +0.36 & −2.28 \\
+Twelfth-worst & +7.71 & +0.77 & −2.61 \\
+Thirteenth-worst & +8.80 & +1.32 & −3.00 \\
+Fourteenth-worst & +9.96 & +2.04 & −3.50 \\
+\bottomrule
+\end{tabular}
+\caption{The reward for losing, $R$, from each starting position, in draft places. A positive figure means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its column. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position.}
+\label{tab:positions}
+\end{table}
+
+\subsection{Help for the teams that wait}
+
+Under both lotteries, nothing grows with waiting, so the help for a longer wait, $H$, is zero. Under Simple COLA, a team that moves from the fifth-longest wait to the longest gains 6.3 places.
+
+The longest wait, $L$, shows what that help does over 25 seasons. It averaged 16.4 seasons under the old lottery and 16.3 under 3-2-1, a difference of 0.1 seasons (−1.6 to 1.8). The interval includes zero, so 3-2-1 gives the teams that wait no more help than the old lottery did. Under Simple COLA, the longest wait averaged 5.5 seasons, 10.8 fewer than under 3-2-1 (9.4 to 12.1). It was five or six seasons in every league, against 10 to 25 under 3-2-1.
+
+\subsection{Long-term parity}
+
+The three mechanisms are level on the wait for the next series win. It averaged 4.65 seasons under the old lottery, 4.47 under 3-2-1, and 4.58 under Simple COLA. Simple COLA's wait is 0.11 seasons longer than 3-2-1's (−0.10 to 0.32), and the old lottery's is 0.18 longer (−0.06 to 0.42). Both intervals include zero.
+
+The number of waits that ended points the same way. Depending on the mechanism, 80.3 to 86.5 waits for a series win ended per league on average. In the NBA's last 25 seasons, 88 ended. The draft order changes which teams end their waits, and it barely changes how many waits end.
+
+Simple COLA has one cost on parity, the first of the two named in Section 1. Its teams took 3.13 seasons on average to return to the playoffs, against 2.94 under 3-2-1, a difference of 0.18 seasons (0.08 to 0.28). Two features of the rule lie behind it. Its pool includes the eight teams that lose in the first round, and 39\% of its top-three picks went to them. A team that takes a top-three pick also goes to the back of the list, even if it stays weak (Section 5).
+
+\subsection{The other six mechanisms}
+
+Table~\ref{tab:results} also reports the equal-odds lottery and five more COLA mechanisms. The equal-odds lottery favors no team, so it gives no reward for losing and no help for a longer wait. Its longest wait averaged 16.0 seasons, 0.2 fewer than under 3-2-1 (−1.6 to 2.1).
+
+Against 3-2-1, every COLA mechanism shortened the longest wait. The five besides Simple COLA shortened it by 2.2 to 6.9 seasons, and each of their intervals excludes zero. Three of them, Waitlist COLA, Full-lottery COLA, and Countdown COLA, also gave no reward for losing from any position in any season.
+
+Simple COLA is therefore one of several COLA mechanisms that remove the reward for losing and help the teams that wait. Of the nine mechanisms, it gives the most help, and it is the only one that holds no drawing. Section 8 turns to how a league might choose among them.
+
 \clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}

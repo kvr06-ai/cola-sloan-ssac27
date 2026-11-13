@@ -44,6 +44,7 @@ output every time.
 | `node simple_losing_check.js --cutoff` | Section 5.2: the line between the third and fourth picks |
 | `node limits_check.js` | Section 5: Table 2, and the seasons after a top-three pick |
 | `node design_check.js` | Section 6: the design of the simulations, and Tables 3 and 4 |
+| `node results_check.js` | Section 7: the results for the nine mechanisms, and Tables 5 and 6 |
 | `node verify_classic.js runs/frontier/classic.json` | A check of the Classic COLA simulations against the mechanism's rules |
 | `node t321_adopted_check.js runs/frontier/t321.json` | The same check for 3-2-1 |
 
