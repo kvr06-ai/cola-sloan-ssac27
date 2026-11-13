@@ -13,6 +13,10 @@
 \ifPDFTeX
   \usepackage[utf8]{inputenc}
   \usepackage[T1]{fontenc}
+  % pdfLaTeX has no meaning for the minus sign U+2212, which the text uses in
+  % negative numbers. Set it as an en dash, the glyph the formulas also use
+  % for a minus under this engine.
+  \DeclareUnicodeCharacter{2212}{\textendash}
 \fi
 \PassOptionsToPackage{no-math}{fontspec}
 \usepackage{caladea}
