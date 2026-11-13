@@ -1,9 +1,11 @@
 %%%% main.tex
 %%%% SSAC27 full paper, Paper ID 100, Basketball track.
-%%%% Holds only the sections drafted and approved since the outline was settled.
-%%%% The layout follows SSAC's Word template (Caladea matches Cambria's metrics),
-%%%% so the page count here tracks the final document. Keep the LaTeX plain enough
-%%%% for pandoc to convert into that template.
+%%%% Holds the sections drafted so far.
+%%%% The layout follows SSAC's Word template, so this build tracks the final
+%%%% document: Caladea (Cambria's metrics) at 11pt, left-aligned text with no
+%%%% hyphenation, numbered equations, formula letters and digits in the text
+%%%% font, and the references on a new page with the appendix after them. Keep
+%%%% the LaTeX plain enough for pandoc to convert into that template.
 
 \documentclass[11pt,letterpaper]{article}
 
@@ -12,14 +14,20 @@
   \usepackage[utf8]{inputenc}
   \usepackage[T1]{fontenc}
 \fi
+\PassOptionsToPackage{no-math}{fontspec}
 \usepackage{caladea}
 \usepackage[left=1in,right=1in,top=1.1in,bottom=1.2in]{geometry}
 \usepackage{titlesec}
 \usepackage{booktabs}
 \usepackage{float}
-\usepackage[font=footnotesize,labelfont=bf,labelsep=period,justification=justified,singlelinecheck=false,skip=4pt]{caption}
+\usepackage[font=footnotesize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false,skip=4pt]{caption}
 \usepackage{array}
 \usepackage{amsmath}
+\usepackage[italic,defaultmathsizes]{mathastext}
+\ifPDFTeX\else
+  % A true minus sign in formulas, from the text font.
+  \AtBeginDocument{\Umathcode`\-="2 \symmtoperatorfont "2212\relax}
+\fi
 \usepackage{cite}
 \renewcommand{\citepunct}{], [}
 \renewcommand{\citedash}{]--[}
@@ -32,6 +40,8 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{11pt}
 \frenchspacing
+\raggedright
+\hyphenpenalty=10000
 \renewcommand{\footnotelayout}{\normalsize}
 
 \titleformat{\section}{\fontsize{16}{19}\selectfont\bfseries}{\thesection.}{0.4em}{}
@@ -44,9 +54,7 @@
 \begin{center}
 {\fontsize{18}{22}\selectfont\bfseries Practical Incentive-Compatible Drafts:\\Carry-Over Lottery Allocation\par}
 \vspace{6pt}
-{\fontsize{14}{17}\selectfont Paper Track: Basketball\par}
-\vspace{2pt}
-{\fontsize{14}{17}\selectfont Paper ID: 100\par}
+{\fontsize{14}{17}\selectfont Paper Track: Basketball\\Paper ID: 100\par}
 \vspace{4pt}
 Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}
 \end{center}
@@ -261,29 +269,29 @@ Section 1 listed three things we measure: help for the teams that have waited lo
 Let $p_i$ be the number of the pick that team $i$ receives in a season's draft, so that $p_i = 1$ means the first pick. Under a mechanism with a drawing, $p_i$ depends on chance, and we use its expected value $\mathrm{E}[p_i]$, the average pick over all the ways the drawing could come out. A team with an equal chance at the first pick and the third pick has an expected pick of 2. We compute each expected value exactly, by going through every possible outcome of the drawing and how likely it is, so the figure carries no random error.
 
 \textbf{The reward for losing.} Take one season and the team with the fifth-worst record among the 14 that missed the playoffs. Call it team $m$. Suppose it had finished with the worst record in the league and nothing else had changed, so that every other team keeps its record and every team keeps its priority. Write $\mathrm{E}[p_m^{\mathrm{worst}}]$ for its expected pick in that case. The reward for losing is
-\[
+\begin{equation}\label{eq:reward}
 R = \mathrm{E}[p_m] - \mathrm{E}[p_m^{\mathrm{worst}}].
-\]
-If the team would pick sixth on average as things stand and fifth on average with the worst record, $R$ is $+1$. A positive $R$ means the worse record brought an earlier pick. A zero or negative $R$ means losing bought nothing or cost the team places. The fifth-worst record is our standard starting point, and Section 7 reports the others.
+\end{equation}
+If the team would pick sixth on average as things stand and fifth on average with the worst record, $R$ is +1. A positive $R$ means the worse record brought an earlier pick. A zero or negative $R$ means losing bought nothing or cost the team places. The fifth-worst record is our standard starting point, and Section 7 reports the others.
 
 \textbf{The help for a longer wait.} Take the team with the fifth-highest priority among the same 14 teams. Call it team $q$. Suppose its priority alone had been one step above the highest in its pool, where a step is one season of waiting or 1,000 tickets. Write $\mathrm{E}[p_q^{\mathrm{top}}]$ for its expected pick in that case. The help for a longer wait is
-\[
+\begin{equation}\label{eq:help}
 H = \mathrm{E}[p_q] - \mathrm{E}[p_q^{\mathrm{top}}].
-\]
+\end{equation}
 It counts the draft places a mechanism gives a team for having waited the longest. Under a lottery in which nothing carries over, $H$ is zero.
 
 \textbf{The longest wait.} For each team, we count the seasons in a row in which it neither won a playoff series nor received a top-three pick. Write $w_i(s)$ for team $i$'s count after season $s$ and its draft, with $w_i(0) = 0$. Then
-\[
+\begin{equation}\label{eq:count}
 w_i(s) =
 \begin{cases}
 0 & \text{if team $i$ won a series or received a top-three pick in season $s$,} \\
 w_i(s-1) + 1 & \text{otherwise.}
 \end{cases}
-\]
+\end{equation}
 This is Simple COLA's wait, counted the same way under every mechanism. The longest wait in a league is the largest count any team reaches in any season,
-\[
+\begin{equation}\label{eq:longest}
 L = \max_{i,\,s} \, w_i(s).
-\]
+\end{equation}
 
 \textbf{Two waits for playoff success.} A stretch of seasons without a series win ends when the team wins a series. A team that wins a series, goes four seasons without one, and then wins again has completed a stretch of four seasons. The wait for the next series win is the average length of the stretches that ended during a league's 25 seasons. The wait to return to the playoffs is the same average for stretches of seasons outside the playoffs. A stretch still open when the league ends is left out, under every mechanism alike. Shorter waits mean that a team that falls behind recovers sooner, so these two numbers measure long-term parity.
 
@@ -292,12 +300,12 @@ Each measure gives one number per league. $R$ and $H$ are averaged over the leag
 \subsection{How we compare two mechanisms}
 
 To compare mechanisms $A$ and $B$ on a measure $X$, we take the difference in each league, $d_\ell = X^A_\ell - X^B_\ell$ for leagues $\ell = 1, \dots, 30$. Comparing two mechanisms league by league in this way is called pairing. We report the average difference $\bar{d}$ with a 95\% confidence interval,
-\[
+\begin{equation}\label{eq:interval}
 \bar{d} \;\pm\; t \, \frac{s_d}{\sqrt{30}},
-\]
+\end{equation}
 where $s_d$ is the standard deviation of the 30 differences, a measure of how far apart they lie, and $t = 2.045$ is the standard multiplier for a 95\% interval built from 30 values (the 97.5th percentile of Student's $t$ distribution with 29 degrees of freedom). When the interval excludes zero, we say the two mechanisms differ on that measure.
 
-Each league counts once, however many seasons it holds, because the seasons of one league depend on each other. Pairing guarantees that both mechanisms start from the same 30 leagues, and its effect fades after the first draft. Across the 30 leagues, a league's longest wait under one mechanism is almost unrelated to its longest wait under another. The correlation is a number between $-1$ and $1$ that measures how closely two quantities move together, with 0 meaning they are unrelated. For the longest wait, it averages $-0.02$ over the 36 pairs that nine mechanisms make. For the two average waits, it averages $0.01$ and $-0.01$. The intervals are therefore about as wide as intervals from unrelated leagues would be.
+Each league counts once, however many seasons it holds, because the seasons of one league depend on each other. Pairing guarantees that both mechanisms start from the same 30 leagues, and its effect fades after the first draft. Across the 30 leagues, a league's longest wait under one mechanism is almost unrelated to its longest wait under another. The correlation is a number between −1 and 1 that measures how closely two quantities move together, with 0 meaning they are unrelated. For the longest wait, it averages −0.02 over the 36 pairs that nine mechanisms make. For the two average waits, it averages 0.01 and −0.01. The intervals are therefore about as wide as intervals from unrelated leagues would be.
 
 \subsection{How the simulated leagues compare with the NBA}
 
@@ -346,13 +354,13 @@ The second check asks whether the reward for losing and the help for a longer wa
 \toprule
 \textbf{Measure} & \textbf{Mechanism} & \textbf{Real standings: average (95\% interval)} & \textbf{Simulated leagues} \\
 \midrule
-Reward for losing, $R$ & Old lottery & $+1.30$ ($1.26$ to $1.34$) & $+1.32$ \\
+Reward for losing, $R$ & Old lottery & +1.30 (1.26 to 1.34) & +1.32 \\
 \addlinespace
- & 3-2-1 & $-0.55$ ($-0.70$ to $-0.39$) & $-0.63$ \\
+ & 3-2-1 & −0.55 (−0.70 to −0.39) & −0.63 \\
 \addlinespace
- & Simple COLA & $-0.73$ ($-1.07$ to $-0.39$) & $-0.94$ \\
+ & Simple COLA & −0.73 (−1.07 to −0.39) & −0.94 \\
 \addlinespace
-Help for a longer wait, $H$ & Simple COLA & $6.0$ ($5.4$ to $6.7$) & $6.3$ \\
+Help for a longer wait, $H$ & Simple COLA & 6.0 (5.4 to 6.7) & 6.3 \\
 \bottomrule
 \end{tabular}
 \caption{The reward for losing and the help for a longer wait on the NBA's real standings, one season at a time, beside their values in the simulated leagues. All values are draft places. Each interval treats the 22 seasons as unrelated to one another.}
@@ -361,8 +369,9 @@ Help for a longer wait, $H$ & Simple COLA & $6.0$ ($5.4$ to $6.7$) & $6.3$ \\
 
 Table~\ref{tab:realcheck} shows that all four simulated values lie inside the intervals from the real standings. In all 22 real seasons, Simple COLA's reward for losing was zero or negative, as Theorem 1 requires, and the old lottery's was positive.
 
-Simple COLA's two values depend on waits, and a simulated league starts with every wait at zero. From the sixth season of each league on, the simulated teams have the same five seasons of history behind them as our data holds for the real teams in 2004-05. Measured over those seasons, the two values are $-0.57$ and $6.0$, and both are inside the intervals too.
+Simple COLA's two values depend on waits, and a simulated league starts with every wait at zero. From the sixth season of each league on, the simulated teams have the same five seasons of history behind them as our data holds for the real teams in 2004-05. Measured over those seasons, the two values are −0.57 and 6.0, and both are inside the intervals too.
 
+\clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}
 
