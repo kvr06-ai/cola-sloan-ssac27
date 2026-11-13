@@ -19,7 +19,7 @@ interactive results page shows the simulations of an earlier draft.
 ## Repository layout
 
     paper/                  the paper: main.tex, references.bib and the built
-                            main.pdf, with the outline it follows
+                            main.pdf
     abstract-submission/    the abstract as submitted to SSAC27 and accepted,
                             its source, and the script that counts its words
     testbed/harness/        the simulation driver, the analysis scripts, the
