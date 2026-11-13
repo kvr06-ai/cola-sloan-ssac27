@@ -1,19 +1,20 @@
 #!/bin/sh
-# E=14 rerun + middle option (pressure-test sims 1 and 2).
+# Record-based reference mechanisms (the own-metric comparison Highley asked for):
 #
-#   ./e14_run.sh [seasons] [reps] [chunk] [conc]
+#   ./ref_run.sh [seasons] [reps] [chunk] [conc]
 #
-# Same memory-safe chunked runner as tighten_run.sh, at Highley's canonical
-# eligibility E=14 (the 14 non-playoff teams) instead of the 22-team pool the
-# headline sweep standardized on. Six configs:
-#   classic  Classic COLA at E=14 (engine cola lottery: top-4 by index, 5-14 by record)
-#   g0..g3   full-depth weighted lottery (cola^gamma over the 14) at E=14
-#   mid      MIDDLE OPTION: top-4 lottery by index, picks 5-14 by index (not record)
-# Analyze runs/e14/ with the usual scripts (own_metric_gaps.js, stats_tests.js).
+# Same memory-safe chunked runner as e14_run.sh. Three configs:
+#   nba    post-2019 NBA lottery (14-team pool, official ball counts, top-4 draw,
+#          picks 5-14 by record)
+#   t321a  3-2-1 proposal, NBA-style top-4 draw over tiered balls (drawDepth 4)
+#   t321b  3-2-1 proposal, full 16-pick tiered draw (drawDepth 16)
+# Analyze runs/ref/ together with runs/e14/ (e14_analysis.js runsDir arg works,
+# but note the NBA/3-2-1 own metric is RECORD, so their help-by-own-metric gap
+# equals their tanking gap by construction).
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
-OUT="$DIR/runs/e14"
+OUT="$DIR/runs/ref"
 SEASONS="${1:-15}"
 REPS="${2:-48}"
 CHUNK="${3:-12}"
@@ -45,16 +46,13 @@ run_config() {  # tag cfgjson
   done
 }
 
-run_config classic '{"id":830,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"'}'
-run_config g0      '{"id":831,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":0}'
-run_config g1      '{"id":832,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1}'
-run_config g2      '{"id":833,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":2}'
-run_config g3      '{"id":834,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":3}'
-run_config mid     '{"id":835,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1,"lotteryDepth":4}'
+run_config nba   '{"id":840,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"nba"}'
+run_config t321a '{"id":841,"E":"16-tiered","C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"t321","drawDepth":4}'
+run_config t321b '{"id":842,"E":"16-tiered","C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"t321","drawDepth":16}'
 wait
 
 echo "concatenating chunks into one file per config..."
-for tag in classic g0 g1 g2 g3 mid; do
+for tag in nba t321a t321b; do
   TAG="$tag" OUTDIR="$OUT" node -e '
     const fs=require("fs"), dir=process.env.OUTDIR, tag=process.env.TAG;
     const files=fs.readdirSync(dir).filter(f=>f.startsWith(tag+"_s")&&f.endsWith(".json")).sort();
@@ -64,4 +62,4 @@ for tag in classic g0 g1 g2 g3 mid; do
     console.log(tag+".json: "+all.length+" reps from "+files.length+" chunks");
   '
 done
-echo "e14 run done at $(date)"
+echo "ref run done at $(date)"

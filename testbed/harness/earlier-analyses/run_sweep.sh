@@ -24,14 +24,14 @@
 # Results: runs/<name>/sweep.csv   (rebuilt as units finish; valid mid-run)
 # Stop:    pkill -f 'sweep.js --parallel'
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 NAME="${1:-fullengine_$(date +%Y%m%d_%H%M%S)}"
 CONC="${2:-12}"
 CHUNK="${3:-5}"
 OUT="$DIR/runs/$NAME"
 mkdir -p "$OUT"
 
-nohup caffeinate -is env COLA_FULL_ENGINE=1 node "$DIR/sweep.js" \
+nohup caffeinate -is env COLA_FULL_ENGINE=1 node "$DIR/earlier-analyses/sweep.js" \
   --parallel --name "$NAME" --config-id all --replicates 50 \
   --concurrency "$CONC" --chunk-size "$CHUNK" \
   >> "$OUT/sweep.log" 2>&1 &
@@ -41,5 +41,5 @@ echo "Sweep launched."
 echo "  PID:         $PID  (name=$NAME, concurrency=$CONC, chunk=$CHUNK)"
 echo "  watch:       tail -f $OUT/sweep.log"
 echo "  results:     $OUT/sweep.csv   (rebuilt as units finish)"
-echo "  resume:      ./run_sweep.sh $NAME $CONC $CHUNK   (after a crash/sleep)"
+echo "  resume:      ./earlier-analyses/run_sweep.sh $NAME $CONC $CHUNK   (after a crash/sleep)"
 echo "  stop:        pkill -f 'sweep.js --parallel'"

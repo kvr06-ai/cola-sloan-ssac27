@@ -11,7 +11,7 @@
 # run it under nohup/caffeinate yourself for long jobs:
 #   caffeinate -is ./probe_run.sh 15 12
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
 OUT="$DIR/runs/probe"
 SEASONS="${1:-15}"

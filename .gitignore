@@ -19,15 +19,16 @@ paper/SSAC paper template.pdf
 *.swp
 *~
 
-# Basketball-GM testbed: internal reports + simulation artifacts (not for distribution)
+# Local reports and simulation outputs that are not part of the repository
 testbed/*.html
 testbed/*.pdf
-# Engine fork (its own ~1GB git repo + node_modules) and transient run outputs.
-# The harness SCRIPTS under testbed/harness/ are tracked; the fork and runs are not.
+# The simulator's source (its own repository, about 1 GB with its packages) and
+# run outputs stay local. The result files the paper reads, under runs/frontier/
+# and runs/ref/, were committed with `git add -f`.
 testbed/harness/zengm-fork/
 testbed/harness/runs/
 # Exception: the NBA-rules arm is committed as the shared substrate for
-# metric_screen.js, so a fresh clone can screen candidate priority metrics
+# earlier-analyses/metric_screen.js, so a fresh clone can screen candidate priority metrics
 # without first re-running a sweep.
 !testbed/harness/runs/ref/
 !testbed/harness/runs/ref/nba.json

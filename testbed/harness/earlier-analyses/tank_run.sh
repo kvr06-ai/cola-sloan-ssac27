@@ -20,7 +20,7 @@
 #
 # Analyze with: node tank_engine.js
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
 OUT="$DIR/runs/tank"
 SEASONS="${1:-8}"

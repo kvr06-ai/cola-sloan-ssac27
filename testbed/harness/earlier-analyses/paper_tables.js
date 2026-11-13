@@ -321,7 +321,7 @@ for (const [leg, x, y, why] of CONTRASTS) {
 // promotes everyone behind them. Splitting the worst-versus-fifth-worst gap into
 // the raffle share and the tail share shows which effect is doing the work.
 {
-	const { pickDistribution, buildPool } = require("./pick_dist.js");
+	const { pickDistribution, buildPool } = require("../pick_dist.js");
 	console.log(`\nWhere the tanking gradient comes from (exact, same seasons):`);
 	console.log(
 		`mechanism                       gap    worst: P(top 4)  fallback   5th-worst: P(top 4)  fallback`,
