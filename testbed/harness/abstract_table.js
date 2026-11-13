@@ -20,7 +20,7 @@
  * team to the worst record in the pool, and re-rank under the rule (drought,
  * then most wins, then a coin flip, so tied positions count at their mean).
  * Positive = losing buys an earlier pick. The record-based and index mechanisms
- * are priced by tank_counterfactual.js.
+ * are priced by earlier-analyses/tank_counterfactual.js.
  *
  * Usage: node abstract_table.js [runsDir=runs/frontier]
  */
@@ -171,10 +171,11 @@ if (logs.simplerule) {
 // The abstract's Table 1 (added 2026-09-29): four rules on the three criteria.
 //   Help for a worse record   draft places gained when the 5th-worst record among the 14
 //                             non-playoff teams drops to the worst record, everything else
-//                             held. Exact for the 2019 lottery (pick_dist.js), Simple COLA
-//                             and Full-lottery (record never read, so 0); the adopted 3-2-1
-//                             is priced by simulating its draw MC_DRAWS times per season,
-//                             with its pick floor and repeat limits.
+//                             held. Exact for every rule: the 2019 lottery (pick_dist.js),
+//                             Simple COLA, Full-lottery (record never read, so 0) and the
+//                             adopted 3-2-1 (measures.js sums over every state of its
+//                             drawing, with its pick floor and repeat limits), so the
+//                             table prints the same figures on every run.
 //   Help for a longer wait    draft places gained when the 5th-longest wait among the 14
 //                             non-playoff teams becomes the longest wait in the pool.
 //                             Exact for Simple COLA (its order) and Full-lottery (Plackett-
@@ -186,38 +187,10 @@ if (logs.simplerule) {
 // Run: node abstract_table.js --table1
 if (flagsHas("--table1")) {
 	const { pickDistribution, buildPool } = require("./pick_dist.js");
-	const MC_DRAWS = 2000;
-	const BALLS = { bottom3: 2, nonPlayIn: 3, seed910: 2, seed8: 1 };
+	const { t321Picks } = require("./measures.js");
+	// Expected pick of one team under the adopted 3-2-1, or null if it is outside the pool.
 	function t321Expected(teams, hist, tid) {
-		const byConf = {};
-		for (const t of teams) (byConf[t.conf] ??= []).push(t);
-		const role = {};
-		const pool = Object.values(byConf).flatMap((c) => {
-			const w8 = c.slice().sort((a, b) => a.wins - b.wins).slice(0, 8);
-			w8.forEach((t, i) => { role[t.tid] = i < 5 ? "nonPlayIn" : i < 7 ? "seed910" : "seed8"; });
-			return w8;
-		});
-		pool.filter((t) => role[t.tid] === "nonPlayIn").sort((a, b) => a.wins - b.wins).slice(0, 3)
-			.forEach((t) => { role[t.tid] = "bottom3"; });
-		if (!pool.some((t) => t.tid === tid)) return null;
-		const base = pool.map((t) => ({ tid: t.tid, w: BALLS[role[t.tid]], b3: role[t.tid] === "bottom3" }));
-		const past = (id, back) => { const h = hist[id] ?? []; return h.length >= back ? h[h.length - back] : null; };
-		let sum = 0;
-		for (let n = 0; n < MC_DRAWS; n++) {
-			const rem = base.slice();
-			for (let pick = 1; rem.length; pick++) {
-				let c = rem;
-				if (pick === 1) { const f = c.filter((x) => past(x.tid, 1) !== 1); if (f.length) c = f; }
-				if (pick <= 5) { const f = c.filter((x) => !((past(x.tid, 1) ?? 99) <= 5 && (past(x.tid, 2) ?? 99) <= 5)); if (f.length) c = f; }
-				if (pick <= 12) { const b3 = c.filter((x) => x.b3); if (b3.length > 0 && b3.length >= 13 - pick) c = b3; }
-				let roll = Math.random() * c.reduce((s, x) => s + x.w, 0);
-				let ch = c[c.length - 1];
-				for (const x of c) { roll -= x.w; if (roll < 0) { ch = x; break; } }
-				if (ch.tid === tid) { sum += pick; break; }
-				rem.splice(rem.indexOf(ch), 1);
-			}
-		}
-		return sum / MC_DRAWS;
+		return t321Picks(teams.map((t) => ({ id: t.tid, conf: t.conf, rec: t.wins })), hist).get(tid) ?? null;
 	}
 	const worstRecord = {
 		nba(log) { const out = []; for (const e of log) { const pool = e.teams.filter((t) => t.playoffRoundsWon < 0); if (pool.length !== 14) continue;
