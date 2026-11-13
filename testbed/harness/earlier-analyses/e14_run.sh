@@ -1,17 +1,19 @@
 #!/bin/sh
-# Memory-safe tightening run.
+# E=14 rerun + middle option (pressure-test sims 1 and 2).
 #
-#   ./tighten_run.sh [seasons] [reps] [chunk] [conc]
+#   ./e14_run.sh [seasons] [reps] [chunk] [conc]
 #
-# Each config's REPS replicates are split into CHUNK-replicate processes (the
-# proven-stable ~3GB size), launched CONC at a time and resumable per chunk
-# (a finished chunk's JSON is skipped on re-run), then concatenated into one
-# file per config: runs/tighten/<config>.json. Analyze with the usual scripts
-# pointed at runs/tighten/. Run under caffeinate for the long job.
+# Same memory-safe chunked runner as tighten_run.sh, at Highley's canonical
+# eligibility E=14 (the 14 non-playoff teams) instead of the 22-team pool the
+# headline sweep standardized on. Six configs:
+#   classic  Classic COLA at E=14 (engine cola lottery: top-4 by index, 5-14 by record)
+#   g0..g3   full-depth weighted lottery (cola^gamma over the 14) at E=14
+#   mid      MIDDLE OPTION: top-4 lottery by index, picks 5-14 by index (not record)
+# Analyze runs/e14/ with the usual scripts (own_metric_gaps.js, stats_tests.js).
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
-OUT="$DIR/runs/tighten"
+OUT="$DIR/runs/e14"
 SEASONS="${1:-15}"
 REPS="${2:-48}"
 CHUNK="${3:-12}"
@@ -43,18 +45,16 @@ run_config() {  # tag cfgjson
   done
 }
 
-# Same configs and ids as the n=12 baseline (unpaired across mechanisms).
-run_config g0        '{"id":810,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":0}'
-run_config g1        '{"id":812,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1}'
-run_config g2        '{"id":814,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":2}'
-run_config g3        '{"id":815,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":3}'
-run_config classic   '{"id":820,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"'}'
-run_config countdown '{"id":821,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"countdown"}'
-run_config beckett   '{"id":822,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"beckett"}'
+run_config classic '{"id":830,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"'}'
+run_config g0      '{"id":831,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":0}'
+run_config g1      '{"id":832,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1}'
+run_config g2      '{"id":833,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":2}'
+run_config g3      '{"id":834,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":3}'
+run_config mid     '{"id":835,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1,"lotteryDepth":4}'
 wait
 
 echo "concatenating chunks into one file per config..."
-for tag in g0 g1 g2 g3 classic countdown beckett; do
+for tag in classic g0 g1 g2 g3 mid; do
   TAG="$tag" OUTDIR="$OUT" node -e '
     const fs=require("fs"), dir=process.env.OUTDIR, tag=process.env.TAG;
     const files=fs.readdirSync(dir).filter(f=>f.startsWith(tag+"_s")&&f.endsWith(".json")).sort();
@@ -64,4 +64,4 @@ for tag in g0 g1 g2 g3 classic countdown beckett; do
     console.log(tag+".json: "+all.length+" reps from "+files.length+" chunks");
   '
 done
-echo "tightening done at $(date)"
+echo "e14 run done at $(date)"

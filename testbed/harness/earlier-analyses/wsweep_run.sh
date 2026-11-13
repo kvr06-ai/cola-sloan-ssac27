@@ -11,7 +11,7 @@
 # Defaults: 15 seasons, 12 replicates, 3-way. Run under caffeinate for long jobs:
 #   caffeinate -is ./wsweep_run.sh 15 12 3
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
 SEASONS="${1:-15}"
 REPS="${2:-12}"
@@ -52,4 +52,4 @@ run_one beckett   "{\"id\":822,\"E\":22,\"C\":null,\"S\":\"unbounded\",\"seasons
 
 wait
 echo "wsweep done at $(date). Analyze:"
-echo "  node wsweep_analysis.js g0=runs/wsweep/g0.json g1=runs/wsweep/g1.json g2=runs/wsweep/g2.json g3=runs/wsweep/g3.json classic=runs/wsweep/classic.json countdown=runs/wsweep/countdown.json beckett=runs/wsweep/beckett.json"
+echo "  node earlier-analyses/wsweep_analysis.js g0=runs/wsweep/g0.json g1=runs/wsweep/g1.json g2=runs/wsweep/g2.json g3=runs/wsweep/g3.json classic=runs/wsweep/classic.json countdown=runs/wsweep/countdown.json beckett=runs/wsweep/beckett.json"

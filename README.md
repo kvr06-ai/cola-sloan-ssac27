@@ -1,7 +1,7 @@
 # Practical Incentive-Compatible Drafts: Carry-Over Lottery Allocation
 
-Paper, simulation harness, and analysis code for our MIT Sloan Sports Analytics
-Conference (SSAC27) submission, in the Basketball track.
+Paper, simulation code and data for our submission to the MIT Sloan Sports
+Analytics Conference 2027 (SSAC27), in the Basketball track.
 
 Carry-Over Lottery Allocation (COLA) measures a team's weakness by its playoff
 results over many seasons. Each team carries a draft priority from one season
@@ -13,79 +13,62 @@ stated assumptions, and compares nine mechanisms inside a full basketball
 simulator on help for long-waiting teams, long-term parity, and the reward for
 losing.
 
-## What is here
+This is a working draft. The paper in `paper/` is still being written, and the
+interactive results page shows the simulations of an earlier draft.
 
-    abstract-submission/
-      ssac27-abstract.pdf     the abstract as submitted to SSAC27 and accepted
-      ssac27-abstract.tex     its source
-      wordcount_abstract.py   checks the abstract against the 500-word cap
-    paper/
-      main.tex                the full paper
-      references.bib          bibliography
-      outline.tex             the outline the paper follows
-    testbed/harness/          the engine driver, sweep runners, and analysis
-    simulator/                source of the public interactive results page
-    original-study/           the Python simulation, NBA data, results, and
-                              figures behind an earlier COLA preprint
-                              (arXiv:2602.02487)
+## Repository layout
 
-## Reproducing the numbers
+    paper/                  the paper: main.tex, references.bib and the built
+                            main.pdf, with the outline it follows
+    abstract-submission/    the abstract as submitted to SSAC27 and accepted,
+                            its source, and the script that counts its words
+    testbed/harness/        the simulation driver, the analysis scripts, the
+                            result files of the simulations and the NBA data
+    results-page/           source of the public interactive results page
+    original-study/         code and data of an earlier COLA preprint
+                            (arXiv:2602.02487), by its authors
+    LICENSE                 the MIT License, for the code and result files
 
-The mechanisms are configurations of the lottery code inside ZenGM
-Basketball-GM, a basketball simulator with public code that plays out every
-game from generated rosters and contracts under automated general managers.
-League generation and every draw are seeded per replicate, so a given
-configuration and seed reproduce a run exactly.
+## Reproducing the paper's numbers
 
-Requirements: Node.js 18 or later. The Overleaf sync drops the executable bit
-on the shell scripts, so after cloning run `chmod +x testbed/harness/*.sh`
-before any of the runners below.
+You need Node.js 18 or later and nothing else. Each command below reads only
+files in this repository, finishes in under a minute, and prints the same
+output every time.
 
-From `testbed/harness`, each script prints one reported result:
+    cd testbed/harness
 
-    node abstract_table.js --table1
-                                  the abstract's table and the nine-mechanism
-                                  comparison, on the committed 25-season run
-    node gap_decomposition.js     where the reward for losing comes from
-    node paper_tables.js          the two-ranking comparison and help gradients
-    node tank_counterfactual.js   picks bought by losing, paired counterfactual
-    node tank_crosscheck.js       independent Monte Carlo check of the above
-    node pool_swap.js --validate  pool manipulation, plus model-vs-engine checks
-    node tank_engine.js           the behavioral tanking arm
-    node metric_screen.js         candidate priority metrics, runs on committed data
-    node frontier_analysis.js     the four-criteria comparison on the 25-season run
-    node t321_adopted_check.js runs/frontier/t321.json
-                                  verifies the adopted 3-2-1 arm against its rules
-    node verify_classic.js runs/frontier/classic.json
-                                  verifies the Classic COLA run against its rules
-    node simple_losing_check.js   Section 4's numbers: the Simple COLA run against
-                                  its rule, and what losing does to a team's pick
-                                  (--cutoff adds Section 5's third-and-fourth-pick line)
-    node limits_check.js          Section 5's numbers: where each pool ends, and
-                                  the seasons after a top-three pick
-    node design_check.js          Section 6's numbers: the run's design, the simulated
-                                  leagues against the NBA, and the two help measures
-                                  on real NBA standings (measures.js holds the
-                                  measures themselves)
+| Command | What it reproduces |
+|:--|:--|
+| `node abstract_table.js --table1` | The table in the abstract, and the summary figures in Section 1 |
+| `node simple_losing_check.js` | Section 4: the test of Theorem 1 on the simulated leagues, and what one more loss costs a team |
+| `node simple_losing_check.js --cutoff` | Section 5.2: the line between the third and fourth picks |
+| `node limits_check.js` | Section 5: Table 2, and the seasons after a top-three pick |
+| `node design_check.js` | Section 6: the design of the simulations, and Tables 3 and 4 |
+| `node verify_classic.js runs/frontier/classic.json` | A check of the Classic COLA simulations against the mechanism's rules |
+| `node t321_adopted_check.js runs/frontier/t321.json` | The same check for 3-2-1 |
 
-`abstract_table.js`, `metric_screen.js`, `frontier_analysis.js`,
-`simple_losing_check.js`, `limits_check.js`, `design_check.js` and the two
-verify scripts work on a fresh clone with no setup, because their inputs are
-committed: one reference run (`testbed/harness/runs/ref/nba.json`), the NBA
-seasons file (`testbed/harness/data/nba-data.json`) and the
-result files of the 25-season run (`testbed/harness/runs/frontier/*.json`, 30
-leagues each on shared seeds: the nine mechanisms, plus `simple.json`, an
-earlier form of Simple COLA). The other scripts read run outputs under
-`testbed/harness/runs/`, which are regenerated by the runners in the same
-directory (`e14_run.sh`, `ref_run.sh`, `tank_run.sh`, `frontier_run.sh`).
-Those runs take several hours; `frontier_watchdog.sh` keeps the long one
-within memory and disk on its own, and `rerun_guarded.sh` re-runs a single
-mechanism under a memory guard.
+## The simulations and the data
 
-## Building the documents
+The simulated leagues come from ZenGM Basketball-GM, a basketball simulator
+with public code. Our driver sets the first-round draft order under each
+mechanism, and the simulator plays out everything else: every game, and every
+trade, signing and draft selection, with its own general managers running all
+30 teams. One seed fixes every chance event in a league, so a given seed and
+mechanism reproduce a league.
 
-    tectonic abstract-submission/ssac27-abstract.tex
+`testbed/harness/runs/frontier/` holds one result file for each mechanism, with
+30 leagues of 25 seasons in each. Every mechanism starts from the same 30
+leagues. `testbed/harness/data/nba-data.json` holds the NBA's standings,
+playoff results and first-round picks from 1999-00 to 2025-26, compiled from
+Basketball Reference.
+
+`testbed/harness/README.md` describes both file formats and how to run the
+simulations again, which needs the simulator and takes about 11 hours.
+
+## Building the paper
+
     tectonic paper/main.tex
+    tectonic abstract-submission/ssac27-abstract.tex
 
 ## License
 

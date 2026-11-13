@@ -7,7 +7,7 @@
 # fewer leagues (30 leagues x 25 seasons per mechanism, about the season count
 # of the 48 x 15 runs) so that the long-term-parity criterion, the longest
 # drought any team has between playoff-series wins, resolves inside the run.
-# Same memory-safe chunked runner as e14_run.sh. Nine configs, in the order the
+# Same memory-safe chunked runner as earlier-analyses/e14_run.sh. Nine configs, in the order the
 # results are needed:
 #   classic    Classic COLA, 14-team pool (top-4 by index, 5-14 by record). Re-run
 #              2026-11-11 on the weighted path with tail "record", so it shares
@@ -32,7 +32,7 @@
 # All nine share config id 900, so a given seed builds the SAME initial league
 # under every mechanism (the seed hash reads the id); the histories separate at
 # the first draw. Cross-mechanism comparisons can therefore be made per seed.
-# Analyze runs/frontier/ with frontier_analysis.js.
+# The paper's scripts read runs/frontier/ (see README.md).
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 FORK="$DIR/zengm-fork"

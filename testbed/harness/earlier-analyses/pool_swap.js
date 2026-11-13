@@ -51,7 +51,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { pickDistribution, buildPool, MECHS } = require("./pick_dist.js");
+const { pickDistribution, buildPool, MECHS } = require("../pick_dist.js");
 
 const ALPHA = 1000; // engine index scale: colaPre / ALPHA ~ drought-years
 

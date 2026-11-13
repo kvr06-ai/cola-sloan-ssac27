@@ -41,7 +41,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { pickDistribution, buildPool, MECHS } = require("./pick_dist.js");
+const { pickDistribution, buildPool, MECHS } = require("../pick_dist.js");
 
 const ROOT = process.argv[2] ?? "runs";
 const SOURCES = {

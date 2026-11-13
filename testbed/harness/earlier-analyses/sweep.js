@@ -31,7 +31,7 @@ const path = require('path');
 const child_process = require('child_process');
 const { evaluateAll } = require('./objectives.js');
 
-const ZENGM_FORK_DIR = path.join(__dirname, 'zengm-fork');
+const ZENGM_FORK_DIR = path.join(__dirname, '..', 'zengm-fork');
 // Driver selection. Default: the synthesized Track B testbed (fast 48-config
 // screen). COLA_FULL_ENGINE=1: the full ZenGM engine driver (per-game sim, real
 // rosters/contracts/AI GMs), used to re-derive the frontier (validation design
@@ -170,6 +170,7 @@ function runZengmSeasonsRealBatch(config, seeds) {
     };
     const outputPath = path.join(
         __dirname,
+        '..',
         'runs',
         `_driver_out_${process.pid}_cfg${config.id}_batch${seeds.length}_${Date.now()}.json`,
     );
@@ -500,7 +501,7 @@ function runDriverAsync(config, seeds) {
             delta: config.delta, rho: config.rho, W: config.W, T: config.T,
             variant: config.variant, seasons: config.seasons, seed: seeds[0],
         };
-        const outputPath = path.join(__dirname, 'runs',
+        const outputPath = path.join(__dirname, '..', 'runs',
             `_driver_${process.pid}_cfg${config.id}_${seeds[0]}-${seeds[seeds.length - 1]}_${Date.now()}_${Math.round(performance.now())}.json`);
         fs.mkdirSync(path.dirname(outputPath), { recursive: true });
         const env = Object.assign({}, process.env, {
@@ -663,7 +664,7 @@ function parseArgs(argv) {
 if (require.main === module) {
     const args = parseArgs(process.argv);
     const gridPath = path.join(__dirname, 'dial_grid.json');
-    const outPath = args.outPath || path.join(__dirname, 'runs', `sweep_${args.mode}_${Date.now()}.csv`);
+    const outPath = args.outPath || path.join(__dirname, '..', 'runs', `sweep_${args.mode}_${Date.now()}.csv`);
 
     let replicates = args.replicates;
     if (args.mode === 'full' && !args.seeds) replicates = 50;
@@ -677,7 +678,7 @@ if (require.main === module) {
     if (args.parallel) {
         // Resumable, parallel, crash/sleep-safe path for the long full-engine sweep.
         const name = args.name || `sweep_${Date.now()}`;
-        const sweepDir = path.join(__dirname, 'runs', name);
+        const sweepDir = path.join(__dirname, '..', 'runs', name);
         runSweepParallel({
             gridPath,
             sweepDir,

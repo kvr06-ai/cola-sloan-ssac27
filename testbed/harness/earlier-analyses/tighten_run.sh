@@ -1,20 +1,17 @@
 #!/bin/sh
-# Record-based reference mechanisms (the own-metric comparison Highley asked for):
+# Memory-safe tightening run.
 #
-#   ./ref_run.sh [seasons] [reps] [chunk] [conc]
+#   ./tighten_run.sh [seasons] [reps] [chunk] [conc]
 #
-# Same memory-safe chunked runner as e14_run.sh. Three configs:
-#   nba    post-2019 NBA lottery (14-team pool, official ball counts, top-4 draw,
-#          picks 5-14 by record)
-#   t321a  3-2-1 proposal, NBA-style top-4 draw over tiered balls (drawDepth 4)
-#   t321b  3-2-1 proposal, full 16-pick tiered draw (drawDepth 16)
-# Analyze runs/ref/ together with runs/e14/ (e14_analysis.js runsDir arg works,
-# but note the NBA/3-2-1 own metric is RECORD, so their help-by-own-metric gap
-# equals their tanking gap by construction).
+# Each config's REPS replicates are split into CHUNK-replicate processes (the
+# proven-stable ~3GB size), launched CONC at a time and resumable per chunk
+# (a finished chunk's JSON is skipped on re-run), then concatenated into one
+# file per config: runs/tighten/<config>.json. Analyze with the usual scripts
+# pointed at runs/tighten/. Run under caffeinate for the long job.
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"
-OUT="$DIR/runs/ref"
+OUT="$DIR/runs/tighten"
 SEASONS="${1:-15}"
 REPS="${2:-48}"
 CHUNK="${3:-12}"
@@ -46,13 +43,18 @@ run_config() {  # tag cfgjson
   done
 }
 
-run_config nba   '{"id":840,"E":14,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"nba"}'
-run_config t321a '{"id":841,"E":"16-tiered","C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"t321","drawDepth":4}'
-run_config t321b '{"id":842,"E":"16-tiered","C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"t321","drawDepth":16}'
+# Same configs and ids as the n=12 baseline (unpaired across mechanisms).
+run_config g0        '{"id":810,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":0}'
+run_config g1        '{"id":812,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":1}'
+run_config g2        '{"id":814,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":2}'
+run_config g3        '{"id":815,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"weighted","gamma":3}'
+run_config classic   '{"id":820,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"'}'
+run_config countdown '{"id":821,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"countdown"}'
+run_config beckett   '{"id":822,"E":22,"C":null,"S":"unbounded","seasons":'"$SEASONS"',"variant":"beckett"}'
 wait
 
 echo "concatenating chunks into one file per config..."
-for tag in nba t321a t321b; do
+for tag in g0 g1 g2 g3 classic countdown beckett; do
   TAG="$tag" OUTDIR="$OUT" node -e '
     const fs=require("fs"), dir=process.env.OUTDIR, tag=process.env.TAG;
     const files=fs.readdirSync(dir).filter(f=>f.startsWith(tag+"_s")&&f.endsWith(".json")).sort();
@@ -62,4 +64,4 @@ for tag in nba t321a t321b; do
     console.log(tag+".json: "+all.length+" reps from "+files.length+" chunks");
   '
 done
-echo "ref run done at $(date)"
+echo "tightening done at $(date)"

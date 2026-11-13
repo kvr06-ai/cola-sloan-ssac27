@@ -29,7 +29,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { pickDistribution, buildPool, MECHS } = require("./pick_dist.js");
+const { pickDistribution, buildPool, MECHS } = require("../pick_dist.js");
 
 const DIR = process.argv[2] ?? path.join("runs", "tank");
 
