@@ -87,6 +87,23 @@ mechanism under a memory guard.
     tectonic abstract-submission/ssac27-abstract.tex
     tectonic paper/main.tex
 
+## License
+
+The code and result files in this repository are released under the MIT
+License (see `LICENSE`). Three things sit outside it:
+
+- `paper/` and `abstract-submission/` hold the manuscript and the abstract,
+  which remain the authors' and are not licensed for reuse.
+- `original-study/` holds the code and data of the earlier study, by its own
+  authors. It is included for reference and keeps its original terms.
+- The simulator, ZenGM Basketball-GM, is not part of this repository. It is
+  available from its developer under its own license, which is not an
+  open-source license.
+
+The NBA standings, playoff results and draft picks in
+`testbed/harness/data/nba-data.json` are facts compiled from Basketball
+Reference, shared here so the results can be reproduced.
+
 ## Related
 
 The code and data behind an earlier preprint on COLA, Highley, Duncan, and
