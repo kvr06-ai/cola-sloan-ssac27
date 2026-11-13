@@ -237,21 +237,21 @@ A proof covers one season's draft. How much a mechanism helps the teams that wai
 
 \subsection{The simulator}
 
-ZenGM Basketball-GM is a basketball management game. Its user acts as a team's general manager, the person who decides which players the team drafts, signs, and trades. Its code is public, so anyone can read how it works~\cite{zengm}.
+ZenGM Basketball-GM is a basketball management game with public code~\cite{zengm}. Its user acts as a team's general manager, the person who decides which players the team drafts, signs, and trades.
 
-The simulator creates a league of fictional players. Each player has ratings, numbers that describe a player's skills. The simulator plays every game one possession at a time, where a possession is one team's turn with the ball, and what happens on each possession depends on the ratings of the ten players on the court. It also runs everything around the games. Players improve, age, get injured, and retire. Teams sign players to contracts under a salary cap, a limit on the total a team pays its players. Teams also trade players and compete for free agents, the players whose contracts have ended. Each year, a new group of prospects, the young players available to be drafted, enters through a draft of two rounds, and each team starts with one pick in each round. We let the simulator's built-in general managers, which are part of the program, run all 30 teams, so no person makes a decision in any league.
+The simulator creates a league of fictional players. Each player has ratings, numbers that describe a player's skills. The simulator plays every game one possession at a time, where a possession is one team's turn with the ball, and what happens on each possession depends on the ratings of the ten players on the court. It also runs everything around the games. Players improve, age, get injured, and retire. Teams sign players to contracts under a salary cap, a limit on the total a team pays its players. Teams also trade players and compete for free agents, the players whose contracts have ended. Each year, a new group of prospects, the young players available to be drafted, enters through a draft of two rounds, and each team starts with one pick in each round. We let the simulator's built-in general managers run all 30 teams, so no person makes a decision in any league.
 
-A league has the shape of the NBA. Thirty teams in two conferences play 82 games each. The teams that finish seventh to tenth in each conference meet in a play-in, 16 teams reach the playoffs, and each playoff series goes to the first team to win four games. Draft order matters in these leagues for the same reason it matters in the NBA. The simulated teams strongly favor the best prospects still available, and a team's results come from the players it has.
+A league has the shape of the NBA. Thirty teams in two conferences play 82 games each, followed by a play-in and playoffs for 16 teams, in which each series goes to the first team to win four games. Draft order matters in these leagues for the same reason it matters in the NBA. The simulated teams strongly favor the best prospects still available, and a team's results come from the players it has.
 
-The simulator's developer added COLA in February 2026 as a draft format its users can choose~\cite{zengm2026cola}. In this study, our own code sets the order in which teams pick in the first round under each of the nine mechanisms, and the simulator does everything else. The simulator has no rule that tells a team to lose, so no simulated team loses on purpose. Where we report a reward for losing, we compute what a team would have gained by losing, and no team in the leagues acts on it.
+The simulator's developer added COLA in February 2026 as a draft format its users can choose~\cite{zengm2026cola}. In this study, our own code sets the first-round draft order under each of the nine mechanisms, and the simulator does everything else. The simulator has no rule that tells a team to lose, so no simulated team loses on purpose. Where we report a reward for losing, we compute what a team would have gained by losing, and no team in the leagues acts on it.
 
 \subsection{What we ran}
 
 We ran each of the nine mechanisms on 30 leagues for 25 seasons. That makes 6,750 simulated seasons and about 8.3 million regular-season games.
 
-A simulated league depends on chance at every step, from the players it starts with to each shot and each lottery drawing. One number, called a random seed, fixes all of those chance events, so a given random seed and mechanism always produce the same league. We used the same 30 random seeds for every mechanism. A league therefore starts with the same players under all nine mechanisms and plays an identical first season. The nine versions of a league begin to separate at the first draft, and by the fourth season no two of them are alike.
+A simulated league depends on chance at every step, from the players it starts with to each shot and each lottery drawing. One number, called a random seed, fixes all of those chance events, so a given seed and mechanism always produce the same league. We used the same 30 seeds for every mechanism. A league therefore starts with the same players under all nine mechanisms and plays an identical first season. The nine versions of a league begin to separate at the first draft, and by the fourth season no two of them are alike.
 
-Every league starts with no history, so every wait and every ticket count begins at zero. One approximation applies to 3-2-1. Its pool includes the loser of the play-in game between the seventh and eighth teams in each conference, and in our simulated leagues the team with the eighth-best record in each conference stands in for that loser. Appendix B gives the remaining details of each mechanism as we ran it.
+Every league starts with no history, so every wait and every ticket count begins at zero. One approximation applies to 3-2-1. Its pool includes the loser of each seven-eight play-in game, and in our simulated leagues the team with the eighth-best record in each conference stands in for that loser. Appendix B gives the remaining details of each mechanism as we ran it.
 
 \subsection{What we measured}
 
@@ -259,13 +259,13 @@ Section 1 listed three things we measure: help for the teams that have waited lo
 
 Let $p_i$ be the number of the pick that team $i$ receives in a season's draft, so that $p_i = 1$ means the first pick. Under a mechanism with a drawing, $p_i$ depends on chance, and we use its expected value $\mathrm{E}[p_i]$, the average pick over all the ways the drawing could come out. A team with an equal chance at the first pick and the third pick has an expected pick of 2. We compute each expected value exactly, by going through every possible outcome of the drawing and how likely it is, so the figure carries no random error.
 
-\textbf{The reward for losing.} Take one season and the team with the fifth-worst record among the 14 that missed the playoffs. Call it team $m$. Suppose it had finished with the worst record in the league and nothing else had changed, so that every other team keeps its record and every team keeps its priority, the number a mechanism carries over for it from season to season. Write $\mathrm{E}[p_m^{\mathrm{worst}}]$ for its expected pick in that case. The reward for losing is
+\textbf{The reward for losing.} Take one season and the team with the fifth-worst record among the 14 that missed the playoffs. Call it team $m$. Suppose it had finished with the worst record in the league and nothing else had changed, so that every other team keeps its record and every team keeps its priority. Write $\mathrm{E}[p_m^{\mathrm{worst}}]$ for its expected pick in that case. The reward for losing is
 \[
 R = \mathrm{E}[p_m] - \mathrm{E}[p_m^{\mathrm{worst}}].
 \]
 If the team would pick sixth on average as things stand and fifth on average with the worst record, $R$ is $+1$. A positive $R$ means the worse record brought an earlier pick. A zero or negative $R$ means losing bought nothing or cost the team places. The fifth-worst record is our standard starting point, and Section 7 reports the others.
 
-\textbf{The help for a longer wait.} Take the team with the fifth-highest priority among the same 14 teams. Call it team $q$. Suppose its priority alone had been one step above the highest priority in its pool, the group of teams that take part in the mechanism. A step is one season of waiting or 1,000 tickets. Write $\mathrm{E}[p_q^{\mathrm{top}}]$ for its expected pick in that case. The help for a longer wait is
+\textbf{The help for a longer wait.} Take the team with the fifth-highest priority among the same 14 teams. Call it team $q$. Suppose its priority alone had been one step above the highest in its pool, where a step is one season of waiting or 1,000 tickets. Write $\mathrm{E}[p_q^{\mathrm{top}}]$ for its expected pick in that case. The help for a longer wait is
 \[
 H = \mathrm{E}[p_q] - \mathrm{E}[p_q^{\mathrm{top}}].
 \]
@@ -290,7 +290,7 @@ Each measure gives one number per league. $R$ and $H$ are averaged over the leag
 
 \subsection{How we compare two mechanisms}
 
-To compare mechanisms $A$ and $B$ on a measure $X$, we take the difference in each league, $d_\ell = X^A_\ell - X^B_\ell$ for leagues $\ell = 1, \dots, 30$. Comparing two mechanisms league by league in this way is called pairing. We report the average difference $\bar{d}$ with a 95\% confidence interval, the range that very likely contains the true difference. The interval is
+To compare mechanisms $A$ and $B$ on a measure $X$, we take the difference in each league, $d_\ell = X^A_\ell - X^B_\ell$ for leagues $\ell = 1, \dots, 30$. Comparing two mechanisms league by league in this way is called pairing. We report the average difference $\bar{d}$ with a 95\% confidence interval,
 \[
 \bar{d} \;\pm\; t \, \frac{s_d}{\sqrt{30}},
 \]
@@ -332,7 +332,7 @@ Longest wait for a series win or a top-three pick, in seasons & 13 & 16.4 (12 to
 
 The simulated leagues match the NBA on four of the seven statistics. Playoff teams return at the same rate. The two average waits are within about a tenth of a season of the NBA's. A team's record also follows its record of a season earlier as closely as in the NBA.
 
-They differ in two ways. Records are a little more bunched in the simulated leagues, where the spread is 0.135 against the NBA's 0.152. Some NBA teams lost on purpose in those seasons and no simulated team does, which may explain part of that gap. Team strength also lasts longer in the simulated leagues. Three seasons apart, the correlation is 0.29 in the simulated leagues and 0.09 in the NBA, which is lower than in any of the 30 leagues. A weak simulated team therefore stays weak for longer, and the longest waits run longer. Under the old lottery, the longest wait for a series win or a top-three pick averages 16.4 seasons across the simulated leagues. The NBA's longest over the same 25 seasons was 13, by Sacramento from 2004-05 to 2016-17.
+They differ in two ways. Records are a little more bunched in the simulated leagues, where the spread is 0.135 against the NBA's 0.152. Some NBA teams lost on purpose in those seasons and no simulated team does, which may explain part of that gap. Team strength also lasts longer there. Three seasons apart, the correlation is 0.29, against 0.09 in the NBA, a value lower than in any of the 30 leagues. A weak simulated team therefore stays weak for longer, and the longest waits run longer. Under the old lottery, the longest wait averages 16.4 seasons across the simulated leagues. The NBA's longest over the same 25 seasons was 13, by Sacramento from 2004-05 to 2016-17.
 
 Section 7 should be read with this in mind. Every mechanism is tested on the same leagues, so its comparisons between mechanisms are on equal terms. The lengths of the longest waits under the three reference lotteries are likely somewhat greater than the NBA would see. Section 8 returns to what one simulator can show.
 
