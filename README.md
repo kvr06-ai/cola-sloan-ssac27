@@ -32,10 +32,10 @@ losing.
 ## Reproducing the numbers
 
 The mechanisms are configurations of the lottery code inside ZenGM
-Basketball-GM, an open-source basketball simulator that plays out every game
-from generated rosters and contracts under automated general managers. League
-generation and every draw are seeded per replicate, so a given configuration and
-seed reproduce a run exactly.
+Basketball-GM, a basketball simulator with public code that plays out every
+game from generated rosters and contracts under automated general managers.
+League generation and every draw are seeded per replicate, so a given
+configuration and seed reproduce a run exactly.
 
 Requirements: Node.js 18 or later. The Overleaf sync drops the executable bit
 on the shell scripts, so after cloning run `chmod +x testbed/harness/*.sh`
@@ -63,11 +63,16 @@ From `testbed/harness`, each script prints one reported result:
                                   (--cutoff adds Section 5's third-and-fourth-pick line)
     node limits_check.js          Section 5's numbers: where each pool ends, and
                                   the seasons after a top-three pick
+    node design_check.js          Section 6's numbers: the run's design, the simulated
+                                  leagues against the NBA, and the two help measures
+                                  on real NBA standings (measures.js holds the
+                                  measures themselves)
 
 `abstract_table.js`, `metric_screen.js`, `frontier_analysis.js`,
-`simple_losing_check.js`, `limits_check.js` and the two
+`simple_losing_check.js`, `limits_check.js`, `design_check.js` and the two
 verify scripts work on a fresh clone with no setup, because their inputs are
-committed: one reference run (`testbed/harness/runs/ref/nba.json`) and the
+committed: one reference run (`testbed/harness/runs/ref/nba.json`), the NBA
+seasons file (`testbed/harness/data/nba-data.json`) and the
 result files of the 25-season run (`testbed/harness/runs/frontier/*.json`, 30
 leagues each on shared seeds: the nine mechanisms, plus `simple.json`, an
 earlier form of Simple COLA). The other scripts read run outputs under
