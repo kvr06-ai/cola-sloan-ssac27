@@ -33,8 +33,8 @@
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
- * With --json <file>, it also writes the numbers behind Figure 2 to that
- * file, for make_figures.py.
+ * With --json <file>, it also writes the numbers behind the two figures of
+ * Section 6.5 to that file, for make_figures.py.
  *
  * Usage: node design_check.js [runsDir=runs/frontier] [realFile=data/nba-data.json] [--json file]
  */
@@ -299,7 +299,7 @@ const scored = realAll.filter((s) => s.teams.filter((t) => t.missed).length === 
 console.log(`\n3. The two help measures on real standings, ${scored[0].label} to ${scored.at(-1).label} (${scored.length} seasons), draft places\n`);
 const W3 = [40, 28, 20, 18, 24];
 console.log(pad(["measure and mechanism", "real mean [95% interval]", "real seasons > 0", "sim, 25 seasons", "sim, seasons 6 to 25"], W3));
-const figure2 = []; // the numbers behind Figure 2, written with --json
+const figure2 = []; // the numbers behind the real-standings figure, written with --json
 for (const [name, tag, fn] of ROWS) {
 	const values = bySeason(realAll, fn).filter((v) => v != null);
 	const real = M.interval(values);
@@ -323,4 +323,12 @@ for (const [name, tag, fn] of ROWS) {
 }
 console.log("");
 
-if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify({ realStandings: figure2 }, null, 1));
+if (JSON_OUT) {
+	const out = {
+		// Part 2: the NBA's value and each old-lottery league's value of every statistic.
+		nbaComparison: { first: nba[0].label, last: nba.at(-1).label, nba: nbaProfile, leagues: simProfiles },
+		// Part 3: the two help measures on real standings.
+		realStandings: figure2,
+	};
+	fs.writeFileSync(JSON_OUT, JSON.stringify(out, null, 1));
+}
