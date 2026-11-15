@@ -10,20 +10,24 @@ for the Word version. The files are named by content:
     reward-by-position   Section 7.1, the reward for losing by starting position
     longest-wait         Section 7.2, the longest wait in each league
     next-series-win      Section 7.3, the wait for the next series win in each league
+    mechanism-map        Section 8.1, the nine mechanisms on the reward for losing
+                         and the longest wait
+    draft-2026           Section 8.2, the 2026 draft under each mechanism
 
 The carryover figure shows Simple COLA's rule on one invented team. Its waits
 follow from the rule in Section 3 and the list of seasons below. Every other
-figure takes its values from design_check.js and results_check.js, which this
-script runs with --json, so each value is the one those scripts print.
+figure takes its values from design_check.js, results_check.js and
+draft2026_check.js, which this script runs with --json, so each value is the
+one those scripts print.
 
-Needs Python 3 with matplotlib, and Node.js for the two scripts. The text is
+Needs Python 3 with matplotlib, and Node.js for the three scripts. The text is
 set in the paper's font, Caladea, when it is installed or when --font-dir names
 a folder holding its files, and in DejaVu Serif otherwise.
 
 Usage: python3 make_figures.py [--font-dir DIR] [--data DIR]
 
---data DIR reads design.json and results.json from DIR, written earlier by the
-two scripts with --json, in place of running them again.
+--data DIR reads design.json, results.json and draft.json from DIR, written
+earlier by the three scripts with --json, in place of running them again.
 """
 
 import argparse
@@ -43,7 +47,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib import font_manager, transforms  # noqa: E402
+from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
+from matplotlib.patches import Rectangle  # noqa: E402
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE.parent.parent / "paper" / "figures"
@@ -131,19 +137,20 @@ def save(fig, name):
 	print(f"wrote paper/figures/{name}.pdf and .png")
 
 
+SCRIPTS = {"design": "design_check.js", "results": "results_check.js", "draft": "draft2026_check.js"}
+
+
 def load_data(data_dir):
+	"""The JSON each script writes with --json, keyed as in SCRIPTS."""
 	if data_dir:
 		d = pathlib.Path(data_dir)
-		return json.loads((d / "design.json").read_text()), json.loads((d / "results.json").read_text())
+		return {key: json.loads((d / f"{key}.json").read_text()) for key in SCRIPTS}
 	with tempfile.TemporaryDirectory() as tmp:
 		tmp = pathlib.Path(tmp)
-		jobs = [
-			["node", "design_check.js", "--json", str(tmp / "design.json")],
-			["node", "results_check.js", "--json", str(tmp / "results.json")],
-		]
+		jobs = [["node", script, "--json", str(tmp / f"{key}.json")] for key, script in SCRIPTS.items()]
 		with ThreadPoolExecutor(len(jobs)) as pool:
 			list(pool.map(lambda cmd: subprocess.run(cmd, cwd=HERE, check=True, stdout=subprocess.DEVNULL), jobs))
-		return json.loads((tmp / "design.json").read_text()), json.loads((tmp / "results.json").read_text())
+		return {key: json.loads((tmp / f"{key}.json").read_text()) for key in SCRIPTS}
 
 
 # ---------------------------------------------------------------------------
@@ -502,19 +509,144 @@ def fig_next_series_win(results, design):
 	save(fig, "next-series-win")
 
 
+# ---------------------------------------------------------------------------
+# Section 8.1: the nine mechanisms on the reward for losing and the longest wait
+# ---------------------------------------------------------------------------
+
+# Where each name sits beside its dot: offset in points, and alignment.
+MAP_LABELS = {
+	"nba": (7, 0, "left"),
+	"uniform": (0, -10, "center"),
+	"t321": (-7, 0, "right"),
+	"classic": (7, 0, "left"),
+	"waitlist": (7, 0, "left"),
+	"full": (-7, 0, "right"),
+	"simplerule": (-7, 0, "right"),
+	"countdown": (7, 0, "left"),
+	"beckett": (-7, 0, "right"),
+}
+
+
+def fig_mechanism_map(results):
+	mechs = results["mechanisms"]
+	at = results["positions"].index(5)  # the standard starting point of Section 6.3
+	fig, ax = plt.subplots(figsize=(WIDTH, 3.0))
+	fig.subplots_adjust(left=0.09, right=0.98, top=0.95, bottom=0.16)
+	ax.axvline(0, color=INK_2, lw=0.8, ls=(0, (2, 2)), zorder=1)
+	for m in mechs:
+		tag = m["tag"]
+		x = results["reward"][tag][at]
+		y = statistics.mean(results["longestWait"][tag])
+		ax.plot([x], [y], marker=MARKER.get(tag, "o"), ms=7, color=COLOR.get(tag, OTHER), mec="white", mew=0.8, ls="none", zorder=3)
+		dx, dy, ha = MAP_LABELS[tag]
+		name = m["name"] + (", no drawing" if tag == "simplerule" else "")
+		# A white backing keeps the dashed zero line from running through a name.
+		ax.annotate(name, (x, y), xytext=(dx, dy), textcoords="offset points", ha=ha, va="center", fontsize=8.5, color=INK, bbox=dict(fc="white", ec="none", pad=0.6), zorder=4)
+	ax.set_xlim(-5.4, 3.6)
+	ax.set_ylim(0, 18.5)
+	ax.set_yticks(range(0, 19, 3))
+	ax.yaxis.grid(True, color=GRID, lw=0.5, zorder=0)
+	ax.set_axisbelow(True)
+	ax.text(-0.15, 18.3, "Losing costs places", ha="right", va="top", fontsize=8, color=INK_2, style="italic")
+	ax.text(0.15, 18.3, "Losing gains places", ha="left", va="top", fontsize=8, color=INK_2, style="italic")
+	ax.set_xlabel("Reward for losing from the fifth-worst record, $R$ (draft places)", labelpad=4)
+	ax.set_ylabel("Longest wait, $L$ (seasons)", labelpad=4)
+	save(fig, "mechanism-map")
+
+
+# ---------------------------------------------------------------------------
+# Section 8.2: the 2026 draft under each mechanism
+# ---------------------------------------------------------------------------
+
+# The columns of chances. Classic, Waitlist and Full-lottery COLA draw their
+# first pick on the same tickets, so they share one column.
+DRAFT_COLUMNS = [
+	("old", "Old\nlottery"),
+	("uniform", "Equal-odds\nlottery"),
+	("t321", "3-2-1"),
+	("full", "Classic,\nWaitlist and\nFull-lottery\nCOLA"),
+	("countdown", "Countdown\nCOLA"),
+	("beckett", "Beckett\nCOLA"),
+]
+# Shading for a chance of the first pick, from none to the largest in the figure.
+SHADE = LinearSegmentedColormap.from_list("first-pick", ["#f3f7fd", "#2a78d6", "#123d73"])
+
+
+def chance_text(v):
+	"""A chance of the first pick as the figure prints it, in percent."""
+	if v is None:
+		return "–"  # outside the mechanism's pool
+	if v == 0:
+		return "0"  # in the pool, but barred from the first pick
+	if v < 0.0005:
+		return "<0.1"
+	return f"{100 * v:.1f}"
+
+
+def fig_draft2026(draft):
+	rows = draft["rows"]
+	for r in rows:  # the three ticket mechanisms must agree to share a column
+		fp = r["firstPick"]
+		assert fp["classic"] == fp["waitlist"] == fp["full"], r["id"]
+	groups = [
+		("Missed the playoffs", sorted((r for r in rows if r["missed"]), key=lambda r: (r["wins"], r["name"]))),
+		("Lost in the first round", sorted((r for r in rows if not r["missed"]), key=lambda r: (r["wins"], r["name"]))),
+	]
+	top = max(v for r in rows for m, _ in DRAFT_COLUMNS if (v := r["firstPick"][m]) is not None)
+	header, row_h, group_h = 0.82, 0.158, 0.2
+	height = header + sum(group_h + row_h * len(g) for _, g in groups) + 0.04
+	fig = plt.figure(figsize=(WIDTH, height))
+	ax = fig.add_axes([0, 0, 1, 1])
+	ax.set_xlim(0, WIDTH)
+	ax.set_ylim(height, 0)
+	ax.axis("off")
+	x_wins, x_wait, left, width = 1.72, 2.12, 2.42, 0.6
+	x_simple = left + width * len(DRAFT_COLUMNS) + 0.25
+	small = 7.5
+	ax.text(left + width * len(DRAFT_COLUMNS) / 2, 0.06, "Chance of the first pick, %", ha="center", va="top", fontsize=8, color=INK_2)
+	for k, (_, label) in enumerate(DRAFT_COLUMNS):
+		ax.text(left + width * (k + 0.5), header - 0.06, label, ha="center", va="bottom", fontsize=small, color=INK_2, linespacing=1.05)
+	ax.text(x_wins, header - 0.06, "Wins", ha="center", va="bottom", fontsize=small, color=INK_2)
+	ax.text(x_wait, header - 0.06, "Wait", ha="center", va="bottom", fontsize=small, color=INK_2)
+	ax.text(x_simple, header - 0.06, "Simple\nCOLA\npick", ha="center", va="bottom", fontsize=small, color=INK_2, linespacing=1.05)
+	ax.plot([0, WIDTH], [header, header], color=INK_2, lw=0.6)
+	y = header
+	for title, group in groups:
+		ax.text(0.02, y + group_h / 2 + 0.01, title, ha="left", va="center", fontsize=small, color=INK_2, style="italic")
+		y += group_h
+		for r in group:
+			middle = y + row_h / 2
+			ax.text(0.02, middle, r["name"], ha="left", va="center", fontsize=small)
+			ax.text(x_wins, middle, str(r["wins"]), ha="center", va="center", fontsize=small)
+			ax.text(x_wait, middle, str(r["wait"]), ha="center", va="center", fontsize=small)
+			for k, (m, _) in enumerate(DRAFT_COLUMNS):
+				v = r["firstPick"][m]
+				x0 = left + width * k
+				if v:
+					ax.add_patch(Rectangle((x0 + 0.02, y + 0.012), width - 0.04, row_h - 0.024, color=SHADE(v / top), lw=0))
+				ax.text(x0 + width / 2, middle, chance_text(v), ha="center", va="center", fontsize=small, color="white" if v and v / top > 0.55 else (INK_2 if v is None else INK))
+			pick = r["simplePick"]
+			ax.text(x_simple, middle, "" if pick is None else f"{pick:g}", ha="center", va="center", fontsize=small, fontweight="bold" if pick is not None and pick <= 3 else "normal")
+			y += row_h
+	save(fig, "draft-2026")
+
+
 def main():
 	p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
 	p.add_argument("--font-dir", help="a folder holding the Caladea font files")
-	p.add_argument("--data", help="a folder holding design.json and results.json from an earlier run")
+	p.add_argument("--data", help="a folder holding design.json, results.json and draft.json from an earlier run")
 	a = p.parse_args()
 	family = set_style(a.font_dir)
-	design, results = load_data(a.data)
+	data = load_data(a.data)
+	design, results, draft = data["design"], data["results"], data["draft"]
 	fig_carryover()
 	fig_nba_comparison(design)
 	fig_real_standings(design)
 	fig_reward_by_position(results)
 	fig_longest_wait(results)
 	fig_next_series_win(results, design)
+	fig_mechanism_map(results)
+	fig_draft2026(draft)
 	print(f"font: {family}")
 
 

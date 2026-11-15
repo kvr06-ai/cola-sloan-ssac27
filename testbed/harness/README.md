@@ -13,8 +13,9 @@ paper that reports numbers.
     simple_losing_check.js         Section 4 and, with --cutoff, Section 5.2
     limits_check.js                Section 5
     design_check.js                Section 6
-    results_check.js               Section 7
-    make_figures.py                Figures 1 to 6, from the two scripts above (needs Python 3
+    results_check.js               Sections 7 and 8.1
+    draft2026_check.js             Section 8.2, the 2026 draft under each mechanism
+    make_figures.py                Figures 1 to 8, from the three scripts above (needs Python 3
                                    and matplotlib; set in Caladea when it is installed)
     verify_classic.js              checks the Classic COLA run against its rules
     t321_adopted_check.js          checks the 3-2-1 run against its rules
