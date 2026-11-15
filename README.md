@@ -18,8 +18,8 @@ interactive results page shows the simulations of an earlier draft.
 
 ## Repository layout
 
-    paper/                  the paper: main.tex, references.bib and the built
-                            main.pdf
+    paper/                  the paper: main.tex, references.bib, the built
+                            main.pdf, and its figures in figures/
     abstract-submission/    the abstract as submitted to SSAC27 and accepted,
                             its source, and the script that counts its words
     testbed/harness/        the simulation driver, the analysis scripts, the
@@ -31,9 +31,10 @@ interactive results page shows the simulations of an earlier draft.
 
 ## Reproducing the paper's numbers
 
-You need Node.js 18 or later and nothing else. Each command below reads only
-files in this repository, finishes in under a minute, and prints the same
-output every time.
+You need Node.js 18 or later. Drawing the figures also needs Python 3 with
+matplotlib (`pip install matplotlib`). Each command below reads only files in
+this repository, finishes in under a minute, and gives the same output every
+time.
 
     cd testbed/harness
 
@@ -42,9 +43,10 @@ output every time.
 | `node abstract_table.js --table1` | The table in the abstract, and the summary figures in Section 1 |
 | `node simple_losing_check.js` | Section 4: the test of Theorem 1 on the simulated leagues, and what one more loss costs a team |
 | `node simple_losing_check.js --cutoff` | Section 5.2: the line between the third and fourth picks |
-| `node limits_check.js` | Section 5: Table 2, and the seasons after a top-three pick |
-| `node design_check.js` | Section 6: the design of the simulations, and Tables 3 and 4 |
-| `node results_check.js` | Section 7: the results for the nine mechanisms, and Tables 5 and 6 |
+| `node limits_check.js` | Section 5: the line at the end of each pool, and the seasons after a top-three pick |
+| `node design_check.js` | Section 6: the design of the simulations, Table 2 and Figure 2 |
+| `node results_check.js` | Section 7: the results for the nine mechanisms, Table 3, and Figures 3 and 4 |
+| `python3 make_figures.py` | Figures 1 to 4, drawn into `paper/figures/` from the two scripts above |
 | `node verify_classic.js runs/frontier/classic.json` | A check of the Classic COLA simulations against the mechanism's rules |
 | `node t321_adopted_check.js runs/frontier/t321.json` | The same check for 3-2-1 |
 

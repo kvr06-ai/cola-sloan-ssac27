@@ -19,7 +19,10 @@
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
- * Usage: node results_check.js [runsDir=runs/frontier]
+ * With --json <file>, it also writes the numbers behind Figures 3 and 4 to
+ * that file, for make_figures.py.
+ *
+ * Usage: node results_check.js [runsDir=runs/frontier] [--json file]
  */
 
 "use strict";
@@ -28,7 +31,10 @@ const fs = require("fs");
 const path = require("path");
 const M = require("./measures.js");
 
-const ROOT = process.argv[2] ?? "runs/frontier";
+const args = process.argv.slice(2);
+const jsonAt = args.indexOf("--json");
+const JSON_OUT = jsonAt >= 0 ? args.splice(jsonAt, 2)[1] : null;
+const ROOT = args[0] ?? "runs/frontier";
 
 // [run file, name in measures.js, name in the paper]
 const MECHS = [
@@ -172,3 +178,20 @@ for (const [tag, , name] of MECHS) {
 	console.log(pad([name, `${losers} of ${picks} (${((100 * losers) / picks).toFixed(1)}%)`], [20, 24]));
 }
 console.log("");
+
+// ---------------------------------------------------------------------------
+// The numbers behind Figures 3 and 4, for make_figures.py
+// ---------------------------------------------------------------------------
+
+if (JSON_OUT) {
+	const out = {
+		positions: RANKS,
+		mechanisms: MECHS.map(([tag, , name]) => ({ tag, name })),
+		// Figure 3: the reward for losing from each starting position, as in part 2.
+		reward: Object.fromEntries(MECHS.map(([tag]) => [tag, RANKS.map((_, i) => mean(leagues[tag].map((v) => meanOf(v.rewards[i]))))])),
+		scored321,
+		// Figure 4: the longest wait in each of the 30 leagues, as in parts 1 and 3.
+		longestWait: Object.fromEntries(MECHS.map(([tag]) => [tag, col(tag, "L")])),
+	};
+	fs.writeFileSync(JSON_OUT, JSON.stringify(out, null, 1));
+}
