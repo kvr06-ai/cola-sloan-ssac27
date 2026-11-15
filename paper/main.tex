@@ -83,7 +83,20 @@
 \let\oldthebibliography\thebibliography
 \renewcommand{\thebibliography}[1]{\oldthebibliography{#1}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}}
 
+% \bstctlcite passes the reference-style settings in references.bib to
+% IEEEtran.bst without listing them (the definition from IEEEtran's own
+% documentation, for classes other than IEEEtran).
+\makeatletter
+\def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
+\def\@bstctlcite[#1]#2{\@bsphack
+  \@for\@citeb:=#2\do{%
+    \edef\@citeb{\expandafter\@firstofone\@citeb}%
+    \if@filesw\immediate\write\csname #1\endcsname{\string\citation{\@citeb}}\fi}%
+  \@esphack}
+\makeatother
+
 \begin{document}
+\bstctlcite{IEEEexample:BSTcontrol}
 
 \begin{center}
 {\fontsize{18}{22}\selectfont\bfseries Practical Incentive-Compatible Drafts:\\Carry-Over Lottery Allocation\par}
