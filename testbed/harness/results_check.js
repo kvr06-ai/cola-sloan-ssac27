@@ -19,8 +19,8 @@
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
- * With --json <file>, it also writes the numbers behind Figures 3 and 4 to
- * that file, for make_figures.py.
+ * With --json <file>, it also writes the numbers behind the figures of
+ * Section 7 to that file, for make_figures.py.
  *
  * Usage: node results_check.js [runsDir=runs/frontier] [--json file]
  */
@@ -180,18 +180,20 @@ for (const [tag, , name] of MECHS) {
 console.log("");
 
 // ---------------------------------------------------------------------------
-// The numbers behind Figures 3 and 4, for make_figures.py
+// The numbers behind the figures of Section 7, for make_figures.py
 // ---------------------------------------------------------------------------
 
 if (JSON_OUT) {
 	const out = {
 		positions: RANKS,
 		mechanisms: MECHS.map(([tag, , name]) => ({ tag, name })),
-		// Figure 3: the reward for losing from each starting position, as in part 2.
+		// The reward for losing from each starting position, as in part 2.
 		reward: Object.fromEntries(MECHS.map(([tag]) => [tag, RANKS.map((_, i) => mean(leagues[tag].map((v) => meanOf(v.rewards[i]))))])),
 		scored321,
-		// Figure 4: the longest wait in each of the 30 leagues, as in parts 1 and 3.
+		// The longest wait in each of the 30 leagues, as in parts 1 and 3.
 		longestWait: Object.fromEntries(MECHS.map(([tag]) => [tag, col(tag, "L")])),
+		// The wait for the next series win in each of the 30 leagues, as in part 1.
+		nextSeriesWin: Object.fromEntries(MECHS.map(([tag]) => [tag, col(tag, "W")])),
 	};
 	fs.writeFileSync(JSON_OUT, JSON.stringify(out, null, 1));
 }

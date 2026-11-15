@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""Draws Figures 1 to 4 of the paper into paper/figures/.
+"""Draws the paper's figures into paper/figures/.
 
 Each figure is saved twice, as a PDF for the LaTeX build and as a 300-dpi PNG
-for the Word version.
+for the Word version. The files are named by content:
 
-Figure 1 shows Simple COLA's rule on one invented team. Its waits follow from
-the rule in Section 3 and the list of seasons below. Figures 2 to 4 take every
-value from design_check.js and results_check.js, which this script runs with
---json, so each value is the one those scripts print.
+    carryover            Section 3.1, Simple COLA's wait for one invented team
+    nba-comparison       Section 6.5, the simulated leagues beside the NBA
+    real-standings       Section 6.5, the two help measures on real standings
+    reward-by-position   Section 7.1, the reward for losing by starting position
+    longest-wait         Section 7.2, the longest wait in each league
+    next-series-win      Section 7.3, the wait for the next series win in each league
+
+The carryover figure shows Simple COLA's rule on one invented team. Its waits
+follow from the rule in Section 3 and the list of seasons below. Every other
+figure takes its values from design_check.js and results_check.js, which this
+script runs with --json, so each value is the one those scripts print.
 
 Needs Python 3 with matplotlib, and Node.js for the two scripts. The text is
 set in the paper's font, Caladea, when it is installed or when --font-dir names
@@ -24,9 +31,11 @@ import collections
 import json
 import math
 import pathlib
+import statistics
 import subprocess
 import sys
 import tempfile
+import textwrap
 from concurrent.futures import ThreadPoolExecutor
 
 import matplotlib
@@ -138,7 +147,7 @@ def load_data(data_dir):
 
 
 # ---------------------------------------------------------------------------
-# Figure 1. Simple COLA's wait for one invented team
+# Section 3.1: Simple COLA's wait for one invented team
 # ---------------------------------------------------------------------------
 
 # Each season: how the team's playoffs ended, and whether it received a
@@ -158,7 +167,7 @@ SEASONS = [
 RESULT = {"missed": "Missed the\nplayoffs", "first": "Lost in the\nfirst round", "series": "Won a\nseries"}
 
 
-def figure1():
+def fig_carryover():
 	# The rule of Section 3: when the playoffs end, a series winner goes back
 	# to zero and every other team adds one season; after the draft, the teams
 	# with the first three picks go back to zero.
@@ -212,27 +221,27 @@ def figure1():
 		va="center",
 		arrowprops=dict(arrowstyle="-|>", color=INK_2, lw=0.7, shrinkA=2, shrinkB=1, mutation_scale=7),
 	)
-	save(fig, "fig1-carryover")
+	save(fig, "carryover")
 
 
 # ---------------------------------------------------------------------------
-# Figure 2. The reward for losing and the help for a longer wait on real standings
+# Section 6.5: the reward for losing and the help for a longer wait on real standings
 # ---------------------------------------------------------------------------
 
 # design_check.js part 3 lists its four rows in this order.
-FIG2_ROWS = [("R", "nba", "Old lottery"), ("R", "t321", "3-2-1"), ("R", "simplerule", "Simple COLA"), ("H", "simplerule", "Simple COLA")]
+REAL_ROWS = [("R", "nba", "Old lottery"), ("R", "t321", "3-2-1"), ("R", "simplerule", "Simple COLA"), ("H", "simplerule", "Simple COLA")]
 
 
-def figure2(design):
+def fig_real_standings(design):
 	rows = design["realStandings"]
-	assert [r["tag"] for r in rows] == [t for _, t, _ in FIG2_ROWS], "design_check.js changed its rows"
+	assert [r["tag"] for r in rows] == [t for _, t, _ in REAL_ROWS], "design_check.js changed its rows"
 	n_seasons = rows[0]["real"]["seasons"]
 
 	fig = plt.figure(figsize=(WIDTH, 2.55))
 	gs = fig.add_gridspec(2, 1, height_ratios=[3, 1], left=0.17, right=0.585, top=0.86, bottom=0.27, hspace=0.95)
 	panels = [fig.add_subplot(gs[0]), fig.add_subplot(gs[1])]
-	groups = {"R": (panels[0], [r for r, (m, _, _) in zip(rows, FIG2_ROWS) if m == "R"], [n for m, _, n in FIG2_ROWS if m == "R"]),
-		  "H": (panels[1], [r for r, (m, _, _) in zip(rows, FIG2_ROWS) if m == "H"], [n for m, _, n in FIG2_ROWS if m == "H"])}
+	groups = {"R": (panels[0], [r for r, (m, _, _) in zip(rows, REAL_ROWS) if m == "R"], [n for m, _, n in REAL_ROWS if m == "R"]),
+		  "H": (panels[1], [r for r, (m, _, _) in zip(rows, REAL_ROWS) if m == "H"], [n for m, _, n in REAL_ROWS if m == "H"])}
 	titles = {"R": "Reward for losing, $R$", "H": "Help for a longer wait, $H$"}
 	digits = {"R": 2, "H": 1}
 	limits = {"R": (-1.3, 1.6), "H": (5.0, 7.0)}
@@ -245,7 +254,7 @@ def figure2(design):
 	for key, (ax, data, names) in groups.items():
 		k = len(data)
 		ys = list(range(k - 1, -1, -1))
-		for y, r, tag in zip(ys, data, [t for m, t, _ in FIG2_ROWS if m == key]):
+		for y, r, tag in zip(ys, data, [t for m, t, _ in REAL_ROWS if m == key]):
 			c = COLOR[tag]
 			real = r["real"]
 			ax.plot([real["lo"], real["hi"]], [y + 0.14] * 2, color=c, lw=2.2, solid_capstyle="butt", zorder=3)
@@ -273,11 +282,11 @@ def figure2(design):
 		Line2D([0], [0], ls="none", marker="D", ms=5, mfc="white", mec=INK_2, mew=1.3, label="Simulated leagues: average"),
 	]
 	fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.005, 0.0), ncol=2, frameon=False, handlelength=2.2, columnspacing=1.6)
-	save(fig, "fig2-real-standings")
+	save(fig, "real-standings")
 
 
 # ---------------------------------------------------------------------------
-# Figure 3. The reward for losing from each starting position
+# Section 7.1: the reward for losing from each starting position
 # ---------------------------------------------------------------------------
 
 
@@ -285,7 +294,7 @@ def ordinal(n):
 	return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
 
 
-def figure3(results):
+def fig_reward_by_position(results):
 	pos = results["positions"]
 	fig, ax = plt.subplots(figsize=(WIDTH, 2.7))
 	fig.subplots_adjust(left=0.1, right=0.99, top=0.97, bottom=0.18)
@@ -304,11 +313,11 @@ def figure3(results):
 	ax.set_ylabel("Reward for losing, $R$ (draft places)", labelpad=4)
 	ax.text(pos[0] - 0.35, 10.9, "Above 0, dropping to the worst record gains a team places", ha="left", va="top", fontsize=8, color=INK_2, style="italic")
 	ax.text(pos[0] - 0.35, -4.35, "Below 0, it costs the team places", ha="left", va="bottom", fontsize=8, color=INK_2, style="italic")
-	save(fig, "fig3-reward-by-position")
+	save(fig, "reward-by-position")
 
 
 # ---------------------------------------------------------------------------
-# Figure 4. The longest wait in each league
+# Section 7.2: the longest wait in each league
 # ---------------------------------------------------------------------------
 
 
@@ -324,7 +333,7 @@ def dot_offsets(count, dx=0.27, dy=0.17, max_rows=5):
 	return out
 
 
-def figure4(results):
+def fig_longest_wait(results):
 	mechs = results["mechanisms"]
 	waits = results["longestWait"]
 	n = len(mechs)
@@ -355,7 +364,142 @@ def figure4(results):
 	ax.xaxis.grid(True, color=GRID, lw=0.5, zorder=0)
 	ax.set_axisbelow(True)
 	ax.set_xlabel("Longest wait in a league, in seasons, with one dot per league", labelpad=4)
-	save(fig, "fig4-longest-wait")
+	save(fig, "longest-wait")
+
+
+# ---------------------------------------------------------------------------
+# Rows of dots, one per league, for values that rarely tie
+# ---------------------------------------------------------------------------
+
+
+def swarm(values, gap, step, max_slots=4):
+	"""Vertical offsets for one row of dots. Taken in order of value, each dot
+	takes the free slot nearest the row's center line, where a slot is free if
+	no dot already in it lies closer than `gap` along the row."""
+	placed = []
+	out = [0.0] * len(values)
+	for i in sorted(range(len(values)), key=lambda j: values[j]):
+		x = values[i]
+		for k in range(2 * max_slots + 1):
+			y = 0.0 if k == 0 else ((k + 1) // 2) * step * (1 if k % 2 else -1)
+			if all(abs(x - px) >= gap or abs(y - py) > 1e-9 for px, py in placed):
+				break
+		placed.append((x, y))
+		out[i] = y
+	return out
+
+
+# ---------------------------------------------------------------------------
+# Section 6.5: the simulated leagues beside the NBA
+# ---------------------------------------------------------------------------
+
+# The seven statistics of Section 6.5, worded and rounded as the paper gives
+# them: a number of decimals, a percentage, or whole seasons.
+NBA_ROWS = [
+	("spread", "Spread of win percentage within a season (standard deviation)", "3"),
+	("lag1", "Correlation between a team's win percentage and its own a season earlier", "2"),
+	("lag3", "The same correlation, three seasons apart", "2"),
+	("again", "Playoff teams that reached the playoffs again the next season", "%"),
+	("back", "Wait to return to the playoffs, in seasons", "2"),
+	("win", "Wait for the next series win, in seasons", "2"),
+	("longest", "Longest wait for a series win or a top-three pick, in seasons", "whole"),
+]
+
+
+def nba_strings(kind, nba, values):
+	"""The NBA's value, and the leagues' average with the lowest and highest."""
+	avg, lo, hi = statistics.mean(values), min(values), max(values)
+	if kind == "%":
+		pct = lambda x: f"{100 * x:.0f}%"  # noqa: E731
+		return pct(nba), f"{pct(avg)} ({pct(lo)} to {pct(hi)})"
+	if kind == "whole":
+		return f"{nba:.0f}", f"{avg:.1f} ({lo:.0f} to {hi:.0f})"
+	d = int(kind)
+	return f"{nba:.{d}f}", f"{avg:.{d}f} ({lo:.{d}f} to {hi:.{d}f})"
+
+
+def fig_nba_comparison(design):
+	c = design["nbaComparison"]
+	n = len(NBA_ROWS)
+	height = 3.45
+	fig = plt.figure(figsize=(WIDTH, height))
+	top, bottom = 0.87, 0.1
+	row = (top - bottom) / n
+	strip_left, strip_width = 0.385, 0.25
+	col_nba, col_sim = 0.725, 0.995
+	fig.text(col_nba, 0.975, "NBA", ha="right", va="top", fontsize=8, color=INK_2)
+	fig.text(col_sim, 0.975, "Simulated leagues:\naverage (lowest to highest)", ha="right", va="top", fontsize=8, color=INK_2, linespacing=1.1)
+	dot = 3.4  # points
+	for i, (key, label, kind) in enumerate(NBA_ROWS):
+		y0 = top - (i + 1) * row
+		ax = fig.add_axes([strip_left, y0 + 0.1 * row, strip_width, 0.8 * row])
+		values = [league[key] for league in c["leagues"]]
+		nba = c["nba"][key]
+		lo, hi = min(values + [nba]), max(values + [nba])
+		pad = 0.08 * (hi - lo)
+		ax.set_xlim(lo - pad, hi + pad)
+		ax.set_ylim(-1, 1)
+		gap = dot / (strip_width * WIDTH * 72) * (hi - lo + 2 * pad)
+		step = dot / (0.8 * row * height * 72) * 2
+		ax.axhline(0, color=GRID, lw=0.6, zorder=1)
+		ax.plot(values, swarm(values, gap, step), marker="o", ms=dot, color=COLOR["nba"], mec="white", mew=0.3, ls="none", zorder=3)
+		ax.plot([nba], [0], marker="D", ms=6, color=INK, mec="white", mew=0.6, ls="none", zorder=4)
+		ax.axis("off")
+		middle = y0 + row / 2
+		fig.text(0.005, middle, textwrap.fill(label, 42, break_on_hyphens=False), ha="left", va="center", fontsize=8.5, linespacing=1.1)
+		shown_nba, shown_sim = nba_strings(kind, nba, values)
+		fig.text(col_nba, middle, shown_nba, ha="right", va="center", fontsize=8.5)
+		fig.text(col_sim, middle, shown_sim, ha="right", va="center", fontsize=8.5)
+	handles = [
+		Line2D([0], [0], ls="none", marker="o", ms=dot + 1, color=COLOR["nba"], label="One simulated league, run under the old lottery"),
+		Line2D([0], [0], ls="none", marker="D", ms=6, color=INK, label=f"The NBA, {c['first']} to {c['last']}"),
+	]
+	fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.0, 0.0), ncol=2, frameon=False, handletextpad=0.4, columnspacing=1.8)
+	save(fig, "nba-comparison")
+
+
+# ---------------------------------------------------------------------------
+# Section 7.3: the wait for the next series win in each league
+# ---------------------------------------------------------------------------
+
+
+def fig_next_series_win(results, design):
+	mechs = results["mechanisms"]
+	waits = results["nextSeriesWin"]
+	nba = design["nbaComparison"]["nba"]["win"]
+	n = len(mechs)
+	height, top, bottom = 3.0, 0.92, 0.155
+	fig, ax = plt.subplots(figsize=(WIDTH, height))
+	fig.subplots_adjust(left=0.2, right=0.9, top=top, bottom=bottom)
+	at = transforms.blended_transform_factory(ax.transAxes, ax.transData)
+	lo = min(min(v) for v in waits.values())
+	hi = max(max(v) for v in waits.values())
+	x0, x1 = math.floor(lo * 2) / 2 - 0.1, math.ceil(hi * 2) / 2 + 0.1
+	ax.set_xlim(x0, x1)
+	ax.set_ylim(-0.6, n - 0.35)
+	dot = 3.1  # points
+	gap = dot / (0.7 * WIDTH * 72) * (x1 - x0)
+	step = dot / ((top - bottom) * height * 72 / (n + 0.25))
+	for i, m in enumerate(mechs):
+		y = n - 1 - i
+		values = waits[m["tag"]]
+		offsets = swarm(values, gap, step, max_slots=5)
+		ax.plot(values, [y + o for o in offsets], marker="o", ms=dot, color=COLOR.get(m["tag"], OTHER), mec="white", mew=0.3, ls="none", zorder=3)
+		avg = statistics.mean(values)
+		ax.plot([avg, avg], [y - 0.42, y + 0.42], color=INK, lw=1.0, zorder=4)
+		ax.text(1.045, y, f"{avg:.2f}", transform=at, ha="right", va="center", fontsize=8.5)
+	ax.text(1.045, n - 0.35, "Average", transform=at, ha="right", va="bottom", fontsize=8, color=INK_2)
+	# The three lotteries sit above the six COLA mechanisms.
+	ax.axhline(n - 3.5, color=GRID, lw=0.9, zorder=1)
+	ax.axvline(nba, color=INK_2, lw=0.7, ls=(0, (2, 2)), zorder=1)
+	ax.text(nba, n - 0.35, f"NBA, {nba:.2f}", ha="center", va="bottom", fontsize=7.5, color=INK_2)
+	ax.set_yticks([n - 1 - i for i in range(n)], [m["name"] for m in mechs])
+	ax.tick_params(axis="y", length=0, pad=6)
+	ax.spines["left"].set_visible(False)
+	ax.xaxis.grid(True, color=GRID, lw=0.5, zorder=0)
+	ax.set_axisbelow(True)
+	ax.set_xlabel("Wait for the next series win in a league, in seasons, with one dot per league", labelpad=4)
+	save(fig, "next-series-win")
 
 
 def main():
@@ -365,10 +509,12 @@ def main():
 	a = p.parse_args()
 	family = set_style(a.font_dir)
 	design, results = load_data(a.data)
-	figure1()
-	figure2(design)
-	figure3(results)
-	figure4(results)
+	fig_carryover()
+	fig_nba_comparison(design)
+	fig_real_standings(design)
+	fig_reward_by_position(results)
+	fig_longest_wait(results)
+	fig_next_series_win(results, design)
 	print(f"font: {family}")
 
 

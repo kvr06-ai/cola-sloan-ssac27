@@ -106,7 +106,7 @@ A COLA mechanism keeps one number for each team, called its priority, and update
 Simple COLA shows this cycle in its plainest form. A team's priority is its wait, the number of seasons since it last won a playoff series or received one of the first three picks. A team whose last series win came six seasons ago, with no top-three pick since, has a wait of six. When the playoffs end, every team that won a series goes back to a wait of zero, and every other team adds one season. There are 22 such teams: the 14 that missed the playoffs and the 8 that lost in the first round. Those 22 teams pick first, in order of wait, longest first. If two teams have the same wait, the one with more wins this season picks first. The 8 teams that won a series pick after them. After the draft, the three teams that picked first go back to zero. Figure~\ref{fig:carryover} follows one invented team through ten seasons of this rule.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/fig1-carryover}
+\includegraphics[width=\linewidth]{figures/carryover}
 \caption{One invented team's wait under Simple COLA over ten seasons. Each bar is the team's wait, in seasons, when the draft order is set. The wait grows by one in each season without a playoff series win, including a season that ends with a first-round loss, and returns to zero after a series win or a top-three pick.}
 \label{fig:carryover}
 \end{figure}
@@ -305,33 +305,13 @@ Each league counts once, however many seasons it holds, because the seasons of o
 
 The leagues are fictional, so we checked them against the NBA in two ways. The NBA numbers come from the standings, playoff results, and draft picks on Basketball Reference, a public archive of NBA statistics~\cite{bbref}.
 
-The first check compares league-wide patterns. Table~\ref{tab:nba} sets the 30 leagues we ran under the old lottery beside the NBA's last 25 seasons, 2001-02 to 2025-26. We use those leagues because the NBA held a lottery weighted by record in every one of those seasons. A team's win percentage is the share of its games that it won.
-\begin{table}[H]
+The first check compares league-wide patterns. Figure~\ref{fig:nba} sets the 30 leagues we ran under the old lottery beside the NBA's last 25 seasons, 2001-02 to 2025-26. We use those leagues because the NBA held a lottery weighted by record in every one of those seasons. A team's win percentage is the share of its games that it won.
+\begin{figure}[htbp]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.58\linewidth}>{\raggedleft\arraybackslash}p{0.09\linewidth}>{\raggedleft\arraybackslash}p{0.27\linewidth}@{}}
-\toprule
-\textbf{Statistic} & \textbf{NBA} & \textbf{Simulated leagues} \\
-\midrule
-Spread of win percentage within a season (standard deviation) & 0.152 & 0.135 (0.121 to 0.153) \\
-\addlinespace
-Correlation between a team's win percentage and its own a season earlier & 0.60 & 0.62 (0.47 to 0.70) \\
-\addlinespace
-The same correlation, three seasons apart & 0.09 & 0.29 (0.17 to 0.40) \\
-\addlinespace
-Playoff teams that reached the playoffs again the next season & 73\% & 73\% (67\% to 78\%) \\
-\addlinespace
-Wait to return to the playoffs, in seasons & 2.99 & 2.89 (2.25 to 3.36) \\
-\addlinespace
-Wait for the next series win, in seasons & 4.55 & 4.65 (3.93 to 5.93) \\
-\addlinespace
-Longest wait for a series win or a top-three pick, in seasons & 13 & 16.4 (12 to 25) \\
-\bottomrule
-\end{tabular}
-\caption{The 30 leagues run under the old lottery beside the NBA's 25 seasons from 2001-02 to 2025-26. The last column gives the average of the 30 leagues, with the lowest and highest league in parentheses.}
-\label{tab:nba}
-\end{table}
+\includegraphics[width=\linewidth]{figures/nba-comparison}
+\caption{The 30 leagues run under the old lottery beside the NBA's 25 seasons from 2001-02 to 2025-26. Each dot is one league, the black diamond is the NBA, and each row has its own scale. The columns on the right give the NBA's value and the average of the 30 leagues, with the lowest and highest league in parentheses.}
+\label{fig:nba}
+\end{figure}
 
 The simulated leagues match the NBA on four of the seven statistics. Playoff teams return at the same rate. The two average waits are within about a tenth of a season of the NBA's. A team's record also follows its record of a season earlier as closely as in the NBA.
 
@@ -342,7 +322,7 @@ Section 7 should be read with this in mind. Every mechanism is tested on the sam
 The second check asks whether the reward for losing and the help for a longer wait come out the same on real standings. We took each of the 22 seasons from 2004-05, the first with 30 teams, to 2025-26. For each one, we computed $R$ and $H$ from that season's final standings and playoff results alone, with the same code we use on the simulated leagues. Each team's wait and its earlier picks come from the real seasons since 1999-00. We do not replay history. No mechanism's picks are allowed to change what happened in later seasons, so every real result stays as it happened. The check asks what each mechanism's rule would have done with the standings the NBA actually produced. We apply the old lottery's odds, which date from 2019, to all 22 seasons.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/fig2-real-standings}
+\includegraphics[width=\linewidth]{figures/real-standings}
 \caption{The reward for losing and the help for a longer wait on the NBA's real standings, one season at a time, beside their values in the simulated leagues. Each line is the 95\% interval over the 22 seasons from 2004-05 to 2025-26, and the filled dot on it is the average. The open diamond is the average over the simulated leagues. All values are draft places. Each interval treats the 22 seasons as unrelated to one another.}
 \label{fig:realcheck}
 \end{figure}
@@ -394,7 +374,7 @@ The 3-2-1 lottery removes that reward at the bottom of the standings. From the f
 Under Simple COLA, losing costs a team places from every position, 0.94 from the fifth-worst record and 3.50 from the fourteenth-worst. The reward was never positive, from any position in any season, as Theorem 1 requires.
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/fig3-reward-by-position}
+\includegraphics[width=\linewidth]{figures/reward-by-position}
 \caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. Appendix C gives each value.}
 \label{fig:positions}
 \end{figure}
@@ -406,14 +386,20 @@ Under both lotteries, nothing grows with waiting, so the help for a longer wait,
 The longest wait, $L$, shows what that help does over 25 seasons. It averaged 16.4 seasons under the old lottery and 16.3 under 3-2-1, a difference of 0.1 seasons (−1.6 to 1.8). The interval includes zero, so 3-2-1 gives the teams that wait no more help than the old lottery did. Under Simple COLA, the longest wait averaged 5.5 seasons, 10.8 fewer than under 3-2-1 (9.4 to 12.1). It was five or six seasons in every league, against 10 to 25 under 3-2-1 (Figure~\ref{fig:longest}).
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=\linewidth]{figures/fig4-longest-wait}
+\includegraphics[width=\linewidth]{figures/longest-wait}
 \caption{The longest wait in each of the 30 leagues under each mechanism, where a wait counts the seasons in a row with neither a playoff series win nor a top-three pick. Each dot is one league. The black bar and the column on the right give the average over the 30 leagues, as in Table~\ref{tab:results}.}
 \label{fig:longest}
 \end{figure}
 
 \subsection{Long-term parity}
 
-The three mechanisms are level on the wait for the next series win. It averaged 4.65 seasons under the old lottery, 4.47 under 3-2-1, and 4.58 under Simple COLA. Simple COLA's wait is 0.11 seasons longer than 3-2-1's (−0.10 to 0.32), and the old lottery's is 0.18 longer (−0.06 to 0.42). Both intervals include zero.
+The three mechanisms are level on the wait for the next series win (Figure~\ref{fig:parity}). It averaged 4.65 seasons under the old lottery, 4.47 under 3-2-1, and 4.58 under Simple COLA. Simple COLA's wait is 0.11 seasons longer than 3-2-1's (−0.10 to 0.32), and the old lottery's is 0.18 longer (−0.06 to 0.42). Both intervals include zero.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/next-series-win}
+\caption{The wait for the next series win in each of the 30 leagues under each mechanism. Each dot is one league. The black bar and the column on the right give the average over the 30 leagues, as in Table~\ref{tab:results}. The dashed line marks the NBA's average over 2001-02 to 2025-26, 4.55 seasons.}
+\label{fig:parity}
+\end{figure}
 
 The number of waits that ended points the same way. Depending on the mechanism, 80.3 to 86.5 waits for a series win ended per league on average. In the NBA's last 25 seasons, 88 ended. The draft order changes which teams end their waits, and it barely changes how many waits end.
 
