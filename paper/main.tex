@@ -413,6 +413,44 @@ Against 3-2-1, every COLA mechanism shortened the longest wait (Figure~\ref{fig:
 
 Simple COLA is therefore one of several COLA mechanisms that remove the reward for losing and help the teams that wait. Of the nine mechanisms, it gives the most help, and it is the only one that holds no drawing. Section 8 turns to how a league might choose among them.
 
+\section{Discussion and adoption}
+
+\subsection{Choosing a mechanism}
+
+Figure~\ref{fig:map} places the nine mechanisms on the two sides of the dilemma in Section 1, the reward for losing and the longest wait. The three lotteries sit at the top, with longest waits of 16.0 to 16.4 seasons. All six COLA mechanisms sit lower, and Simple COLA sits lowest, at 5.5 seasons.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/mechanism-map}
+\caption{The nine mechanisms on the reward for losing from the fifth-worst record and on the longest wait, both from Table~\ref{tab:results}. A point to the left of the dashed line means that dropping to the worst record costs a team places. A lower point means a shorter longest wait.}
+\label{fig:map}
+\end{figure}
+
+A league that wants the most help for the teams that wait, and the simplest rule, would choose Simple COLA. Its whole rule fits in one sentence. Teams that did not win a playoff series pick first, in order of the seasons since their last series win or top-three pick, longest first, and a tie goes to the team with more wins. It holds no drawing, so the order is known as soon as the first round of the playoffs ends. Its costs are the two exceptions of Section 5 and a return to the playoffs that takes 0.18 seasons longer than under 3-2-1 (Section 7.3).
+
+A league that gives those exceptions more weight, or wants to keep a lottery night, the televised drawing that settles the top of the order, could choose Full-lottery COLA. It draws every pick in proportion to tickets, and its pool ends at the last playoff place, so a team can gain at most 9.6 places at the line (Section 5.1). In our leagues, it gave no reward for losing from any position in any season. It shortened the longest wait by 4.3 seasons against 3-2-1 (2.9 to 5.8), and its teams returned to the playoffs as quickly as under 3-2-1, a difference of −0.06 seasons (−0.17 to 0.06).
+
+The NBA has already moved in this direction. Its 3-2-1 lottery removed the reward for losing at the bottom of the standings and added a memory of recent picks (Section 3.3). Letting priority carry over is the next step. A league can take it in any season, because every team's wait and tickets can be read from past seasons, as the next subsection does for 2026.
+
+\subsection{The 2026 draft}
+
+Figure~\ref{fig:draft2026} shows what each mechanism would have done with the 2026 draft. As in the check of Section 6.5, every team's priority comes from the real seasons since 1999-00, and no season is replayed, so every earlier draft keeps the picks the NBA actually made. For each team, the figure gives the chance of the first pick under each mechanism that holds a drawing, and the pick itself under Simple COLA.
+\begin{figure}[htb]
+\centering
+\includegraphics[width=\linewidth]{figures/draft-2026}
+\caption{The 2026 draft under each mechanism, scored on the 2025-26 standings and playoff results. Each team's priority is carried over from the real seasons since 1999-00, and each pick counts for the team that held it on lottery day. The shaded columns give each team's chance of the first pick, and the last column gives its pick under Simple COLA, which holds no drawing. Classic, Waitlist, and Full-lottery COLA share a column because the same tickets set their first pick. A team's wait is the number of seasons since its last series win or top-three pick. A dash marks a team outside a mechanism's pool. Teams with the same record share the old lottery's odds equally, and Dallas, which received the 2025 first pick, cannot receive it under 3-2-1.}
+\label{fig:draft2026}
+\end{figure}
+
+Under the old lottery, the chances follow this season's record. Washington, Indiana, and Brooklyn, the three worst teams, held 14.0\% each. Under 3-2-1, the chances are much flatter, from 2.9\% to 8.8\% among the teams that can receive the first pick. Under the COLA mechanisms, they follow each team's playoff history over many seasons. Simple COLA would give the first three picks to Chicago, Sacramento, and New Orleans. Chicago last won a playoff series in 2015, Sacramento last received a top-three pick in 2018, and New Orleans received the first pick in 2019. Washington, with the worst record, would pick 17th, because its second pick in 2024 reset its wait. Indiana, which reached the 2025 Finals, would pick 22nd, last in the pool.
+
+\subsection{Auction drafts}
+
+Section 2 described two plans that use an auction. An auction still needs a rule for how much each team has to bid, and that rule can reward losing just as a draft order can. Silver's plan gives the most units to the worst records~\cite{silver2026arc}, so a worse record still buys a team more to spend. The Celtics' credits already carry over and shrink with playoff success~\cite{quinn2026credits}. A COLA priority could set the amounts in either plan, so that a team's budget grows while it waits and a worse record this season adds nothing.
+
+\subsection{What one simulator can show}
+
+All of our comparisons come from one simulator. It shows how the mechanisms compare when everything else is equal, because every mechanism ran on the same 30 leagues. On the NBA's real standings, the reward for losing and the help for a longer wait came out as they did in the simulated leagues (Figure~\ref{fig:realcheck}). The simulator shows the size of each effect less exactly. Its teams stay strong or weak for longer than NBA teams do (Section 6.5), so every mechanism's longest wait would likely be shorter in the NBA.
+
 \clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}

@@ -45,8 +45,9 @@ time.
 | `node simple_losing_check.js --cutoff` | Section 5.2: the line between the third and fourth picks |
 | `node limits_check.js` | Section 5: the line at the end of each pool, and the seasons after a top-three pick |
 | `node design_check.js` | Section 6: the design of the simulations, and Figures 2 and 3 |
-| `node results_check.js` | Section 7: the results for the nine mechanisms, Table 2, and Figures 4 to 6 |
-| `python3 make_figures.py` | Figures 1 to 6, drawn into `paper/figures/` from the two scripts above |
+| `node results_check.js` | Sections 7 and 8.1: the results for the nine mechanisms, Table 2, and Figures 4 to 7 |
+| `node draft2026_check.js` | Section 8.2: the 2026 draft under each mechanism, and Figure 8 |
+| `python3 make_figures.py` | Figures 1 to 8, drawn into `paper/figures/` from the three scripts above |
 | `node verify_classic.js runs/frontier/classic.json` | A check of the Classic COLA simulations against the mechanism's rules |
 | `node t321_adopted_check.js runs/frontier/t321.json` | The same check for 3-2-1 |
 
