@@ -46,7 +46,9 @@
 
 \linespread{0.955}
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{11pt}
+% The template's 11pt after a paragraph, with a little give so a heading can
+% fit at the foot of a page.
+\setlength{\parskip}{11pt plus 1pt minus 2pt}
 \frenchspacing
 \raggedright
 \hyphenpenalty=10000
@@ -54,8 +56,32 @@
 
 \titleformat{\section}{\fontsize{16}{19}\selectfont\bfseries}{\thesection.}{0.4em}{}
 \titleformat{\subsection}{\fontsize{12}{14}\selectfont\bfseries}{\thesubsection.}{0.4em}{}
-\titlespacing*{\section}{0pt}{12pt}{0pt}
-\titlespacing*{\subsection}{0pt}{11pt}{0pt}
+\titlespacing*{\section}{0pt}{12pt plus 2pt minus 3pt}{0pt}
+\titlespacing*{\subsection}{0pt}{11pt plus 2pt minus 3pt}{0pt}
+
+% Spacing the template leaves open. A figure or table may share a page with
+% text, and the floats on a page of floats stack at its top. Lists sit close
+% to their text. References follow one another with no gap, as in the
+% template's own reference list.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.85}
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@fpsep}{10pt plus 2pt}
+\setlength{\@fpbot}{0pt plus 1fil}
+\makeatother
+\usepackage{enumitem}
+\setlist{topsep=4pt,itemsep=2pt,parsep=0pt}
+\let\oldthebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{\oldthebibliography{#1}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}\setlength{\parskip}{0pt}}
 
 \begin{document}
 
@@ -128,7 +154,7 @@ We compare the six COLA mechanisms with three lotteries that set priority from o
 In the framework's terms, 3-2-1 rebuilds priority from this season's standings every year. Nothing grows with waiting. Success costs nothing in later years. The one thing it remembers is its limit on repeat picks. A team cannot receive the first pick two years in a row or a top-five pick three years in a row~\cite{oconnor2026lottery}. That places 3-2-1 at the edge of the family, with the first two dials set almost to zero. It also explains the two properties noted earlier. Its priority comes from one season's standings, so some teams can still gain by finishing lower. Nothing carries over, so a team that has been weak for years gets no extra help. Section 7 measures both.
 
 Table~\ref{tab:mechanisms} lists the dial settings of all nine mechanisms. Appendix B gives the exact rules, including how ties are broken and where the teams outside each pool pick.
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
@@ -336,7 +362,7 @@ Simple COLA's two values depend on waits. A simulated league starts with every w
 \section{Results}
 
 Table~\ref{tab:results} gives the nine mechanisms on the five measures of Section 6. Every value in it is an average over the 30 simulated leagues. We compare each mechanism with 3-2-1, the lottery the NBA adopted in 2026. Where the text gives a difference from 3-2-1, the parentheses hold its 95\% interval. Each difference is computed before rounding. The first three subsections take the old lottery, 3-2-1, and Simple COLA through the reward for losing, the help for the teams that wait, and long-term parity. The fourth covers the other six mechanisms.
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
