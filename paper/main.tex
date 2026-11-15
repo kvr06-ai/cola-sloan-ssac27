@@ -361,7 +361,7 @@ Countdown COLA & −4.51 & 4.7 & 9.3* & 4.64 & 3.11* \\
 Beckett COLA & −1.64 & 2.5 & 14.1* & 4.55 & 3.02 \\
 \bottomrule
 \end{tabular}
-\caption{The nine mechanisms on the five measures of Section 6, as averages over the 30 simulated leagues. $R$ and $H$ are in draft places, and the three waits are in seasons. An asterisk marks a wait whose difference from 3-2-1 has a 95\% interval that excludes zero. Appendix C gives each difference with its interval.}
+\caption{The nine mechanisms on the five measures of Section 6, as averages over the 30 simulated leagues. $R$ and $H$ are in draft places, and the three waits are in seasons. An asterisk marks a wait whose difference from 3-2-1 has a 95\% interval that excludes zero. Appendix C names the script that prints each difference with its interval.}
 \label{tab:results}
 \end{table}
 
@@ -375,7 +375,7 @@ Under Simple COLA, losing costs a team places from every position, 0.94 from the
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/reward-by-position}
-\caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. Appendix C gives each value.}
+\caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. Appendix C names the script that prints each value.}
 \label{fig:positions}
 \end{figure}
 
@@ -462,5 +462,57 @@ The wider family lets a league choose its own balance of targeted help, parity, 
 \clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+
+\clearpage
+\section*{Appendix}
+
+\subsection*{A. Proof of Theorem 1}
+
+Take a season under Simple COLA, and let $P$ be its pool, the 22 teams that did not win a first-round series. For a team $j$ in $P$, write $w_j$ for its wait and $v_j$ for its regular-season wins. A coin flip settles any tie on both. We treat the coin flips as one random order of the teams, drawn independently of the game results, and write $j \succ i$ when team $j$ comes before team $i$ in that order. Simple COLA places $j$ ahead of $i$ when $w_j > w_i$, when $w_j = w_i$ and $v_j > v_i$, or when $w_j = w_i$, $v_j = v_i$, and $j \succ i$. The pool takes the first 22 picks, so a team's pick is one more than the number of teams in $P$ placed ahead of it.
+
+Compare two outcomes of one regular-season game between a team $i$ in $P$ and an opponent $o$. In the first, $i$ wins, and in the second, $i$ loses. The same eight teams win a first-round series in both, and the random order is the same. Primes mark the values after the loss.
+
+The pool is the same in both outcomes, because it holds every team without a series win. Every wait is also the same. A wait counts the seasons since a team last won a playoff series or received a top-three pick, and neither this season's series winners nor any earlier pick changes. So $w'_j = w_j$ for every team $j$. The loss takes one win from $i$ and gives one to $o$, so $v'_i = v_i - 1$ and $v'_j \ge v_j$ for every other team $j$.
+
+Now take any team $j$ that is placed ahead of $i$ after the win. If $w_j > w_i$, then $w'_j > w'_i$. If $w_j = w_i$ and $v_j > v_i$, then $v'_j \ge v_j > v_i > v'_i$. If $w_j = w_i$, $v_j = v_i$, and $j \succ i$, then $v'_j \ge v_j = v_i > v'_i$. In each case, $j$ is still placed ahead of $i$ after the loss. The teams ahead of $i$ after the win are therefore all still ahead after the loss, so $i$'s pick is the same or later. Repeating the argument one game at a time covers any number of losses.
+
+The proof covers one draft. Section 5.2 takes up the next draft, in which a top-three pick resets a wait.
+
+\subsection*{B. The rules as run}
+
+Our driver sets the first-round order under each mechanism, and the simulator sets the second round as it normally does. A mechanism fixes where each team's own first-round pick falls. A traded pick keeps that place, and the team that holds it makes the selection. Every drawing uses the league's random seed, and every league starts with all tickets, waits, and counts at zero. Wherever a rule below leaves two teams level, they keep a fixed order, except under Simple COLA, where the seed draws the order.
+
+Classic, Waitlist, and Full-lottery COLA share one ticket rule. After the playoffs, a team without a series win gains 1,000 tickets, and a team that won one, two, three, or four series keeps 75\%, 50\%, 25\%, or none of its tickets. After the draft, the teams with picks 1 to 4 keep none, 25\%, 50\%, and 75\% of theirs. Every result is rounded to a whole ticket.
+
+\textbf{Old lottery.} The pool is the 14 teams that missed the playoffs, ranked by record, worst first. The first four picks are drawn without replacement, with 140, 140, 140, 125, 105, 90, 75, 60, 45, 30, 20, 15, 10, and 5 chances in 1,000 by rank. Picks 5 to 14 go to the rest of the pool by record, worst first, and the 16 playoff teams follow, worst record first. Teams with the same record keep a fixed order, where the NBA would split their odds.
+
+\textbf{Equal-odds lottery.} The pool is the same 14 teams. All 14 picks are drawn without replacement, with equal chances. The playoff teams follow, worst record first.
+
+\textbf{3-2-1.} The pool is the eight worst records in each conference, 16 teams in all. In each conference, the five worst are the teams that miss the play-in, the next two are the ninth and tenth seeds, and the eighth-worst stands in for the loser of the seven-eight game. The three worst records in the league hold 2 chances each, the other seven teams that miss the play-in hold 3, the ninth and tenth seeds hold 2, and the two stand-ins hold 1. All 16 picks are drawn without replacement under three limits. No team receives the first pick in two straight drafts, and no team receives a top-five pick in three straight drafts. The three worst records are placed by pick 12, so once the picks left through 12 equal the number of those teams still undrawn, the next picks are drawn among them. A limit that would leave no team to draw is skipped. The other 14 teams follow, worst record first.
+
+\textbf{Classic COLA.} The pool is the 14 teams that missed the playoffs. The first four picks are drawn without replacement, each team's chance proportional to its tickets, or equal if no team left has any. Picks 5 to 14 go to the rest of the pool by record, worst first, and the playoff teams follow, worst record first.
+
+\textbf{Waitlist COLA.} The rules are those of Classic COLA, except that picks 5 to 14 go by tickets, most first.
+
+\textbf{Full-lottery COLA.} The pool is the same 14 teams. All 14 picks are drawn without replacement, each team's chance proportional to its tickets, or equal among the teams left if none has any. The playoff teams follow, worst record first.
+
+\textbf{Simple COLA.} After the playoffs, a team that won a series returns to a wait of zero, and every other team's wait grows by one. After the draft, the teams with picks 1 to 3 return to zero. The pool is the 22 teams without a series win, and it picks in order of wait, longest first, then more wins first. A random order drawn from the seed settles any tie that remains. The eight series winners follow, earliest playoff exit first and then fewer wins first.
+
+\textbf{Countdown COLA.} The pool and the wait are those of Simple COLA. A team's score is its wait times its wins, and the pool is ranked by score, then wait, then wins, highest first. The order is filled from pick 22 up. Each step draws one of the five lowest-ranked teams left, with 6, 5, 4, 3, and 2 chances from the lowest up, and the last team left takes the first pick. The series winners follow as under Simple COLA.
+
+\textbf{Beckett COLA.} After the playoffs, a team's count returns to zero if it won a series or finished in the top six of its conference by wins, and grows by one otherwise. After the draft, the team with the first pick returns to zero. The pool is every team with a count of two or more, and a team's entries are its count times its wins. The first four picks are drawn without replacement in proportion to entries, and the rest of the pool follows by entries, most first. The teams outside the pool follow, earliest playoff exit first, with the teams that missed the playoffs first, and then fewer wins first.
+
+\subsection*{C. Reproducing the numbers}
+
+Every number in the paper comes from a script in the \texttt{testbed/harness} folder of the repository. Each script reads only files in the repository, runs in under a minute, and prints the same output every time.
+\begin{itemize}
+\item \texttt{abstract\_table.js} prints the summary figures of Section 1.
+\item \texttt{simple\_losing\_check.js} prints the check of Theorem 1 in Section 4, and with \texttt{-{}-cutoff}, the line between the third and fourth picks in Section 5.2.
+\item \texttt{limits\_check.js} prints the rest of Section 5.
+\item \texttt{design\_check.js} prints Section 6 and the values behind Figures 2 and 3.
+\item \texttt{results\_check.js} prints Sections 7 and 8.1, Table 2, and the values behind Figures 4 to 7, including every difference from 3-2-1 with its 95\% interval.
+\item \texttt{draft2026\_check.js} prints the 2026 draft of Section 8.2 and Figure 8.
+\item \texttt{make\_figures.py} draws Figures 1 to 8 from the output of these scripts.
+\end{itemize}
 
 \end{document}
