@@ -26,6 +26,10 @@
 \usepackage{float}
 \usepackage[font=footnotesize,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false,skip=4pt]{caption}
 \usepackage{array}
+\usepackage{graphicx}
+% The figures sit in paper/figures. The second path finds them when a build
+% runs from the repository's top folder.
+\graphicspath{{./}{paper/}}
 \usepackage{amsmath}
 \usepackage[italic,defaultmathsizes]{mathastext}
 \ifPDFTeX\else
@@ -99,7 +103,13 @@ None of the draft proposals above look beyond the current season to decide which
 
 A COLA mechanism keeps one number for each team, called its priority, and updates that number once a year. After the playoffs, priority rises for the teams that went without success, which in most mechanisms means without a playoff series win. It falls for the teams that had success. The mechanism then sets the draft order from priority, and the teams that receive the best picks give some of their priority back. The next season starts where this one ended. A long run without success therefore builds priority up, and one good season or one high pick spends it.
 
-Simple COLA shows this cycle in its plainest form. A team's priority is its wait, the number of seasons since it last won a playoff series or received one of the first three picks. A team whose last series win came six seasons ago, with no top-three pick since, has a wait of six. When the playoffs end, every team that won a series goes back to a wait of zero, and every other team adds one season. There are 22 such teams: the 14 that missed the playoffs and the 8 that lost in the first round. Those 22 teams pick first, in order of wait, longest first. If two teams have the same wait, the one with more wins this season picks first. The 8 teams that won a series pick after them. After the draft, the three teams that picked first go back to zero.
+Simple COLA shows this cycle in its plainest form. A team's priority is its wait, the number of seasons since it last won a playoff series or received one of the first three picks. A team whose last series win came six seasons ago, with no top-three pick since, has a wait of six. When the playoffs end, every team that won a series goes back to a wait of zero, and every other team adds one season. There are 22 such teams: the 14 that missed the playoffs and the 8 that lost in the first round. Those 22 teams pick first, in order of wait, longest first. If two teams have the same wait, the one with more wins this season picks first. The 8 teams that won a series pick after them. After the draft, the three teams that picked first go back to zero. Figure~\ref{fig:carryover} follows one invented team through ten seasons of this rule.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig1-carryover}
+\caption{One invented team's wait under Simple COLA over ten seasons. Each bar is the team's wait, in seasons, when the draft order is set. The wait grows by one in each season without a playoff series win, including a season that ends with a first-round loss, and returns to zero after a series win or a top-three pick.}
+\label{fig:carryover}
+\end{figure}
 
 The mechanisms in the family differ in three choices. We call these choices dials, because a league can set each one separately. The first dial is how priority grows. In every mechanism we study, each team that qualifies gets the same fixed step, whatever its record. A team that already qualifies therefore gains nothing more by losing more games. What a team might gain by losing its way into qualifying is the subject of Section 5. The second dial is how priority falls, meaning how much a playoff run or a high pick costs. The third dial is how priority becomes lottery odds and draft positions. It covers which teams take part, a group we call the pool, and whether their order comes from a drawing, from priority alone, or from both.
 
@@ -190,37 +200,17 @@ A proof covers the rule as written, so we also tested the rule as our simulator 
 
 \section{When the assumptions fail}
 
-Section 4 called two of its assumptions standard. This section takes each in turn, shows where it could fail, measures the failure size in our simulated leagues, and describes what a league could do about it. No team in the simulated leagues loses on purpose, so each figure below measures a temptation and says nothing about how often a real team would act on it.
+Section 4 called two of its assumptions standard. This section takes each in turn, shows where it could fail, measures the failure size in our simulated leagues, and describes what a league could do about it. No team in the simulated leagues loses on purpose, so each number below measures a temptation and says nothing about how often a real team would act on it.
 
 \subsection{A team that prefers the pool to the playoffs}
 
-The second assumption says a team prefers winning a playoff series to going without one. It matters because every mechanism's pool ends at a line, and a team just inside the pool picks earlier than a team just outside. Table~\ref{tab:limits} shows that line under four mechanisms and what a place on the pool side is worth.
+The second assumption says a team prefers winning a playoff series to going without one. It matters because every mechanism's pool ends at a line, and a team just inside the pool picks earlier than a team just outside.
 
 Under the old lottery, the line is the last playoff place. The best team that missed the playoffs picks 13.6th on average, and the first pick outside the pool is the 15th, so staying in the pool is worth 1.4 places. Under 3-2-1, the line is the play-in game between the seventh and eighth teams in a conference. The loser gets one chance in the drawing and picks 11.6th on average; the first pick outside the pool is 17th, a difference of 5.4 places. Under both lotteries, the team on the line holds the worst odds in the pool.
 
 The difference is larger under COLA, because priority does not depend on record. The team on the line can have the highest priority. Under Full-lottery COLA, the team with the most tickets among those that missed the playoffs picks 5.4th on average, 9.6 places ahead of the first pick outside the pool. Under Simple COLA, the line is a first-round series. A playoff team that holds the longest wait picks first if it loses that series and 23rd at best if it wins, a difference of 22 places. This is the second cost named in Section 1.
 
 To collect that difference, a team would have to lose a playoff series on purpose and give up the second round. A league that prefers not to rely on teams refusing that trade has two options. The first is already in our tests. A full-lottery COLA ends its pool at the last playoff place and draws every pick, so the most a team can gain at the line is 9.6 places, and the gain comes with better odds in a drawing. The second is to count any playoff appearance as success. A first-round loss then buys nothing. That change has two costs. Help stops for a team that reaches the playoffs every year and never advances, and the line returns to the end of the regular season, where late losses can move a team across it. We have not simulated that variant.
-\begin{table}[H]
-\centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}p{0.18\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.21\linewidth}>{\raggedleft\arraybackslash}p{0.21\linewidth}@{}}
-\toprule
-\textbf{Mechanism} & \textbf{Where the pool ends} & \textbf{Places gained by staying in the pool} & \textbf{Top-three picks that went to a team with one in the previous two drafts} & \textbf{Next pick after a top-three pick, when the team missed the playoffs again} \\
-\midrule
-Old lottery & Last playoff place & 1.4 & 29\% & 6.6 \\
-\addlinespace
-3-2-1 & Seven-eight play-in game & 5.4 & 20\% & 8.6 \\
-\addlinespace
-Full-lottery COLA & Last playoff place & 9.6 & 16\% & 9.4 \\
-\addlinespace
-Simple COLA & First-round series & 22 & 0\% & 21.0 \\
-\bottomrule
-\end{tabular}
-\caption{Four mechanisms on this section's measures, from 30 simulated leagues of 25 seasons. For the two COLA mechanisms, the places gained are for the team with the highest priority, which is the most any team on the line can gain.}
-\label{tab:limits}
-\end{table}
 
 \subsection{A team that prefers a later pick}
 
@@ -270,7 +260,7 @@ Every league starts with no history, so every wait and every ticket count begins
 
 Section 1 listed three things we measure: help for the teams that have waited longest, long-term parity, and the reward for losing. This subsection makes them exact, with one number for the reward for losing and two each for help and parity.
 
-Let $p_i$ be the number of the pick that team $i$ receives in a season's draft, so that $p_i = 1$ means the first pick. Under a mechanism with a drawing, $p_i$ depends on chance, and we use its expected value $\mathrm{E}[p_i]$, the average pick over all the ways the drawing could come out. A team with an equal chance at the first pick and the third pick has an expected pick of 2. We compute each expected value exactly, by going through every possible outcome of the drawing and how likely it is, so the figure carries no random error.
+Let $p_i$ be the number of the pick that team $i$ receives in a season's draft, so that $p_i = 1$ means the first pick. Under a mechanism with a drawing, $p_i$ depends on chance, and we use its expected value $\mathrm{E}[p_i]$, the average pick over all the ways the drawing could come out. A team with an equal chance at the first pick and the third pick has an expected pick of 2. We compute each expected value exactly, by going through every possible outcome of the drawing and how likely it is, so the value carries no random error.
 
 \textbf{The reward for losing.} Take one season and the team with the fifth-worst record among the 14 that missed the playoffs. Call it team $m$. Suppose it had finished with the worst record in the league and nothing else had changed, so that every other team keeps its record and every team keeps its priority. Write $\mathrm{E}[p_m^{\mathrm{worst}}]$ for its expected pick in that case. The reward for losing is
 \begin{equation}\label{eq:reward}
@@ -313,7 +303,7 @@ Each league counts once, however many seasons it holds, because the seasons of o
 
 \subsection{How the simulated leagues compare with the NBA}
 
-The leagues are fictional, so we checked them against the NBA in two ways. The NBA figures come from the standings, playoff results, and draft picks on Basketball Reference, a public archive of NBA statistics~\cite{bbref}.
+The leagues are fictional, so we checked them against the NBA in two ways. The NBA numbers come from the standings, playoff results, and draft picks on Basketball Reference, a public archive of NBA statistics~\cite{bbref}.
 
 The first check compares league-wide patterns. Table~\ref{tab:nba} sets the 30 leagues we ran under the old lottery beside the NBA's last 25 seasons, 2001-02 to 2025-26. We use those leagues because the NBA held a lottery weighted by record in every one of those seasons. A team's win percentage is the share of its games that it won.
 \begin{table}[H]
@@ -350,34 +340,20 @@ They differ in two ways. Records are a little more bunched in the simulated leag
 Section 7 should be read with this in mind. Every mechanism is tested on the same leagues, so its comparisons between mechanisms are on equal terms. The lengths of the longest waits under the three reference lotteries are likely somewhat greater than the NBA would see. Section 8 returns to what one simulator can show.
 
 The second check asks whether the reward for losing and the help for a longer wait come out the same on real standings. We took each of the 22 seasons from 2004-05, the first with 30 teams, to 2025-26. For each one, we computed $R$ and $H$ from that season's final standings and playoff results alone, with the same code we use on the simulated leagues. Each team's wait and its earlier picks come from the real seasons since 1999-00. We do not replay history. No mechanism's picks are allowed to change what happened in later seasons, so every real result stays as it happened. The check asks what each mechanism's rule would have done with the standings the NBA actually produced. We apply the old lottery's odds, which date from 2019, to all 22 seasons.
-\begin{table}[H]
+\begin{figure}[htbp]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedleft\arraybackslash}p{0.30\linewidth}>{\raggedleft\arraybackslash}p{0.18\linewidth}@{}}
-\toprule
-\textbf{Measure} & \textbf{Mechanism} & \textbf{Real standings: average (95\% interval)} & \textbf{Simulated leagues} \\
-\midrule
-Reward for losing, $R$ & Old lottery & +1.30 (1.26 to 1.34) & +1.32 \\
-\addlinespace
- & 3-2-1 & −0.55 (−0.70 to −0.39) & −0.63 \\
-\addlinespace
- & Simple COLA & −0.73 (−1.07 to −0.39) & −0.94 \\
-\addlinespace
-Help for a longer wait, $H$ & Simple COLA & 6.0 (5.4 to 6.7) & 6.3 \\
-\bottomrule
-\end{tabular}
-\caption{The reward for losing and the help for a longer wait on the NBA's real standings, one season at a time, beside their values in the simulated leagues. All values are draft places. Each interval treats the 22 seasons as unrelated to one another.}
-\label{tab:realcheck}
-\end{table}
+\includegraphics[width=\linewidth]{figures/fig2-real-standings}
+\caption{The reward for losing and the help for a longer wait on the NBA's real standings, one season at a time, beside their values in the simulated leagues. Each line is the 95\% interval over the 22 seasons from 2004-05 to 2025-26, and the filled dot on it is the average. The open diamond is the average over the simulated leagues. All values are draft places. Each interval treats the 22 seasons as unrelated to one another.}
+\label{fig:realcheck}
+\end{figure}
 
-Table~\ref{tab:realcheck} shows that all four simulated values lie inside the intervals from the real standings. In all 22 real seasons, Simple COLA's reward for losing was zero or negative, as Theorem 1 requires, and the old lottery's was positive.
+Figure~\ref{fig:realcheck} shows that all four simulated values lie inside the intervals from the real standings. In all 22 real seasons, Simple COLA's reward for losing was zero or negative, as Theorem 1 requires, and the old lottery's was positive.
 
 Simple COLA's two values depend on waits, and a simulated league starts with every wait at zero. From the sixth season of each league on, the simulated teams have the same five seasons of history behind them as our data holds for the real teams in 2004-05. Measured over those seasons, the two values are −0.57 and 6.0, and both are inside the intervals too.
 
 \section{Results}
 
-Table~\ref{tab:results} gives the nine mechanisms on the five measures of Section 6. Every figure is an average over the 30 simulated leagues. We compare each mechanism with 3-2-1, the lottery the NBA adopted in 2026. Where the text gives a difference from 3-2-1, the parentheses hold its 95\% interval, and each difference is computed before rounding. The first three subsections take the old lottery, 3-2-1, and Simple COLA through the reward for losing, the help for the teams that wait, and long-term parity. The fourth covers the other six mechanisms.
+Table~\ref{tab:results} gives the nine mechanisms on the five measures of Section 6. Every value in it is an average over the 30 simulated leagues. We compare each mechanism with 3-2-1, the lottery the NBA adopted in 2026. Where the text gives a difference from 3-2-1, the parentheses hold its 95\% interval, and each difference is computed before rounding. The first three subsections take the old lottery, 3-2-1, and Simple COLA through the reward for losing, the help for the teams that wait, and long-term parity. The fourth covers the other six mechanisms.
 \begin{table}[H]
 \centering
 \small
@@ -411,43 +387,29 @@ Beckett COLA & −1.64 & 2.5 & 14.1* & 4.55 & 3.02 \\
 
 \subsection{The reward for losing}
 
-The old lottery rewards losing. A team that dropped from the fifth-worst record to the worst would have gained 1.32 draft places on average. Table~\ref{tab:positions} gives the same measure from every starting position, where a starting position is a team's rank among the 14 records that missed the playoffs, counted from the worst. The old lottery's reward was positive from every position in every season. It reached 9.96 places from the fourteenth-worst record, the best record among the teams that missed the playoffs.
+The old lottery rewards losing. A team that dropped from the fifth-worst record to the worst would have gained 1.32 draft places on average. Figure~\ref{fig:positions} shows the same measure from every starting position, where a starting position is a team's rank among the 14 records that missed the playoffs, counted from the worst. The old lottery's reward was positive from every position in every season. It reached 9.96 places from the fourteenth-worst record, the best record among the teams that missed the playoffs.
 
 The 3-2-1 lottery removes that reward at the bottom of the standings. From the fifth-worst record, a drop to the worst costs a team 0.63 places, because the three worst records hold fewer chances in the drawing than the seven above them. The reward returns in the middle of the standings, as Section 1 described. It is 0.36 places from the eleventh-worst record and 2.04 from the fourteenth-worst.
 
 Under Simple COLA, losing costs a team places from every position, 0.94 from the fifth-worst record and 3.50 from the fourteenth-worst. The reward was never positive, from any position in any season, as Theorem 1 requires.
-\begin{table}[H]
+\begin{figure}[htbp]
 \centering
-\small
-\setlength{\tabcolsep}{4pt}
-\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}>{\raggedleft\arraybackslash}p{0.16\linewidth}@{}}
-\toprule
-\textbf{Starting position} & \textbf{Old lottery} & \textbf{3-2-1} & \textbf{Simple COLA} \\
-\midrule
-Second-worst record & +0.21 & 0.00 & −0.27 \\
-Third-worst & +0.41 & −0.02 & −0.49 \\
-Fourth-worst & +0.80 & −0.61 & −0.72 \\
-Fifth-worst & +1.32 & −0.63 & −0.94 \\
-Sixth-worst & +1.90 & −0.61 & −1.22 \\
-Seventh-worst & +2.56 & −0.55 & −1.35 \\
-Eighth-worst & +3.41 & −0.46 & −1.66 \\
-Ninth-worst & +4.40 & −0.29 & −1.98 \\
-Tenth-worst & +5.56 & −0.02 & −2.06 \\
-Eleventh-worst & +6.67 & +0.36 & −2.28 \\
-Twelfth-worst & +7.71 & +0.77 & −2.61 \\
-Thirteenth-worst & +8.80 & +1.32 & −3.00 \\
-Fourteenth-worst & +9.96 & +2.04 & −3.50 \\
-\bottomrule
-\end{tabular}
-\caption{The reward for losing, $R$, from each starting position, in draft places. A positive figure means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its column. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position.}
-\label{tab:positions}
-\end{table}
+\includegraphics[width=\linewidth]{figures/fig3-reward-by-position}
+\caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. Appendix C gives each value.}
+\label{fig:positions}
+\end{figure}
 
 \subsection{Help for the teams that wait}
 
 Under both lotteries, nothing grows with waiting, so the help for a longer wait, $H$, is zero. Under Simple COLA, a team that moves from the fifth-longest wait to the longest gains 6.3 places.
 
-The longest wait, $L$, shows what that help does over 25 seasons. It averaged 16.4 seasons under the old lottery and 16.3 under 3-2-1, a difference of 0.1 seasons (−1.6 to 1.8). The interval includes zero, so 3-2-1 gives the teams that wait no more help than the old lottery did. Under Simple COLA, the longest wait averaged 5.5 seasons, 10.8 fewer than under 3-2-1 (9.4 to 12.1). It was five or six seasons in every league, against 10 to 25 under 3-2-1.
+The longest wait, $L$, shows what that help does over 25 seasons. It averaged 16.4 seasons under the old lottery and 16.3 under 3-2-1, a difference of 0.1 seasons (−1.6 to 1.8). The interval includes zero, so 3-2-1 gives the teams that wait no more help than the old lottery did. Under Simple COLA, the longest wait averaged 5.5 seasons, 10.8 fewer than under 3-2-1 (9.4 to 12.1). It was five or six seasons in every league, against 10 to 25 under 3-2-1 (Figure~\ref{fig:longest}).
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{figures/fig4-longest-wait}
+\caption{The longest wait in each of the 30 leagues under each mechanism, where a wait counts the seasons in a row with neither a playoff series win nor a top-three pick. Each dot is one league. The black bar and the column on the right give the average over the 30 leagues, as in Table~\ref{tab:results}.}
+\label{fig:longest}
+\end{figure}
 
 \subsection{Long-term parity}
 
@@ -461,7 +423,7 @@ Simple COLA has one cost on parity, the first of the two named in Section 1. Its
 
 Table~\ref{tab:results} also reports the equal-odds lottery and five more COLA mechanisms. The equal-odds lottery favors no team, so it gives no reward for losing and no help for a longer wait. Its longest wait averaged 16.0 seasons, 0.2 fewer than under 3-2-1 (−1.6 to 2.1).
 
-Against 3-2-1, every COLA mechanism shortened the longest wait. The five besides Simple COLA shortened it by 2.2 to 6.9 seasons, and each of their intervals excludes zero. Three of them, Waitlist COLA, Full-lottery COLA, and Countdown COLA, also gave no reward for losing from any position in any season.
+Against 3-2-1, every COLA mechanism shortened the longest wait (Figure~\ref{fig:longest}). The five besides Simple COLA shortened it by 2.2 to 6.9 seasons, and each of their intervals excludes zero. Three of them, Waitlist COLA, Full-lottery COLA, and Countdown COLA, also gave no reward for losing from any position in any season.
 
 Simple COLA is therefore one of several COLA mechanisms that remove the reward for losing and help the teams that wait. Of the nine mechanisms, it gives the most help, and it is the only one that holds no drawing. Section 8 turns to how a league might choose among them.
 

@@ -33,7 +33,10 @@
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
- * Usage: node design_check.js [runsDir=runs/frontier] [realFile=data/nba-data.json]
+ * With --json <file>, it also writes the numbers behind Figure 2 to that
+ * file, for make_figures.py.
+ *
+ * Usage: node design_check.js [runsDir=runs/frontier] [realFile=data/nba-data.json] [--json file]
  */
 
 "use strict";
@@ -42,8 +45,11 @@ const fs = require("fs");
 const path = require("path");
 const M = require("./measures.js");
 
-const ROOT = process.argv[2] ?? "runs/frontier";
-const REAL = process.argv[3] ?? "data/nba-data.json";
+const args = process.argv.slice(2);
+const jsonAt = args.indexOf("--json");
+const JSON_OUT = jsonAt >= 0 ? args.splice(jsonAt, 2)[1] : null;
+const ROOT = args[0] ?? "runs/frontier";
+const REAL = args[1] ?? "data/nba-data.json";
 
 const MECHS = [
 	["nba", "Old lottery"],
@@ -293,6 +299,7 @@ const scored = realAll.filter((s) => s.teams.filter((t) => t.missed).length === 
 console.log(`\n3. The two help measures on real standings, ${scored[0].label} to ${scored.at(-1).label} (${scored.length} seasons), draft places\n`);
 const W3 = [40, 28, 20, 18, 24];
 console.log(pad(["measure and mechanism", "real mean [95% interval]", "real seasons > 0", "sim, 25 seasons", "sim, seasons 6 to 25"], W3));
+const figure2 = []; // the numbers behind Figure 2, written with --json
 for (const [name, tag, fn] of ROWS) {
 	const values = bySeason(realAll, fn).filter((v) => v != null);
 	const real = M.interval(values);
@@ -300,6 +307,7 @@ for (const [name, tag, fn] of ROWS) {
 	const all = mean(sim.map((v) => mean(v.filter((x) => x != null))));
 	const late = mean(sim.map((v) => mean(v.slice(START_UP_SEASONS).filter((x) => x != null))));
 	const inside = (x) => (x >= real.lo && x <= real.hi ? "" : " OUTSIDE");
+	figure2.push({ name, tag, real: { mean: real.mean, lo: real.lo, hi: real.hi, seasons: values.length }, sim: all, simFromSeason6: late });
 	console.log(
 		pad(
 			[
@@ -314,3 +322,5 @@ for (const [name, tag, fn] of ROWS) {
 	);
 }
 console.log("");
+
+if (JSON_OUT) fs.writeFileSync(JSON_OUT, JSON.stringify({ realStandings: figure2 }, null, 1));
