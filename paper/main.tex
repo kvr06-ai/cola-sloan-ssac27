@@ -451,6 +451,14 @@ Section 2 described two plans that use an auction. An auction still needs a rule
 
 All of our comparisons come from one simulator. It shows how the mechanisms compare when everything else is equal, because every mechanism ran on the same 30 leagues. On the NBA's real standings, the reward for losing and the help for a longer wait came out as they did in the simulated leagues (Figure~\ref{fig:realcheck}). The simulator shows the size of each effect less exactly. Its teams stay strong or weak for longer than NBA teams do (Section 6.5), so every mechanism's longest wait would likely be shorter in the NBA.
 
+\section{Conclusion}
+
+For decades, the NBA has traded help for its weakest teams against the tanking that this help invites. The tradeoff came from measuring weakness by one season's record. COLA measures it by how long a team has gone without playoff success, so priority builds while a team waits and is spent when the team succeeds. Under the assumptions of Section 4, losing more games never earns a team an earlier pick under Simple COLA in that season's draft.
+
+Simple COLA is the plainest member of the family. It orders the teams without a series win by how long they have waited, and it holds no drawing. In 30 simulated leagues, it gave no reward for losing from any position, cut the longest wait from 16.3 seasons under 3-2-1 to 5.5, and kept the wait for the next series win level with the old lottery and 3-2-1. Sections 5 and 7 measure its costs, including a return to the playoffs 0.18 seasons slower than under 3-2-1.
+
+The wider family lets a league choose its own balance of targeted help, parity, simplicity, and robustness, and the NBA's 3-2-1 already sits at its edge. Helping the weakest teams and ending tanking can go together once weakness is measured over many seasons.
+
 \clearpage
 \bibliographystyle{IEEEtran}
 \bibliography{references}
