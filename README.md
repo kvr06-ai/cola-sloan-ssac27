@@ -1,75 +1,158 @@
 # Practical Incentive-Compatible Drafts: Carry-Over Lottery Allocation
 
-Paper, simulation code and data for our submission to the MIT Sloan Sports
-Analytics Conference 2027 (SSAC27), in the Basketball track.
+This repository holds the paper, code, and data for our submission to the MIT
+Sloan Sports Analytics Conference 2027 (SSAC27), in the Basketball track. The
+paper proposes Carry-Over Lottery Allocation (COLA), a new way to set the order
+of the National Basketball Association (NBA) draft. The paper is a working
+draft.
 
-Carry-Over Lottery Allocation (COLA) measures a team's weakness by its playoff
-results over many seasons. Each team carries a draft priority from one season
-to the next. Priority grows while the team goes without playoff success and
-falls when it wins a playoff series or receives a high pick, so losing more
-games this season adds nothing. The paper presents COLA as a family of draft
-mechanisms, proves that a member of the family is incentive compatible under
-stated assumptions, and compares nine mechanisms inside a full basketball
-simulator on help for long-waiting teams, long-term parity, and the reward for
-losing.
+## The problem
 
-This is a working draft. The paper in `paper/` is still being written, and the
-interactive results page shows the simulations of an earlier draft.
+Each year, NBA teams take turns choosing new players in the draft. Each turn is
+called a pick, and an earlier pick gives a team a better choice. To help weak
+teams improve, the draft gives earlier picks to teams with worse records.
 
-## Repository layout
+That rule gives a weak team a reason to lose games on purpose, so that it
+finishes lower and picks earlier. Losing on purpose is called tanking. The NBA
+uses a lottery, a random drawing, to decide which of the teams that missed the
+playoffs get the earliest picks. Under the lottery it used from 2019 to 2026, a
+worse record brought better odds, so losing still paid.
 
-    paper/                  the paper: main.tex, references.bib, the built
-                            main.pdf, and its figures in figures/
-    abstract-submission/    the abstract as submitted to SSAC27 and accepted,
-                            its source, and the script that counts its words
-    testbed/harness/        the simulation driver, the analysis scripts, the
-                            result files of the simulations and the NBA data
-    results-page/           source of the public interactive results page
-    original-study/         code and data of an earlier COLA preprint
-                            (arXiv:2602.02487), by its authors
-    LICENSE                 the MIT License, for the code and result files
+At the same conference in 2020,
+[Banchio and Munro](https://www.sloansportsconference.com/research-papers/a-no-tanking-draft-allocation-policy)
+studied lotteries that set their odds by the final standings, the ranking of
+teams by record at the end of one season. They proved that any such lottery
+gives some team a reason to lose, unless every team that missed the playoffs
+gets the same odds. A lottery of this kind therefore cannot both help the
+weakest teams and remove the reason to lose.
+
+## The idea
+
+COLA measures a team's weakness by its playoff results over many seasons. Each
+team holds a score called its draft priority. The score carries over from one
+season to the next, which gives COLA its name. A playoff series is one round of
+the playoffs, played between two teams. Priority grows in each season a team
+goes without a series win, and it falls when the team wins a series or receives
+a top pick. Regular-season losses do not enter a team's priority, so a draft
+ordered by priority need not reward losing.
+
+COLA is a family of rules for setting the draft order, and the paper calls each
+rule a mechanism. The mechanisms differ in how priority grows, how it falls,
+and how it turns into picks.
+
+The paper focuses on the simplest mechanism, Simple COLA, which holds no
+drawing. Under Simple COLA, a team's priority is its wait, the number of
+seasons since it last won a playoff series or received one of the first three
+picks. The teams without a series win this season pick first, longest wait
+first. Between two teams with the same wait, the one with more wins this season
+picks first.
+
+A mechanism is called incentive compatible when no team can get an earlier pick
+by losing on purpose. The paper proves that Simple COLA is incentive compatible
+under assumptions it states about how teams behave.
+
+## What the paper does
+
+The paper compares nine mechanisms in a basketball simulator, on the same 30
+simulated leagues of 25 seasons each. Three of them are lotteries that look at
+one season only. They are the NBA's lottery from 2019 to 2026, its new lottery
+called 3-2-1, and a lottery with equal odds for every team that missed the
+playoffs. The NBA adopted 3-2-1 in May 2026, and it starts with the 2027 draft.
+It gives each of 16 teams one, two, or three chances in the drawing. The other
+six mechanisms are COLA mechanisms, Simple COLA among them.
+
+The paper measures three things:
+
+- help for the teams that have waited longest;
+- long-term parity, meaning how evenly playoff success spreads across teams
+  over many seasons;
+- the reward for losing, meaning how many draft places a team would gain by
+  finishing with a worse record.
+
+In the simulations, Simple COLA gave no reward for losing from any position in
+the standings. The longest stretch any team went without a series win or a
+top-three pick averaged 16.3 seasons under 3-2-1 and 5.5 under Simple COLA. The
+average wait for a team's next series win was within about a tenth of a season
+of the wait under 3-2-1. Sections 5 and 7 of the paper measure what Simple COLA
+costs.
+
+## What is in this repository
+
+    paper/                 the paper's source (main.tex, references.bib), the
+                           built paper (main.pdf), and the figures
+    abstract-submission/   the abstract as submitted to SSAC27 and accepted,
+                           its source, and the script that counts its words
+    testbed/harness/       the code that runs each mechanism in the simulator,
+                           the simulation results, the NBA data, and the
+                           scripts behind every number in the paper
+    results-page/          the source of an interactive results page from an
+                           earlier draft (see Earlier work)
+    original-study/        the code and data of an earlier paper on COLA (see
+                           Earlier work)
+    LICENSE                the MIT License
 
 ## Reproducing the paper's numbers
 
+Every number, table, and figure in the paper comes from a script in
+`testbed/harness/`. The scripts read only files in this repository, so you can
+check every number without the simulator. Each script finishes in under a
+minute and prints the same output every time.
+
 You need Node.js 18 or later. Drawing the figures also needs Python 3 with
-matplotlib (`pip install matplotlib`). Each command below reads only files in
-this repository, finishes in under a minute, and gives the same output every
-time.
+matplotlib, a plotting library (`pip install matplotlib`). Run each command
+below from `testbed/harness/`.
 
     cd testbed/harness
 
-| Command | What it reproduces |
-|:--|:--|
-| `node abstract_table.js --table1` | The table in the abstract, and the summary figures in Section 1 |
-| `node simple_losing_check.js` | Section 4: the test of Theorem 1 on the simulated leagues, and what one more loss costs a team |
-| `node simple_losing_check.js --cutoff` | Section 5.2: the line between the third and fourth picks |
-| `node limits_check.js` | Section 5: the line at the end of each pool, and the seasons after a top-three pick |
-| `node design_check.js` | Section 6: the design of the simulations, and Figures 2 and 3 |
-| `node results_check.js` | Sections 7 and 8.1: the results for the nine mechanisms, Table 2, and Figures 4 to 7 |
-| `node draft2026_check.js` | Section 8.2: the 2026 draft under each mechanism, and Figure 8 |
-| `python3 make_figures.py` | Figures 1 to 8, drawn into `paper/figures/` from the three scripts above |
-| `node verify_classic.js runs/frontier/classic.json` | A check of the Classic COLA simulations against the mechanism's rules |
-| `node t321_adopted_check.js runs/frontier/t321.json` | The same check for 3-2-1 |
+| Command | What it prints | In the paper |
+|:--|:--|:--|
+| `node abstract_table.js --table1` | The abstract's table and the summary numbers | Abstract, Section 1 |
+| `node simple_losing_check.js` | A test of the proof on every simulated season of Simple COLA, and what one more loss costs a team | Section 4 |
+| `node simple_losing_check.js --cutoff` | The same, plus whether the team picking third could gain over two drafts by losing enough games to pick fourth | Section 5.2 |
+| `node limits_check.js` | What a team gains by landing just inside the group of teams that picks first, and how teams fare after a top-three pick | Sections 5.1 and 5.3 |
+| `node design_check.js` | How the simulations were set up, and how the simulated leagues compare with the real NBA | Section 6, Figures 2 and 3 |
+| `node results_check.js` | All nine mechanisms on every measure, and how each differs from 3-2-1 | Sections 7 and 8.1, Table 2, Figures 4 to 7 |
+| `node draft2026_check.js` | The 2026 draft under each mechanism, from the real 2025-26 standings and playoff results | Section 8.2, Figure 8 |
+| `python3 make_figures.py` | Draws the figures into `paper/figures/` | Figures 1 to 8 |
+
+Two more scripts check that the stored simulations followed the written rules
+of two mechanisms, 3-2-1 and Classic COLA. Classic COLA is a COLA mechanism
+that draws the first four picks with chances set by priority.
+
+    node t321_adopted_check.js runs/frontier/t321.json
+    node verify_classic.js runs/frontier/classic.json
 
 ## The simulations and the data
 
-The simulated leagues come from ZenGM Basketball-GM, a basketball simulator
-with public code. Our driver sets the first-round draft order under each
-mechanism, and the simulator plays out everything else: every game, and every
-trade, signing and draft selection, with its own general managers running all
-30 teams. One seed fixes every chance event in a league, so a given seed and
-mechanism reproduce a league.
+The simulator is [ZenGM Basketball-GM](https://github.com/zengm-games/zengm),
+a basketball management game whose code is public. It builds fictional leagues
+shaped like the NBA, with 30 teams that each play 82 games a season. It plays
+every game, and its built-in computer managers make every trade, contract
+signing, and draft choice for all 30 teams. Our code sets the first-round draft
+order under each mechanism, and the simulator does everything else.
 
-`testbed/harness/runs/frontier/` holds one result file for each mechanism, with
-30 leagues of 25 seasons in each. Every mechanism starts from the same 30
-leagues. `testbed/harness/data/nba-data.json` holds the NBA's standings,
-playoff results and first-round picks from 1999-00 to 2025-26, compiled from
-Basketball Reference.
+A simulated league depends on chance at every step, from the players it starts
+with to each shot and each lottery drawing. One number, called a random seed,
+fixes every chance event. A given seed and mechanism therefore always produce
+the same league. All nine mechanisms run on the same 30 seeds, so the paper can
+compare any two of them league by league.
 
-`testbed/harness/README.md` describes both file formats and how to run the
-simulations again, which needs the simulator and takes about 11 hours.
+`testbed/harness/runs/frontier/` holds the result file of each mechanism, with
+30 leagues of 25 seasons in each. `testbed/harness/data/nba-data.json` holds
+the NBA's standings, playoff results, and first-round picks from 1999-00 to
+2025-26. They were compiled from
+[Basketball Reference](https://www.basketball-reference.com/), a public
+statistics website. `testbed/harness/README.md` describes both file formats and
+how to run the simulations again. A full rerun needs the simulator and took
+about 11 hours on our machine.
 
 ## Building the paper
+
+The paper is written in LaTeX, a system for typesetting documents, and
+`paper/main.pdf` is the built copy. To build it again, install
+[Tectonic](https://tectonic-typesetting.github.io/), a LaTeX engine that
+downloads the packages it needs. Then run these commands from the top folder of
+the repository.
 
     tectonic paper/main.tex
     tectonic abstract-submission/ssac27-abstract.tex
@@ -87,18 +170,22 @@ License (see `LICENSE`). Three things sit outside it:
   available from its developer under its own license, which is not an
   open-source license.
 
-The NBA standings, playoff results and draft picks in
+The NBA standings, playoff results, and draft picks in
 `testbed/harness/data/nba-data.json` are facts compiled from Basketball
 Reference, shared here so the results can be reproduced.
 
-## Related
+## Earlier work
 
-The code and data behind an earlier preprint on COLA, Highley, Duncan, and
-Volkov (2026), "Carry-Over Lottery Allocation: Practical Incentive-Compatible
-Drafts" (<https://arxiv.org/abs/2602.02487>), are in `original-study/`,
-merged with their full commit history from
-<https://github.com/vilka-9999/carry_over_lotter_allocation_research>.
+A preprint is a paper shared publicly before peer review. An earlier preprint
+on COLA is Highley, Duncan, and Volkov (2026),
+[Carry-Over Lottery Allocation: Practical Incentive-Compatible Drafts](https://arxiv.org/abs/2602.02487).
+Its code and data are in `original-study/`, merged with their full commit
+history from <https://github.com/vilka-9999/carry_over_lotter_allocation_research>.
 
-The published interactive backtester covering 26 NBA seasons lives at
-<https://kvr06-ai.github.io/cola-manipulation-bound/>, with a results and
-scenario playground at <https://kvr06-ai.github.io/cola-manipulation-bound/sweep/>.
+Two interactive pages come from earlier work on COLA, before this paper. The
+[COLA Explorer](https://kvr06-ai.github.io/cola-manipulation-bound/) shows how
+26 years of NBA drafts would have gone under five versions of COLA. The
+[results page](https://kvr06-ai.github.io/cola-manipulation-bound/sweep/) shows
+the simulations of an earlier draft, with 48 leagues of 15 seasons for each
+mechanism, and a playground that runs three lotteries on team histories you
+enter. Its source is in `results-page/`.
