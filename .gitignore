@@ -12,6 +12,9 @@ paper/*.fdb_latexmk
 # SSAC's own paper template, kept locally for the final formatting pass
 paper/SSAC paper template.pdf
 
+# Copies of the cited papers, kept locally for checking the references
+references/
+
 # macOS
 .DS_Store
 

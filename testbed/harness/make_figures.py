@@ -10,7 +10,7 @@ for the Word version. The files are named by content:
     reward-by-position   Section 7.1, the reward for losing by starting position
     longest-wait         Section 7.2, the longest wait in each league
     next-series-win      Section 7.3, the wait for the next series win in each league
-    mechanism-map        Section 8.1, the nine mechanisms on the reward for losing
+    mechanism-map        Section 8.1, the ten mechanisms on the reward for losing
                          and the longest wait
     draft-2026           Section 8.2, the 2026 draft under each mechanism
 
@@ -344,7 +344,8 @@ def fig_longest_wait(results):
 	mechs = results["mechanisms"]
 	waits = results["longestWait"]
 	n = len(mechs)
-	fig, ax = plt.subplots(figsize=(WIDTH, 3.0))
+	# 3.0 inches held nine rows; each row keeps that height.
+	fig, ax = plt.subplots(figsize=(WIDTH, 3.0 * (n + 0.25) / 9.25))
 	fig.subplots_adjust(left=0.2, right=0.9, top=0.93, bottom=0.155)
 	at = transforms.blended_transform_factory(ax.transAxes, ax.transData)
 	for i, m in enumerate(mechs):
@@ -358,10 +359,11 @@ def fig_longest_wait(results):
 		ax.plot([avg, avg], [y - 0.42, y + 0.42], color=INK, lw=1.0, zorder=4)
 		ax.text(1.045, y, f"{avg:.1f}", transform=at, ha="right", va="center", fontsize=8.5)
 	ax.text(1.045, n - 0.35, "Average", transform=at, ha="right", va="bottom", fontsize=8, color=INK_2)
-	# The three lotteries sit above the six COLA mechanisms.
+	# The three lotteries sit above the seven COLA mechanisms.
 	ax.axhline(n - 3.5, color=GRID, lw=0.9, zorder=1)
 	ax.axvline(25, color=INK_2, lw=0.7, ls=(0, (2, 2)), zorder=1)
-	ax.text(24.7, 0.5, "Every league\nlasts 25 seasons", ha="right", va="center", fontsize=7.5, color=INK_2, linespacing=1.05)
+	# Placed between the Countdown and Simple COLA rows, whose dots stop well short of 25.
+	ax.text(24.7, 2.5, "Every league\nlasts 25 seasons", ha="right", va="center", fontsize=7.5, color=INK_2, linespacing=1.05)
 	ax.set_yticks([n - 1 - i for i in range(n)], [m["name"] for m in mechs])
 	ax.tick_params(axis="y", length=0, pad=6)
 	ax.spines["left"].set_visible(False)
@@ -475,7 +477,8 @@ def fig_next_series_win(results, design):
 	waits = results["nextSeriesWin"]
 	nba = design["nbaComparison"]["nba"]["win"]
 	n = len(mechs)
-	height, top, bottom = 3.0, 0.92, 0.155
+	# 3.0 inches held nine rows; each row keeps that height.
+	height, top, bottom = 3.0 * (n + 0.25) / 9.25, 0.92, 0.155
 	fig, ax = plt.subplots(figsize=(WIDTH, height))
 	fig.subplots_adjust(left=0.2, right=0.9, top=top, bottom=bottom)
 	at = transforms.blended_transform_factory(ax.transAxes, ax.transData)
@@ -496,7 +499,7 @@ def fig_next_series_win(results, design):
 		ax.plot([avg, avg], [y - 0.42, y + 0.42], color=INK, lw=1.0, zorder=4)
 		ax.text(1.045, y, f"{avg:.2f}", transform=at, ha="right", va="center", fontsize=8.5)
 	ax.text(1.045, n - 0.35, "Average", transform=at, ha="right", va="bottom", fontsize=8, color=INK_2)
-	# The three lotteries sit above the six COLA mechanisms.
+	# The three lotteries sit above the seven COLA mechanisms.
 	ax.axhline(n - 3.5, color=GRID, lw=0.9, zorder=1)
 	ax.axvline(nba, color=INK_2, lw=0.7, ls=(0, (2, 2)), zorder=1)
 	ax.text(nba, n - 0.35, f"NBA, {nba:.2f}", ha="center", va="bottom", fontsize=7.5, color=INK_2)
@@ -510,7 +513,7 @@ def fig_next_series_win(results, design):
 
 
 # ---------------------------------------------------------------------------
-# Section 8.1: the nine mechanisms on the reward for losing and the longest wait
+# Section 8.1: the ten mechanisms on the reward for losing and the longest wait
 # ---------------------------------------------------------------------------
 
 # Where each name sits beside its dot: offset in points, and alignment.
@@ -524,6 +527,7 @@ MAP_LABELS = {
 	"simplerule": (-7, 0, "right"),
 	"countdown": (7, 0, "left"),
 	"beckett": (-7, 0, "right"),
+	"capped": (0, -10, "center"),
 }
 
 
@@ -567,6 +571,7 @@ DRAFT_COLUMNS = [
 	("full", "Classic,\nWaitlist and\nFull-lottery\nCOLA"),
 	("countdown", "Countdown\nCOLA"),
 	("beckett", "Beckett\nCOLA"),
+	("capped", "Capped\nCOLA"),
 ]
 # Shading for a chance of the first pick, from none to the largest in the figure.
 SHADE = LinearSegmentedColormap.from_list("first-pick", ["#f3f7fd", "#2a78d6", "#123d73"])
@@ -600,7 +605,7 @@ def fig_draft2026(draft):
 	ax.set_xlim(0, WIDTH)
 	ax.set_ylim(height, 0)
 	ax.axis("off")
-	x_wins, x_wait, left, width = 1.72, 2.12, 2.42, 0.6
+	x_wins, x_wait, left, width = 1.38, 1.73, 1.98, 0.57
 	x_simple = left + width * len(DRAFT_COLUMNS) + 0.25
 	small = 7.5
 	ax.text(left + width * len(DRAFT_COLUMNS) / 2, 0.06, "Chance of the first pick, %", ha="center", va="top", fontsize=8, color=INK_2)

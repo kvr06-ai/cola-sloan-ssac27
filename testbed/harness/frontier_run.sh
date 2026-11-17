@@ -25,11 +25,12 @@
 #   simplerule Simple COLA as the abstract words it: the 22 teams without a series
 #              win, ordered by years since a series win or top-3 pick, ties to most
 #              wins, no draw (added 2026-09-28; existing chunks are skipped)
-# Capped COLA is NOT in this run: the harness cap clamps the engine index in
-# engine units, which does not reproduce the wins-based increment of the
-# published variant.
+#   capped     Capped COLA as Highley published it (2026-04-22), computed
+#              driver-side: wins-based stockpile capped at 150, top five drawn
+#              (added 2026-11-17; existing chunks are skipped). The harness cap
+#              dial (C) clamps the engine index instead and is a different rule.
 #
-# All nine share config id 900, so a given seed builds the SAME initial league
+# All configs share config id 900, so a given seed builds the SAME initial league
 # under every mechanism (the seed hash reads the id); the histories separate at
 # the first draw. Cross-mechanism comparisons can therefore be made per seed.
 # The paper's scripts read runs/frontier/ (see README.md).
@@ -80,10 +81,11 @@ run_config simple    '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"'
 run_config full      '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":1}'
 run_config uniform   '{"id":900,"E":14,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"weighted","gamma":0}'
 run_config simplerule '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"simplerule"}'
+run_config capped    '{"id":900,"E":22,"C":null,"S":"unbounded","seasons":'"$S"',"variant":"capped"}'
 wait
 
 echo "concatenating chunks into one file per config..."
-for tag in classic waitlist nba t321 countdown beckett simple full uniform simplerule; do
+for tag in classic waitlist nba t321 countdown beckett simple full uniform simplerule capped; do
   TAG="$tag" OUTDIR="$OUT" node -e '
     const fs=require("fs"), dir=process.env.OUTDIR, tag=process.env.TAG;
     const files=fs.readdirSync(dir).filter(f=>f.startsWith(tag+"_s")&&f.endsWith(".json")).sort();

@@ -2,8 +2,9 @@
 /**
  * Section 5's numbers, from the 25-season run (30 leagues x 25 seasons each).
  *
- * Reads runs/frontier/{nba,t321,full,simplerule}.json and prints, for the old
- * lottery, the adopted 3-2-1, Full-lottery COLA and Simple COLA:
+ * Reads runs/frontier/{nba,t321,full,simplerule,capped}.json and prints, for
+ * the old lottery, the adopted 3-2-1, Full-lottery COLA, Simple COLA and
+ * Capped COLA:
  *
  * 1. The pool line. Every mechanism's pool ends somewhere, and a team just
  *    inside it picks earlier than a team just outside. For each mechanism this
@@ -25,7 +26,12 @@
  *                    the pool (ties to more wins), at the pick the simulator
  *                    gave it. Other side = pick 23, the first pick among the
  *                    eight series winners.
- *    For the two COLA mechanisms the team is the one with the highest
+ *      Capped COLA   line = a first-round series. Team = the most tickets in
+ *                    the pool (ties to more wins), at its exact expected pick
+ *                    (measures.js). Other side = the first pick outside the
+ *                    pool, which moves with the pool's size from season to
+ *                    season, so its average is printed.
+ *    For the three COLA mechanisms the team is the one with the highest
  *    priority, so the figure is the most any team on the line can gain.
  * 2. Repeat top-three picks. Of the top-three picks made from each league's
  *    third season on, the share that went to a team that had received one in
@@ -45,6 +51,7 @@
 const fs = require("fs");
 const path = require("path");
 const { pickDistribution, buildPool } = require("./pick_dist.js");
+const M = require("./measures.js");
 
 const ROOT = process.argv[2] ?? "runs/frontier";
 const MECHS = [
@@ -52,6 +59,7 @@ const MECHS = [
 	["t321", "3-2-1"],
 	["full", "Full-lottery COLA"],
 	["simplerule", "Simple COLA"],
+	["capped", "Capped COLA"],
 ];
 
 // Simulated drawings per season for 3-2-1, the count abstract_table.js uses.
@@ -196,7 +204,24 @@ function lineSimple(reps) {
 	return out;
 }
 
-const LINE = { nba: lineOldLottery, t321: lineT321, full: lineFull, simplerule: lineSimple };
+// Capped COLA returns the first pick outside the pool with each season's figure,
+// since that pick follows the pool's size.
+function lineCapped(reps) {
+	const inside = [];
+	const outside = [];
+	for (const rep of reps) {
+		M.walk(M.fromSim(rep), (season, state) => {
+			const tickets = M.cappedTickets(season.teams, state.cappedBefore);
+			const pool = season.teams.filter((t) => t.cappedPool);
+			const top = pool.slice().sort((a, b) => tickets[b.id] - tickets[a.id] || b.wins - a.wins)[0];
+			inside.push(M.cappedPicks(season.teams, tickets).get(top.id));
+			outside.push(pool.length + 1);
+		});
+	}
+	return { inside, outside };
+}
+
+const LINE = { nba: lineOldLottery, t321: lineT321, full: lineFull, simplerule: lineSimple, capped: lineCapped };
 
 // ---------------------------------------------------------------------------
 // 2 and 3. Top-three picks: repeats, the season after, and the gap between them
@@ -237,9 +262,12 @@ const rows = {};
 for (const [tag, name] of MECHS) {
 	const reps = load(tag);
 	rows[tag] = { reps };
-	const inside = LINE[tag](reps);
+	const line = LINE[tag](reps);
+	const inside = Array.isArray(line) ? line : line.inside;
 	const m = mean(inside);
-	console.log(name.padEnd(20) + [m.toFixed(2), String(FIRST_OUTSIDE[tag]), (FIRST_OUTSIDE[tag] - m).toFixed(2), String(inside.length)].map((s) => s.padStart(18)).join(""));
+	const other = Array.isArray(line) ? FIRST_OUTSIDE[tag] : mean(line.outside);
+	const otherText = Array.isArray(line) ? String(other) : other.toFixed(2);
+	console.log(name.padEnd(20) + [m.toFixed(2), otherText, (other - m).toFixed(2), String(inside.length)].map((s) => s.padStart(18)).join(""));
 }
 
 console.log("\n2 and 3. Top-three picks\n");

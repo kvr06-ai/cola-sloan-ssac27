@@ -53,13 +53,13 @@ under assumptions it states about how teams behave.
 
 ## What the paper does
 
-The paper compares nine mechanisms in a basketball simulator, on the same 30
+The paper compares ten mechanisms in a basketball simulator, on the same 30
 simulated leagues of 25 seasons each. Three of them are lotteries that look at
 one season only. They are the NBA's lottery from 2019 to 2026, its new lottery
 called 3-2-1, and a lottery with equal odds for every team that missed the
 playoffs. The NBA adopted 3-2-1 in May 2026, and it starts with the 2027 draft.
 It gives each of 16 teams one, two, or three chances in the drawing. The other
-six mechanisms are COLA mechanisms, Simple COLA among them.
+seven mechanisms are COLA mechanisms, Simple COLA among them.
 
 The paper measures three things:
 
@@ -111,16 +111,18 @@ below from `testbed/harness/`.
 | `node simple_losing_check.js --cutoff` | The same, plus whether the team picking third could gain over two drafts by losing enough games to pick fourth | Section 5.2 |
 | `node limits_check.js` | What a team gains by landing just inside the group of teams that picks first, and how teams fare after a top-three pick | Sections 5.1 and 5.3 |
 | `node design_check.js` | How the simulations were set up, and how the simulated leagues compare with the real NBA | Section 6, Figures 2 and 3 |
-| `node results_check.js` | All nine mechanisms on every measure, and how each differs from 3-2-1 | Sections 7 and 8.1, Table 2, Figures 4 to 7 |
+| `node results_check.js` | All ten mechanisms on every measure, and how each differs from 3-2-1 | Sections 7 and 8.1, Table 2, Figures 4 to 7 |
 | `node draft2026_check.js` | The 2026 draft under each mechanism, from the real 2025-26 standings and playoff results | Section 8.2, Figure 8 |
 | `python3 make_figures.py` | Draws the figures into `paper/figures/` | Figures 1 to 8 |
 
-Two more scripts check that the stored simulations followed the written rules
-of two mechanisms, 3-2-1 and Classic COLA. Classic COLA is a COLA mechanism
-that draws the first four picks with chances set by priority.
+Three more scripts check that the stored simulations followed the written
+rules of three mechanisms, 3-2-1, Classic COLA and Capped COLA. Classic COLA is
+a COLA mechanism that draws the first four picks with chances set by priority.
+Capped COLA is one whose tickets grow by a team's wins, up to a cap.
 
     node t321_adopted_check.js runs/frontier/t321.json
     node verify_classic.js runs/frontier/classic.json
+    node verify_capped.js runs/frontier/capped.json
 
 ## The simulations and the data
 
@@ -134,7 +136,7 @@ order under each mechanism, and the simulator does everything else.
 A simulated league depends on chance at every step, from the players it starts
 with to each shot and each lottery drawing. One number, called a random seed,
 fixes every chance event. A given seed and mechanism therefore always produce
-the same league. All nine mechanisms run on the same 30 seeds, so the paper can
+the same league. All ten mechanisms run on the same 30 seeds, so the paper can
 compare any two of them league by league.
 
 `testbed/harness/runs/frontier/` holds the result file of each mechanism, with
