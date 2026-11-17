@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Section 8's illustration: what each of the nine mechanisms would have done
+ * Section 8's illustration: what each of the ten mechanisms would have done
  * with the 2026 draft.
  *
  * Reads data/nba-data.json and scores the 2025-26 season on its own final
@@ -21,6 +21,13 @@
  *            PLAYOFF_FACTORS and DRAFT_LOTTERY_FACTORS, rounded as there).
  *   count    Beckett COLA: seasons since a series win, a top-six finish in the
  *            conference by wins, or the first pick (measures.js walk()).
+ *   stock    Capped COLA: each season's wins for a team that reached the
+ *            playoffs through the play-in or missed them, up to 150 tickets;
+ *            10% off for a play-in team that lost in round 1, 20% off for any
+ *            other round-1 loser; 40% to 100% off for 1 to 4 series won, and
+ *            100% to 20% off for picks 1 to 5 (measures.js walk() and
+ *            cappedTickets()). Its pool leaves out the teams that won a series
+ *            in 2025-26 or 2024-25 and the teams with a top-five pick in 2025.
  *
  * For each team it prints the chance of the first pick under each mechanism
  * with a drawing, and its pick under Simple COLA, which holds no drawing.
@@ -37,6 +44,7 @@
  *   countdown the chance of being the last team placed when the order is
  *             filled from the last pick up (measures.js countdownPicks()).
  *   beckett   entries, count times wins, as a share of the pool's entries.
+ *   capped    tickets as a share of the pool's tickets.
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
@@ -74,6 +82,7 @@ const MECHS = [
 	["full", "Full-lottery COLA"],
 	["countdown", "Countdown COLA"],
 	["beckett", "Beckett COLA"],
+	["capped", "Capped COLA"],
 ];
 
 const raw = JSON.parse(fs.readFileSync(REAL, "utf8"));
@@ -98,7 +107,7 @@ M.walk(league, (s, st, index) => {
 	}
 	if (index === last) {
 		// walk() reuses its objects, so keep copies taken before this draft.
-		state = { wait: { ...st.wait }, count: { ...st.count }, past: JSON.parse(JSON.stringify(st.past)) };
+		state = { wait: { ...st.wait }, count: { ...st.count }, cappedBefore: { ...st.cappedBefore }, past: JSON.parse(JSON.stringify(st.past)) };
 		season = s;
 		return;
 	}
@@ -213,6 +222,10 @@ chance.countdown = Object.fromEntries([...countdown].map(([id, d]) => [id, d[1]]
 // Beckett COLA: entries as a share of the pool's entries.
 chance.beckett = share(Object.fromEntries(teams.filter((t) => state.count[t.id] >= 2).map((t) => [t.id, state.count[t.id] * t.wins])));
 
+// Capped COLA: tickets as a share of the pool's tickets. walk() marked the pool.
+const stock = M.cappedTickets(teams, state.cappedBefore);
+chance.capped = share(Object.fromEntries(teams.filter((t) => t.cappedPool).map((t) => [t.id, stock[t.id]])));
+
 // Simple COLA: the pick itself. A tie on both wait and wins is a coin flip,
 // which counts as half a place, as in measures.js.
 const simple = Object.fromEntries(
@@ -223,7 +236,7 @@ const simple = Object.fromEntries(
 // Print
 // ---------------------------------------------------------------------------
 
-const inAnyPool = new Set([...missed.map((t) => t.id), ...Object.keys(roles), ...Object.keys(simple), ...Object.keys(chance.beckett)]);
+const inAnyPool = new Set([...missed.map((t) => t.id), ...Object.keys(roles), ...Object.keys(simple), ...Object.keys(chance.beckett), ...Object.keys(chance.capped)]);
 const rows = [...inAnyPool]
 	.map((id) => byId.get(id))
 	.sort((a, b) => a.wins - b.wins || a.id.localeCompare(b.id))
@@ -235,6 +248,7 @@ const rows = [...inAnyPool]
 		wait: state.wait[t.id],
 		tickets: tickets[t.id],
 		count: state.count[t.id],
+		stock: stock[t.id],
 		// null for a team outside the mechanism's pool; 0 for a pool team that
 		// cannot receive the first pick.
 		firstPick: Object.fromEntries(MECHS.map(([m]) => [m, t.id in chance[m] ? chance[m][t.id] : null])),
@@ -242,18 +256,18 @@ const rows = [...inAnyPool]
 	}));
 
 const pct = (x) => (x == null ? "-" : (100 * x).toFixed(1));
-const W = [24, 5, 5, 8, 6, ...MECHS.map(() => 9), 8];
+const W = [24, 5, 5, 8, 6, 7, ...MECHS.map(() => 9), 8];
 const pad = (cells) => cells.map((c, i) => (i === 0 ? String(c).padEnd(W[0]) : String(c).padStart(W[i]))).join("");
 console.log(`\nThe 2026 draft under each mechanism, scored on the ${SEASON} season with priorities carried over from ${league[0].label}\n`);
 console.log("Chance of the first pick, in percent; Simple COLA holds no drawing, so its column is the pick itself\n");
-console.log(pad(["team", "wins", "wait", "tickets", "count", ...MECHS.map(([, n]) => n.replace(" COLA", "").replace(" lottery", "")), "Simple"]));
+console.log(pad(["team", "wins", "wait", "tickets", "count", "stock", ...MECHS.map(([, n]) => n.replace(" COLA", "").replace(" lottery", "")), "Simple"]));
 for (const r of rows) {
-	console.log(pad([r.name, r.wins, r.wait, r.tickets, r.count, ...MECHS.map(([m]) => pct(r.firstPick[m])), r.simplePick ?? "-"]));
+	console.log(pad([r.name, r.wins, r.wait, r.tickets, r.count, r.stock, ...MECHS.map(([m]) => pct(r.firstPick[m])), r.simplePick ?? "-"]));
 }
 console.log("");
 console.log(`Chances sum to 100% in every column: ${MECHS.every(([m]) => Math.abs(Object.values(chance[m]).reduce((s, x) => s + x, 0) - 1) < 1e-12)}`);
 console.log(`3-2-1 pool: ${Object.keys(roles).length} teams; losers of the seven-eight games: ${Object.keys(roles).filter((id) => roles[id] === "seed8").join(", ")}; barred from the first pick: ${chance.t321Barred.join(", ") || "none"}`);
-console.log(`Simple COLA's pool: ${Object.keys(simple).length} teams; Beckett COLA's pool: ${Object.keys(chance.beckett).length} teams`);
+console.log(`Simple COLA's pool: ${Object.keys(simple).length} teams; Beckett COLA's pool: ${Object.keys(chance.beckett).length} teams; Capped COLA's pool: ${Object.keys(chance.capped).length} teams`);
 console.log(`Countdown COLA's distributions reproduce measures.js countdownPicks() for all ${countdown.size} teams`);
 console.log("");
 

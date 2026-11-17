@@ -3,7 +3,7 @@
  * Section 6's numbers: the run's design, the simulated leagues against the
  * NBA, and the two help measures on real NBA standings.
  *
- * Reads the nine run files in runs/frontier (30 leagues x 25 seasons each) and
+ * Reads the ten run files in runs/frontier (30 leagues x 25 seasons each) and
  * data/nba-data.json (NBA standings, playoff results and first-round picks,
  * 1999-00 to 2025-26; the seasons to 2024-25 were compiled from Basketball
  * Reference and 2025-26 from ESPN, and each team's pick is the best first-round
@@ -61,7 +61,9 @@ const MECHS = [
 	["simplerule", "Simple COLA"],
 	["countdown", "Countdown COLA"],
 	["beckett", "Beckett COLA"],
+	["capped", "Capped COLA"],
 ];
+const PAIRS = (MECHS.length * (MECHS.length - 1)) / 2;
 // The NBA window for part 2 is the run's own length, 25 seasons.
 const NBA_FIRST = "2001-02";
 // Part 3 skips each league's first five seasons in its second simulated
@@ -155,7 +157,7 @@ const played = (e) =>
 		}
 	}
 	console.log(
-		`First season in which two mechanisms' versions of a league differ, over ${pairs} pairs (36 pairs of mechanisms x 30 leagues): ` +
+		`First season in which two mechanisms' versions of a league differ, over ${pairs} pairs (${PAIRS} pairs of mechanisms x 30 leagues): ` +
 			Object.entries(firstDiffers)
 				.map(([s, n]) => `season ${s} in ${n}`)
 				.join(", ") +
@@ -175,7 +177,7 @@ for (const [tag] of MECHS) {
 		};
 	});
 }
-console.log("\nAcross the 30 leagues, correlation of a measure between two mechanisms (36 pairs of mechanisms)\n");
+console.log(`\nAcross the 30 leagues, correlation of a measure between two mechanisms (${PAIRS} pairs of mechanisms)\n`);
 for (const [key, name] of [
 	["longest", "Longest wait for a series win or top-three pick"],
 	["win", "Wait for the next series win"],

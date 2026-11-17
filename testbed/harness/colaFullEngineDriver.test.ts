@@ -59,7 +59,8 @@ type Config = {
 	// and the uniform-lottery baseline for the equity leg); "weighted" draws the
 	// full draft order over the eligible pool by cola^gamma (the W dial family).
 	// "simplerule" is Simple COLA as the abstract words it (a third anchor).
-	variant?: "countdown" | "beckett" | "simplerule" | "random" | "weighted" | "nba" | "t321";
+	// "capped" is Capped COLA (Highley, 2026-04-22), also computed driver-side.
+	variant?: "countdown" | "beckett" | "simplerule" | "capped" | "random" | "weighted" | "nba" | "t321";
 	// Weighting exponent for the "weighted" variant (0 = flat among eligible,
 	// 1 = proportional to the multi-year index, >1 = steep). Distinct from
 	// COLA_ALPHA, the per-season increment. Ignored for other variants.
@@ -124,6 +125,11 @@ type TeamRec = {
 	// Roster-strength proxy: mean of the team's top-8 players' current ovr. A
 	// lower-noise outcome than wins for the draft-to-outcome channel probe.
 	rosterOvr: number;
+	// Capped COLA only: the team's seed in its conference's first round of the
+	// playoffs (null when it did not reach the first round), and the team that
+	// held its own first-round pick on lottery day.
+	seed?: number | null;
+	pickHolder?: number | null;
 };
 type SeasonRec = {
 	season: number;
@@ -583,6 +589,113 @@ async function injectDraftOrder(
 	}
 }
 
+// --- Capped COLA ------------------------------------------------------------
+// Source: Highley, "Overcoming Inertia to Stop NBA Tanking", 2026-04-22
+// (highleytj.substack.com), as implemented for real NBA seasons by the COLA
+// Explorer (cola-manipulation-bound docs/js/cola-engine.js computeCappedCOLA).
+//   Stockpile: every team outside its conference's top six seeds adds its
+//     regular-season wins, up to 150 tickets. The top six seeds add nothing.
+//   Round 1: a team that came through the play-in (seed 7 or 8) and loses in
+//     round 1 gives up 10%; any other round-1 loser 20%. This comes before the
+//     drawing, which the post holds after round 1.
+//   Pool: every team without a series win this season or last, and without a
+//     top-five pick last season. The first five picks are drawn in proportion
+//     to tickets; the rest of the pool follows by tickets, then wins.
+//   After the drawing: picks 1 to 5 give up 100, 80, 60, 40 and 20%; a team
+//     that won 1, 2, 3 or 4 series gives up 40, 60, 80 or 100% of its tickets.
+// Three choices the post leaves to a simulation (stated in the paper's
+// Appendix B):
+//   - Teams outside the pool pick after it, by tickets and then wins, the
+//     post's rule for picks 6 and later.
+//   - No team opts out of a pick; the simulator has no rule for that choice.
+//   - The enhanced Stepien rule is not enforced. A top-five pick's reduction
+//     and the next season's exclusion fall on the team whose own pick it was,
+//     as the ticket mechanisms' costs do. The run records each pick's holder.
+// Ties left after tickets and wins keep a fixed order (lower tid first). A
+// team with no tickets cannot be drawn; if no team left in the pool holds
+// tickets, the drawing ends and the pool follows by tickets, then wins.
+// Stockpiles are rounded to the cent after every step.
+
+const CAPPED_MAX = 150;
+const CAPPED_DRAWN = 5;
+const CAPPED_KEEP_R1_PLAYIN = 0.9;
+const CAPPED_KEEP_R1_DIRECT = 0.8;
+const CAPPED_KEEP_BY_SERIES = [1, 0.6, 0.4, 0.2, 0]; // index = series won
+const CAPPED_KEEP_BY_PICK = [0, 0.2, 0.4, 0.6, 0.8]; // index = pick - 1, picks 1-5
+const toCent = (x: number) => Math.round(x * 100) / 100;
+
+// Grows the stockpiles, applies the round-1 reductions (both in place) and
+// returns the round-1 order with the tickets the drawing used.
+function cappedDraftOrder(
+	tss: AnchorTeam[],
+	seedByTid: Record<number, number>,
+	stock: Record<number, number>,
+	excluded: Set<number>,
+): { order: Record<number, number>; lottery: Record<number, number> } {
+	for (const ts of tss) {
+		const seed = seedByTid[ts.tid];
+		const s = stock[ts.tid] ?? 0;
+		stock[ts.tid] = seed !== undefined && seed <= 6 ? s : toCent(Math.min(CAPPED_MAX, s + ts.wins));
+	}
+	for (const ts of tss) {
+		if (ts.playoffRoundsWon !== 0) continue;
+		const keep = (seedByTid[ts.tid] ?? 0) >= 7 ? CAPPED_KEEP_R1_PLAYIN : CAPPED_KEEP_R1_DIRECT;
+		stock[ts.tid] = toCent(stock[ts.tid]! * keep);
+	}
+	const lottery: Record<number, number> = { ...stock };
+	const byTickets = (a: AnchorTeam, b: AnchorTeam) =>
+		lottery[b.tid]! - lottery[a.tid]! || b.wins - a.wins || a.tid - b.tid;
+	const inPool = (ts: AnchorTeam) => ts.playoffRoundsWon < 1 && !excluded.has(ts.tid);
+	const left = tss.filter(inPool).sort(byTickets);
+	const outside = tss.filter((ts) => !inPool(ts)).sort(byTickets);
+	const order: Record<number, number> = {};
+	let pick = 1;
+	while (pick <= CAPPED_DRAWN && left.length > 0) {
+		const total = left.reduce((s, t) => s + lottery[t.tid]!, 0);
+		if (total <= 0) break;
+		const roll = Math.random() * total;
+		let cum = 0;
+		let idx = -1;
+		for (let i = 0; i < left.length; i++) {
+			cum += lottery[left[i]!.tid]!;
+			if (roll < cum) {
+				idx = i;
+				break;
+			}
+		}
+		if (idx < 0) idx = left.findLastIndex((t) => lottery[t.tid]! > 0);
+		order[left[idx]!.tid] = pick++;
+		left.splice(idx, 1);
+	}
+	for (const t of left) order[t.tid] = pick++;
+	for (const t of outside) order[t.tid] = pick++;
+	return { order, lottery };
+}
+
+// Applies the pick and series reductions in place and returns the teams kept
+// out of next season's pool.
+function cappedAfterDraft(
+	tss: AnchorTeam[],
+	order: Record<number, number>,
+	stock: Record<number, number>,
+): Set<number> {
+	const next = new Set<number>();
+	for (const ts of tss) {
+		const pick = order[ts.tid];
+		let s = stock[ts.tid] ?? 0;
+		if (pick !== undefined && pick <= CAPPED_DRAWN) {
+			s = toCent(s * CAPPED_KEEP_BY_PICK[pick - 1]!);
+			next.add(ts.tid);
+		}
+		if (ts.playoffRoundsWon >= 1) {
+			s = toCent(s * CAPPED_KEEP_BY_SERIES[ts.playoffRoundsWon]!);
+			next.add(ts.tid);
+		}
+		stock[ts.tid] = s;
+	}
+	return next;
+}
+
 // --- Phase-stepping driver --------------------------------------------------
 
 async function runConfig(config: Config): Promise<SeasonRec[]> {
@@ -592,6 +705,8 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 	const records: SeasonRec[] = [];
 	const droughtState: Record<number, number> = {}; // anchors only
 	const pickHistory: Record<number, number[]> = {}; // t321 adopted: consecutive-season rules
+	const cappedStock: Record<number, number> = {}; // Capped COLA: tickets after each draft
+	let cappedExcluded = new Set<number>(); // Capped COLA: kept out of this season's pool
 	let pendingTeams: TeamRec[] | null = null;
 	let pendingSeason = START;
 	let priorChampionTid: number | null = null;
@@ -902,6 +1017,42 @@ async function runConfig(config: Config): Promise<SeasonRec[]> {
 					}
 				}
 				pendingTeams = await captureSeasonRecord(pendingSeason, colaPreByTid);
+			} else if (config.variant === "capped") {
+				// Capped COLA: order computed driver-side and injected, like the
+				// anchors. Seeds come from the season's first-round bracket.
+				const bracket = await idb.cache.playoffSeries.get(pendingSeason);
+				const seedByTid: Record<number, number> = {};
+				for (const series of bracket?.series[0] ?? []) {
+					seedByTid[series.home.tid] = series.home.seed;
+					if (series.away) seedByTid[series.away.tid] = series.away.seed;
+				}
+				if (Object.keys(seedByTid).length !== 16) {
+					throw new Error(
+						`capped: ${Object.keys(seedByTid).length} first-round teams in ${pendingSeason}, expected 16`,
+					);
+				}
+				const cappedTss: AnchorTeam[] = tss.map((ts: any) => ({
+					tid: ts.tid,
+					wins: ts.won,
+					playoffRoundsWon: ts.playoffRoundsWon,
+					cid: ts.cid,
+				}));
+				const { order, lottery } = cappedDraftOrder(cappedTss, seedByTid, cappedStock, cappedExcluded);
+				await phase.newPhase(PHASE.DRAFT, NO_COND); // engine sets a lottery order...
+				await injectDraftOrder(pendingSeason, order); // ...which we overwrite
+				const holderByTid: Record<number, number> = {};
+				for (const dp of (await idb.cache.draftPicks.getAll()) as any[]) {
+					if (dp.season === pendingSeason && dp.round === 1) {
+						holderByTid[dp.originalTid ?? dp.tid] = dp.tid;
+					}
+				}
+				cappedExcluded = cappedAfterDraft(cappedTss, order, cappedStock);
+				pendingTeams = (await captureSeasonRecord(pendingSeason, lottery)).map((t) => ({
+					...t,
+					cola: cappedStock[t.tid] ?? 0,
+					seed: seedByTid[t.tid] ?? null,
+					pickHolder: holderByTid[t.tid] ?? null,
+				}));
 			} else if (config.variant) {
 				// Anchor: compute the order driver-side, inject over the engine's.
 				const anchorTss: AnchorTeam[] = tss.map((ts: any) => ({

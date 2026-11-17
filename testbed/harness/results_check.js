@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Section 7's numbers: the nine mechanisms on the five measures of Section 6.
+ * Section 7's numbers: the ten mechanisms on the five measures of Section 6.
  *
- * Reads the nine run files in runs/frontier (30 leagues x 25 seasons each) and
+ * Reads the ten run files in runs/frontier (30 leagues x 25 seasons each) and
  * prints:
  *
- * 1. The nine mechanisms on the five measures, as averages over the 30 leagues,
+ * 1. The ten mechanisms on the five measures, as averages over the 30 leagues,
  *    then the difference of each mechanism from 3-2-1, league by league, with
  *    its 95% interval. The reward for losing and the help for a longer wait are
  *    exact expectations (measures.js), averaged over a league's 25 seasons.
@@ -47,6 +47,7 @@ const MECHS = [
 	["simplerule", "simple", "Simple COLA"],
 	["countdown", "countdown", "Countdown COLA"],
 	["beckett", "beckett", "Beckett COLA"],
+	["capped", "capped", "Capped COLA"],
 ];
 const REFERENCE = "t321";
 // Starting positions for part 2: the 2nd-worst to the 14th-worst record.
@@ -99,7 +100,7 @@ for (const [tag, mech] of MECHS) {
 const col = (tag, key) => leagues[tag].map((v) => v[key]);
 
 // ---------------------------------------------------------------------------
-// 1. The nine mechanisms on the five measures
+// 1. The ten mechanisms on the five measures
 // ---------------------------------------------------------------------------
 
 const MEASURES = [
@@ -110,7 +111,7 @@ const MEASURES = [
 	["B", "return to playoffs", 2, false],
 ];
 console.log(`\nSection 7, ${ROOT}\n`);
-console.log("1. The nine mechanisms on the five measures (averages over the 30 leagues)\n");
+console.log("1. The ten mechanisms on the five measures (averages over the 30 leagues)\n");
 const W1 = [20, 20, 24, 14, 18, 20];
 console.log(pad(["mechanism", ...MEASURES.map((m) => m[1])], W1));
 for (const [tag, , name] of MECHS) {
