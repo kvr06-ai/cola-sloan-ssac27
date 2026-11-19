@@ -206,7 +206,7 @@ Capped COLA & Every team without a series win this season or last, or a top-five
 
 \section{Incentive compatibility}
 
-Section 1 called a mechanism incentive compatible when no team can improve its pick by losing on purpose. For Simple COLA, we can state that property exactly, prove it, and say what the proof assumes.
+Section 1 called a mechanism incentive compatible when no team can improve its pick by losing on purpose. For Simple COLA, we can state that property exactly, prove it, and say what the proof assumes. Section 4.5 adds a second result, for a mechanism we call Diet COLA.
 
 \subsection{The result}
 
@@ -242,6 +242,16 @@ The loss also has costs inside the draft. It takes one win from the team's own t
 \subsection{A check on the simulated leagues}
 
 A proof covers the rule as written. We also tested the rule as our simulator runs it. We first confirmed that the simulator's draft order followed the rule in all 750 seasons of the Simple COLA run, 25 seasons in each of 30 leagues. Then, in each season, we took every team that missed the playoffs except the one with the fewest wins. We lowered its win total one game at a time until it sat one win below that team. We held everything else constant. That gave 158,325 cases. Counting each coin-flip tie as half a place, the team's place in the order was later in 98,695 cases and unchanged in the other 59,630. It was earlier in none.
+
+\subsection{Diet COLA, a proof of concept}
+
+Under Simple COLA, a top-three pick returns a team's wait to zero (Section 3.1). The team's run of seasons without a playoff series win goes on. We call that run the team's drought. The team with the longest drought therefore does not always pick first.
+
+Diet COLA is a mechanism in which a pick never shortens a drought. Only a series win ends one. Its pool is Simple COLA's, the 22 teams without a series win this season. Each team in the pool holds one ticket for each season of its drought. Diet COLA draws all 22 of the pool's picks, one after another. A team's chance in each draw is proportional to its tickets.
+
+Appendix D states Theorem 2 and proves it. Under Diet COLA, the team with the longest drought has the best chance at the first pick in every season. No team gains by losing a game. The proof uses the three assumptions of Section 4.3 and a simple model of what a team values.
+
+Diet COLA is a proof of concept. It shows that a draft can always favor the team with the longest drought and still give no team a reason to lose. The impossibility result rules out that combination for a lottery based on the final standings (Section 1). We do not propose Diet COLA for use. It is not one of the ten mechanisms we test. Under Diet COLA, the teams with the longest droughts keep the best odds year after year, until they win a series. Simple COLA is the practical form of the idea. Its return to zero after a top-three pick spreads the top picks among teams (Section 5.3).
 
 \section{When the assumptions fail}
 
@@ -569,4 +579,28 @@ Every number in the paper comes from a script in the \texttt{testbed/harness} fo
 \item \texttt{draft2026\_check.js} prints the 2026 draft of Section 8.2 and Figure 8.
 \item \texttt{make\_figures.py} draws Figures 1 to 8 from the output of these scripts.
 \end{itemize}
+
+\subsection*{D. Diet COLA and the proof of Theorem 2}
+
+Diet COLA is the mechanism of Section 4.5. It keeps one number for each team, its drought. A team's drought is the number of seasons in a row, counting the current one, in which it has not won a playoff series. The pool is the 22 teams that did not win a series this season. Each team in the pool holds as many tickets as its drought. The pool's 22 picks are drawn one after another. In each draw, a team's chance is proportional to its tickets. A drought grows by one in each season without a series win. A series win returns it to zero. Neither a pick nor a team's record changes it. Teams cannot trade these picks.
+
+Write $P$ for the pool and $t_j$ for the tickets of team $j$. Team $i$'s chance at the first pick is its share of the pool's tickets, $t_i / \sum_{j \in P} t_j$.
+
+We describe what a team wants with three values. A playoff series win is worth $s$. Pick $k$ is worth $d_k$, for each of the pool's 22 picks. A regular-season win is worth $g$. The eight series winners pick after the pool, and the model gives those picks no value. We assume $s > d_1 > d_2 > \dots > d_{22} > g > 0$. A team therefore values a series win above any pick, and an earlier pick above a later one. These are the first two assumptions of Section 4.3. A team also values any pick above one regular-season win. That is why a draft that rewards losing tempts teams to lose. A win still has some value of its own. Nothing else matters to a team.
+
+The model is simple in three more ways. Like Theorem 1, it looks at one season and its draft. The regular season decides one thing only, which teams reach the playoffs. The model leaves out the smaller gains from a better record, such as an easier first-round opponent. The result of one game also does not change how well a team plays in later games. A regular-season win therefore never lowers a team's chance of winning a playoff series.
+
+The third assumption of Section 4.3 completes the list. A team cannot add to its own tickets by losing. It could change which other teams are in the pool, and with them the pool's total. Suppose a team loses to a rival with a long drought. The extra win may carry the rival into the playoffs. If the rival then wins a series, it leaves the pool with its tickets, and another team takes its place. We assume that a team expects to gain less than $g$ in this way. Stated exactly, losing a game raises the expected value of the pick a team would draw by less than $g$. The reasons are those of Section 4.3. A rival leaves the pool only by winning a series. In our simulated leagues, one extra win adds at most about five percentage points to a team's chance of a series win. Under Diet COLA, the gain is also shared. The rival's tickets leave the drawing for every team in the pool.
+
+\textbf{Theorem 2.} Take any season under Diet COLA, and suppose the assumptions above hold. Then every team expects more from winning any one of its games than from losing it. No team in the pool has a better chance at the first pick than the team with the longest drought.
+
+\textbf{Proof.} The second claim follows from the rule. The team with the longest drought holds the most tickets. No team therefore has a larger share of the pool's tickets.
+
+For the first claim, take a team $i$ and one of its regular-season games. Count only what the game can change. Let $x$ be the team's chance of winning a playoff series this season if it wins the game. Let $y$ be that chance if it loses. A win never lowers the chance, so $x \ge y$. Let $S$ be what the team expects from the playoffs once it has won a series. It is at least $s$. A team that wins no series stays in the pool and draws a pick. Its tickets are the same after a win as after a loss. The expected value of its pick can therefore differ only because the rest of the pool differs. Write $D$ for that expected value after a win and $D + r$ for it after a loss. The assumption on the pool says that $r < g$. No pick is worth more than $d_1$, so $D \le d_1 < s \le S$.
+
+After a win, the team expects $xS + (1 - x)D + g$. After a loss, it expects $yS + (1 - y)(D + r)$. The first amount exceeds the second by $(x - y)(S - D) + g - (1 - y)r$. The first term is zero or more, because $x \ge y$ and $S > D$. The rest is positive, because $r < g$ and $1 - y$ lies between zero and one. The team therefore expects more from the win. The argument covers a team that can still reach the playoffs. It also covers a team that can no longer reach them, where $x = y = 0$, and a team already sure of its place, where $x = y$.
+
+Now take a game in the team's first-round series. A win raises the team's chance of winning the series, so $x > y$. If the team loses the series, it is in the pool and its opponent is out, whichever games it won along the way. So $r = 0$. The model puts no value on a single playoff game, so $g$ drops out. The win is better by $(x - y)(S - D)$. That amount is positive.
+
+Last, take a team that has already won a series this season. It is out of the pool, and its drought is zero however far it goes. Each further series win adds $s$. The team therefore prefers to win.
 \end{document}
