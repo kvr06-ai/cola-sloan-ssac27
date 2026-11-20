@@ -122,7 +122,7 @@ We focus on Simple COLA. For each team, it counts the seasons since the team las
 
 We test ten mechanisms, including the NBA's old lottery and 3-2-1, in ZenGM Basketball-GM. It is a simulator whose code is public. It simulates every game and every change to each team's roster in realistic fictional leagues. Each mechanism runs on the same 30 leagues for 25 seasons. We compare the mechanisms on three measures. The first is how much they help the teams that have waited the longest. The second is how evenly playoff success spreads across teams over many seasons. We call it long-term parity. The third is the reward for losing, meaning how much a team's pick improves when it loses more games. Because every mechanism plays the same 30 leagues, we can compare any two of them league by league. For each comparison, we report a 95\% confidence interval, the range that very likely contains the true difference. The leagues are fictional. We therefore also check whether the reward for losing and the help for long-waiting teams look the same on real NBA standings, one season at a time.
 
-Of the ten mechanisms, Simple COLA does the most for the teams that have waited longest. Under 3-2-1, the longest any team goes without a playoff series win or one of the first three picks averages 16.3 seasons. Under Simple COLA, it averages 5.5. No team that misses the playoffs ever gains an earlier pick in that season's draft by losing more games. The average wait for a team's next playoff series win is within about a tenth of a season of the wait under 3-2-1. Simple COLA has three costs. Sections 5 and 7 measure them. First, teams wait about 0.2 seasons longer to return to the playoffs. Second, a team that has waited a long time can gain by losing a first-round playoff series. A series win would send it to the back of the list. Third, the team with the third pick can sometimes gain over two drafts by losing enough games to pick fourth. A top-three pick resets a team's wait. The fourth pick does not. Every number in this paper can be reproduced with the code in our public repository (Appendix C). The 3-2-1 lottery expires after the 2029 draft unless the league votes to keep it~\cite{oconnor2026lottery}. The league will therefore soon choose a draft mechanism again.
+Of the ten mechanisms, Simple COLA does the most for the teams that have waited longest. Under 3-2-1, the longest any team goes without a playoff series win or one of the first three picks averages 16.3 seasons. Under Simple COLA, it averages 5.5. No team that misses the playoffs ever gains an earlier pick in that season's draft by losing more games. The average wait for a team's next playoff series win is within about a tenth of a season of the wait under 3-2-1. Simple COLA has three costs. Sections 5 and 7 measure them. First, teams wait about 0.2 seasons longer to return to the playoffs. Second, a team that has waited a long time can gain by losing a first-round playoff series. A series win would send it to the back of the list. Third, the team with the third pick can sometimes gain over two drafts by losing enough games to pick fourth. A top-three pick resets a team's wait. The fourth pick does not. Every number we computed can be reproduced with the code in our public repository (Appendix C). The 3-2-1 lottery expires after the 2029 draft unless the league votes to keep it~\cite{oconnor2026lottery}. The league will therefore soon choose a draft mechanism again.
 
 \section{Background}
 
@@ -422,7 +422,7 @@ Beckett COLA & −1.64 & 2.5 & 14.1* & 4.55 & 3.02 \\
 Capped COLA & −0.91 & 1.2 & 14.5 & 4.41 & 2.91 \\
 \bottomrule
 \end{tabular}
-\caption{The ten mechanisms on the five measures of Section 6, as averages over the 30 simulated leagues. $R$ and $H$ are in draft places. The three waits are in seasons. An asterisk marks a wait whose difference from 3-2-1 has a 95\% interval that excludes zero. Appendix C names the script that prints each difference with its interval.}
+\caption{The ten mechanisms on the five measures of Section 6, as averages over the 30 simulated leagues. $R$ and $H$ are in draft places. The three waits are in seasons. An asterisk marks a wait whose difference from 3-2-1 has a 95\% interval that excludes zero. A script in our repository prints each difference with its interval (Appendix C).}
 \label{tab:results}
 \end{table}
 
@@ -432,7 +432,7 @@ The old lottery rewards losing. A team that dropped from the fifth-worst record 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{figures/reward-by-position}
-\caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. Appendix C names the script that prints each value.}
+\caption{The reward for losing, $R$, from each starting position, in draft places. A positive value means the team picks earlier after dropping to the worst record. Under 3-2-1, a team can miss the playoffs and still fall outside the pool as we run it (Section 6.2). Those seasons are left out of its line. They number 146 of the 750 at the fourteenth-worst record and at most 35 at any other position. A script in our repository prints each value (Appendix C).}
 \label{fig:positions}
 \end{figure}
 
@@ -571,16 +571,7 @@ Classic, Waitlist, and Full-lottery COLA share one ticket rule. After the playof
 
 \subsection*{C. Reproducing the numbers}
 
-Every number in the paper comes from a script in the \texttt{testbed/harness} folder of the repository. Each script reads only files in the repository, runs in under a minute, and prints the same output every time.
-\begin{itemize}
-\item \texttt{abstract\_table.js} prints the summary figures of Section 1.
-\item \texttt{simple\_losing\_check.js} prints the check of Theorem 1 in Section 4. With \texttt{-{}-cutoff}, it prints the line between the third and fourth picks in Section 5.2.
-\item \texttt{limits\_check.js} prints the rest of Section 5.
-\item \texttt{design\_check.js} prints Section 6 and the values behind Figures 2 and 3.
-\item \texttt{results\_check.js} prints Sections 7 and 8.1, Table 2, and the values behind Figures 4 to 7. It also prints every difference from 3-2-1 with its 95\% interval.
-\item \texttt{draft2026\_check.js} prints the 2026 draft of Section 8.2 and Figure 8.
-\item \texttt{make\_figures.py} draws Figures 1 to 8 from the output of these scripts.
-\end{itemize}
+The repository linked on the first page holds the results of every simulated league and the NBA records we used. Its scripts print every number we computed from those stored files, so no reader has to run the simulator. The repository's front page lists each script and what it prints.
 
 \subsection*{D. Diet COLA and the proof of Theorem 2}
 
