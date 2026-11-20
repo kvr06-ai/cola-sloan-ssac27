@@ -106,6 +106,16 @@
 Open-source repository: \url{https://github.com/kvr06-ai/cola-sloan-ssac27}
 \end{center}
 
+\section*{Abstract}
+
+For decades, the NBA has given its worst teams the best chances at the top draft picks. A team out of the playoff race could therefore improve its pick by losing on purpose, a practice called tanking. The NBA's new 3-2-1 lottery shrinks that reward but gives no extra help to a team that stays weak for years. In 2020, Banchio and Munro proved that this tradeoff is unavoidable for any lottery based on final standings.
+
+The tradeoff comes from measuring weakness by a single season's record. We introduce Carry-Over Lottery Allocation (COLA), which measures weakness by playoff results over many seasons. A team's draft priority builds while it goes without playoff success and falls when it wins a playoff series or lands a top pick. COLA works like a waiting list. One more loss leaves a team's place on the list unchanged, so the draft need not reward losing. Help still reaches the teams that stay weak, because they wait the longest.
+
+Simple COLA, the plainest version, needs no lottery. The team that has gone longest without a playoff series win or a top-three pick chooses first. We prove that Simple COLA is incentive compatible, meaning no team gains by losing a game. Only one assumption needs defending, that teams would rather win games than manipulate which rivals they compete with for the top picks.
+
+We test COLA against the NBA's old and new lotteries in a basketball simulator that plays out every game and roster move of realistic fictional leagues. Simple COLA removes the reward for losing and gives the most help to the teams that have waited longest, with little change to long-term parity. We also show where the assumptions could fail and how a league can respond. A league could start COLA in any season, because every team's priority can be read from past results. We show how the 2026 draft would have looked under each rule.
+
 \section{Introduction}
 
 On February 7, 2026, the Utah Jazz played the Orlando Magic in a National Basketball Association (NBA) game. The Jazz led 94-87 going into the fourth and final quarter. They then kept two of their best players, Lauri Markkanen and Jaren Jackson Jr., out of the game for the whole quarter. Orlando outscored them 33-23 and won 120-117~\cite{espn2026jazzmagic}. Five days later, the NBA fined the Jazz \$500,000 over that game and one other~\cite{nba2026fines}. The Jazz had company. The Ringer, a sports website, counted eight of the league's thirty teams trying to finish with the worst records that month~\cite{ringer2026tanking}. Losing on purpose in this way is called tanking.
