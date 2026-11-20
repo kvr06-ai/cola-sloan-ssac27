@@ -84,7 +84,7 @@ costs.
                            its source, and the script that counts its words
     testbed/harness/       the code that runs each mechanism in the simulator,
                            the simulation results, the NBA data, and the
-                           scripts behind every number in the paper
+                           scripts behind every number we computed
     results-page/          the source of an interactive results page from an
                            earlier draft (see Earlier work)
     original-study/        the code and data of an earlier paper on COLA (see
@@ -93,10 +93,10 @@ costs.
 
 ## Reproducing the paper's numbers
 
-Every number, table, and figure in the paper comes from a script in
-`testbed/harness/`. The scripts read only files in this repository, so you can
-check every number without the simulator. Each script finishes in under a
-minute and prints the same output every time.
+Every number we computed for the paper, and every table and figure, comes from
+a script in `testbed/harness/`. The scripts read only files in this repository,
+so you can check every number without the simulator. Each script finishes in
+under a minute and prints the same output every time.
 
 You need Node.js 18 or later. Drawing the figures also needs Python 3 with
 matplotlib, a plotting library (`pip install matplotlib`). Run each command
