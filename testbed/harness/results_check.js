@@ -16,6 +16,9 @@
  *    all, the range of the longest wait across leagues, how many waits for a
  *    series win ended, and how many top-three picks went to teams that lost in
  *    the first round.
+ * 4. The change in a team's chance of the first pick after the same drop as in
+ *    part 2, from every starting position, in percentage points, with each
+ *    mechanism's difference from 3-2-1 from the fifth-worst record.
  *
  * Nothing here is sampled, so the output is identical on every run.
  *
@@ -71,11 +74,13 @@ for (const [tag, mech] of MECHS) {
 	leagues[tag] = reps.map((rep) => {
 		const league = M.fromSim(rep);
 		const rewards = RANKS.map(() => []); // one list of seasons per starting position
+		const firsts = RANKS.map(() => []); // the same, for the chance of the first pick
 		const help = [];
 		let topThree = 0;
 		let topThreeToFirstRoundLosers = 0;
 		M.walk(league, (season, state) => {
 			M.rewardsForLosing(mech, season, state, RANKS).forEach((r, i) => rewards[i].push(r));
+			M.firstPickGains(mech, season, state, RANKS).forEach((g, i) => firsts[i].push(g));
 			help.push(M.helpForWaiting(mech, season, state, STANDARD_RANK));
 			for (const t of season.teams) {
 				if (t.pick > 3) continue;
@@ -86,9 +91,11 @@ for (const [tag, mech] of MECHS) {
 		const ended = M.waitLengths(league, (t) => t.wonSeries);
 		return {
 			rewards,
+			firsts,
 			topThree,
 			topThreeToFirstRoundLosers,
 			R: meanOf(rewards[STANDARD_RANK - 2]),
+			R1: meanOf(firsts[STANDARD_RANK - 2]),
 			H: meanOf(help),
 			L: M.longestWait(league),
 			W: mean(ended),
@@ -181,6 +188,32 @@ for (const [tag, , name] of MECHS) {
 console.log("");
 
 // ---------------------------------------------------------------------------
+// 4. The change in the chance of the first pick
+// ---------------------------------------------------------------------------
+
+console.log("4. The change in a team's chance of the first pick after the same drop as in part 2, by starting position, percentage points\n");
+console.log(pad(["position", ...MECHS.map(([, , name]) => name.replace(" COLA", "").replace(" lottery", ""))], W2));
+for (let i = 0; i < RANKS.length; i++) {
+	console.log(pad([`${RANKS[i]}`, ...MECHS.map(([tag]) => signed(mean(leagues[tag].map((v) => meanOf(v.firsts[i]))), 2))], W2));
+}
+console.log("\nFrom the fifth-worst record: mean over the 30 leagues, and the difference from 3-2-1, league by league, with its 95% interval\n");
+for (const [tag, , name] of MECHS) {
+	const v = col(tag, "R1");
+	const cells = [name, signed(mean(v), 2)];
+	if (tag !== REFERENCE) {
+		const d = M.interval(v.map((x, i) => x - col(REFERENCE, "R1")[i]));
+		cells.push(`${signed(d.mean, 2)} [${d.lo.toFixed(2)}, ${d.hi.toFixed(2)}]`);
+	}
+	console.log(pad(cells, [20, 8, 26]));
+}
+console.log("\nStarting positions where the drop raised or lowered the chance of the first pick (13 positions in each of 750 seasons)\n");
+for (const [tag, , name] of MECHS) {
+	const all = leagues[tag].flatMap((v) => v.firsts.flat()).filter((x) => x != null);
+	console.log(pad([name, `raised ${all.filter((x) => x > ROUNDING).length}, lowered ${all.filter((x) => x < -ROUNDING).length}, of ${all.length}`], [20, 34]));
+}
+console.log("");
+
+// ---------------------------------------------------------------------------
 // The numbers behind the figures of Section 7, for make_figures.py
 // ---------------------------------------------------------------------------
 
@@ -190,6 +223,8 @@ if (JSON_OUT) {
 		mechanisms: MECHS.map(([tag, , name]) => ({ tag, name })),
 		// The reward for losing from each starting position, as in part 2.
 		reward: Object.fromEntries(MECHS.map(([tag]) => [tag, RANKS.map((_, i) => mean(leagues[tag].map((v) => meanOf(v.rewards[i]))))])),
+		// The change in the chance of the first pick from each starting position, as in part 4.
+		firstPick: Object.fromEntries(MECHS.map(([tag]) => [tag, RANKS.map((_, i) => mean(leagues[tag].map((v) => meanOf(v.firsts[i]))))])),
 		scored321,
 		// The longest wait in each of the 30 leagues, as in parts 1 and 3.
 		longestWait: Object.fromEntries(MECHS.map(([tag]) => [tag, col(tag, "L")])),

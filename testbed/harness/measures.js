@@ -33,6 +33,9 @@
  *                              the one with the `rank`-th worst record among
  *                              the 14 that missed the playoffs. A positive
  *                              value is an earlier pick.
+ *   firstPickGains(mech, ...)  for the same team and the same drop, the change
+ *                              in its chance of the first pick, in percentage
+ *                              points. A positive value is a better chance.
  *   helpForWaiting(mech, ...)  draft places a team gains when its priority alone
  *                              rises to one step above the highest in its pool.
  *                              The team is the one with the `rank`-th highest
@@ -54,6 +57,8 @@
  *   "countdown"  Countdown COLA               countdownPicks() follows each team through its drawing
  *   "beckett"    Beckett COLA                 raffleThenOrder(), entries then entries
  *   "capped"     Capped COLA                  cappedPicks() follows every set of drawn teams
+ * firstPickChance() takes each team's chance of the first pick from the same
+ * drawings, also exactly.
  *
  * Carry-over state comes from the league's own history, walked in order by
  * walk(): each team's wait under Simple COLA and Countdown COLA (seasons since
@@ -262,7 +267,8 @@ function longestWait(league) {
 // The 3-2-1 drawing, exactly
 // ---------------------------------------------------------------------------
 
-// Expected pick of every team in the 3-2-1 pool. The pool is the eight worst
+// Expected pick and chance of the first pick of every team in the 3-2-1 pool,
+// as { picks, first }, two maps keyed by team id. The pool is the eight worst
 // records in each conference: five that miss the play-in, the ninth and tenth
 // seeds, and the eighth-best record, which stands in for the loser of the
 // seven-eight game as it does in the simulator's driver. All 16 picks are
@@ -274,9 +280,9 @@ function longestWait(league) {
 // Teams that hold the same chances and fall under the same limits are
 // interchangeable, so the drawing is followed by how many teams of each kind
 // are still left. The pick number follows from that count, and one pass over
-// the counts gives each kind's expected picks with no sampling. Every team of
-// a kind expects the same pick.
-function t321Picks(teams, past) {
+// the counts gives each kind's expected picks and first-pick chance with no
+// sampling. Every team of a kind expects the same pick.
+function t321Drawing(teams, past) {
 	const byConf = {};
 	for (const t of teams) (byConf[t.conf] ??= []).push(t);
 	const role = new Map();
@@ -321,6 +327,7 @@ function t321Picks(teams, past) {
 	const n = pool.length;
 	const prob = new Float64Array(states);
 	const expected = new Float64Array(kinds.length);
+	const first = new Float64Array(kinds.length);
 	prob[states - 1] = 1;
 	const left = new Array(kinds.length);
 	// Drawing a team lowers the packed integer, so one downward pass visits every
@@ -352,19 +359,27 @@ function t321Picks(teams, past) {
 		for (const k of cands) {
 			const q = (p * left[k] * kinds[k].chances) / total;
 			expected[k] += q * pick;
+			if (pick === 1) first[k] += q;
 			prob[code - step[k]] += q;
 		}
 	}
-	return new Map(pool.map((t, i) => [t.id, expected[kindOf[i]] / kinds[kindOf[i]].size]));
+	const perTeam = (byKind) => new Map(pool.map((t, i) => [t.id, byKind[kindOf[i]] / kinds[kindOf[i]].size]));
+	return { picks: perTeam(expected), first: perTeam(first) };
+}
+
+// Expected pick of every team in the 3-2-1 pool (t321Drawing()).
+function t321Picks(teams, past) {
+	return t321Drawing(teams, past).picks;
 }
 
 // ---------------------------------------------------------------------------
 // The Countdown COLA drawing, exactly
 // ---------------------------------------------------------------------------
 
-// Expected pick of every team in Countdown COLA's pool, the teams without a
-// series win. A team's score is its wait times its wins. The order is filled
-// from the last pick to the first, and each step draws one team from the five
+// Expected pick and chance of the first pick of every team in Countdown COLA's
+// pool, the teams without a series win, as { picks, first }. A team's score is
+// its wait times its wins. The order is filled from the last pick to the
+// first, and each step draws one team from the five
 // lowest scores left, with chances 6, 5, 4, 3, 2 from the lowest up. Ties on
 // score go to the longer wait, then to more wins, as in the driver.
 //
@@ -373,7 +388,8 @@ function t321Picks(teams, past) {
 // thing that matters to it is how many of the five sit below it: a draw from
 // below moves it down one, a draw from above changes nothing for it, and its
 // own draw places it. Following that count gives its expected pick exactly.
-function countdownPicks(teams, wait) {
+// The first pick goes to the team still left after every other is drawn.
+function countdownDrawing(teams, wait) {
 	const order = teams
 		.filter((t) => !t.wonSeries)
 		.map((t) => ({ id: t.id, score: wait[t.id] * t.wins, wait: wait[t.id], wins: t.wins }))
@@ -382,11 +398,13 @@ function countdownPicks(teams, wait) {
 	const n = order.length;
 	const width = COUNTDOWN_CHANCES.length;
 	const picks = new Map();
+	const first = new Map();
 	order.forEach((team, position) => {
 		// below[r] is the chance that r of the lowest scores left sit below this team.
 		let below = new Array(width).fill(0);
 		below[Math.min(position, width - 1)] = 1;
 		let expected = 0;
+		let chance = 0;
 		for (let placed = Math.max(0, position - (width - 1)); placed < n; placed++) {
 			const size = Math.min(width, n - placed);
 			let total = 0;
@@ -397,6 +415,7 @@ function countdownPicks(teams, wait) {
 				const p = below[r];
 				if (p > 0) {
 					expected += ((p * COUNTDOWN_CHANCES[r]) / total) * (n - placed);
+					if (n - placed === 1) chance += (p * COUNTDOWN_CHANCES[r]) / total;
 					if (r > 0) next[r - 1] += (p * lower) / total;
 					next[r] += (p * (total - lower - COUNTDOWN_CHANCES[r])) / total;
 				}
@@ -405,8 +424,14 @@ function countdownPicks(teams, wait) {
 			below = next;
 		}
 		picks.set(team.id, expected);
+		first.set(team.id, chance);
 	});
-	return picks;
+	return { picks, first };
+}
+
+// Expected pick of every team in Countdown COLA's pool (countdownDrawing()).
+function countdownPicks(teams, wait) {
+	return countdownDrawing(teams, wait).picks;
 }
 
 // ---------------------------------------------------------------------------
@@ -449,6 +474,18 @@ function raffleThenOrder(pool, id, depth = 4) {
 	};
 	draw(0, pool.reduce((s, t) => s + Math.max(0, t.w), 0), 1, 0, 0);
 	return expected;
+}
+
+// Chance that team `id` receives the first pick of the same drawing: its share
+// of the weight. When no team holds any, the order by key decides, and a tie
+// for the front is shared evenly.
+function firstOfRaffle(pool, id) {
+	const me = pool.find((t) => t.id === id);
+	const total = pool.reduce((s, t) => s + Math.max(0, t.w), 0);
+	if (total > 0) return Math.max(0, me.w) / total;
+	const better = pool.filter((t) => t.key > me.key).length;
+	const equal = pool.filter((t) => t.id !== id && t.key === me.key).length;
+	return better === 0 ? 1 / (1 + equal) : 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -535,14 +572,32 @@ function cappedPicks(teams, tickets) {
 	return picks;
 }
 
+// Chance that team `id` receives the first pick under Capped COLA: its share of
+// the pool's tickets. If no pool team holds any, the first pick goes by tickets
+// and then wins, as in cappedPicks(), to the pool or, when the pool is empty,
+// to the teams outside it. A tie for the front is shared evenly.
+function cappedFirst(teams, tickets, id) {
+	const me = teams.find((t) => t.id === id);
+	const above = (a, b) => tickets[a.id] > tickets[b.id] || (tickets[a.id] === tickets[b.id] && a.wins > b.wins);
+	const level = (a, b) => tickets[a.id] === tickets[b.id] && a.wins === b.wins;
+	const lead = (group) => {
+		const ahead = group.filter((o) => o.id !== id && above(o, me)).length;
+		const tied = group.filter((o) => o.id !== id && level(o, me)).length;
+		return ahead === 0 ? 1 / (1 + tied) : 0;
+	};
+	const pool = teams.filter((t) => t.cappedPool);
+	const total = pool.reduce((s, t) => s + Math.max(0, tickets[t.id]), 0);
+	if (me.cappedPool) return total > 0 ? Math.max(0, tickets[id]) / total : lead(pool);
+	return pool.length > 0 ? 0 : lead(teams.filter((t) => !t.cappedPool));
+}
+
 // ---------------------------------------------------------------------------
 // Expected pick of one team under each mechanism
 // ---------------------------------------------------------------------------
 
-// Simple COLA: place in the pool of teams without a series win, by longest
-// wait and then by better record. A tie on both is settled by a coin flip, so
-// it counts as half a place.
-function simplePlace(teams, wait, id, myWait, myRec) {
+// Simple COLA: the teams ahead of and level with team `id` in the pool of teams
+// without a series win, ordered by longest wait and then by better record.
+function simpleRank(teams, wait, id, myWait, myRec) {
 	let ahead = 0;
 	let tied = 0;
 	for (const o of teams) {
@@ -550,19 +605,28 @@ function simplePlace(teams, wait, id, myWait, myRec) {
 		if (wait[o.id] > myWait || (wait[o.id] === myWait && o.rec > myRec)) ahead++;
 		else if (wait[o.id] === myWait && o.rec === myRec) tied++;
 	}
+	return { ahead, tied };
+}
+
+// Simple COLA: place in that pool. A tie on both wait and record is settled by
+// a coin flip, so it counts as half a place.
+function simplePlace(teams, wait, id, myWait, myRec) {
+	const { ahead, tied } = simpleRank(teams, wait, id, myWait, myRec);
 	return 1 + ahead + tied / 2;
 }
 
 // Beckett COLA: the pool is every team with a count of two or more. Entries are
 // count times wins. The first four picks are drawn by entries and the rest of
 // the pool follows in order of entries. A team that missed the playoffs and is
-// outside the pool picks after it, worst record first.
-function beckettPick(teams, count, id) {
+// outside the pool picks after it, worst record first. beckettOrder() returns
+// the pool and, for a team outside it, the teams ahead of and level with it
+// there, or null when the mechanism does not place the team.
+function beckettOrder(teams, count, id) {
 	const me = teams.find((t) => t.id === id);
 	const pool = teams
 		.filter((t) => count[t.id] >= 2)
 		.map((t) => ({ id: t.id, w: count[t.id] * t.wins, key: count[t.id] * t.wins }));
-	if (count[id] >= 2) return raffleThenOrder(pool, id, 4);
+	if (count[id] >= 2) return { pool, inPool: true };
 	if (!me.missed) return null;
 	let ahead = 0;
 	let tied = 0;
@@ -571,7 +635,22 @@ function beckettPick(teams, count, id) {
 		if (o.wins < me.wins) ahead++;
 		else if (o.wins === me.wins) tied++;
 	}
-	return pool.length + 1 + ahead + tied / 2;
+	return { pool, inPool: false, ahead, tied };
+}
+
+function beckettPick(teams, count, id) {
+	const o = beckettOrder(teams, count, id);
+	if (!o) return null;
+	return o.inPool ? raffleThenOrder(o.pool, id, 4) : o.pool.length + 1 + o.ahead + o.tied / 2;
+}
+
+// Beckett COLA's chance of the first pick. A team outside the pool can receive
+// it only when the pool is empty, as in a simulated league's first season.
+function beckettFirst(teams, count, id) {
+	const o = beckettOrder(teams, count, id);
+	if (!o) return null;
+	if (o.inPool) return firstOfRaffle(o.pool, id);
+	return o.pool.length === 0 && o.ahead === 0 ? 1 / (1 + o.tied) : 0;
 }
 
 // The priority each mechanism carries over, for every team in a season.
@@ -585,6 +664,22 @@ function priorityOf(mech, teams, state) {
 	return {};
 }
 
+// The old lottery's pool. Chances follow the rank by record, worst first, and
+// the order after the drawing is reverse order of record.
+function oldPool(missed) {
+	return missed
+		.slice()
+		.sort((a, b) => a.rec - b.rec)
+		.map((t, i) => ({ id: t.id, w: NBA_BALLS[i] ?? NBA_BALLS.at(-1), key: -t.rec }));
+}
+
+// Classic and Waitlist COLA's pool. The drawing is by tickets. The order after
+// it is reverse order of record under Classic COLA and order of tickets under
+// Waitlist COLA.
+function ticketPool(mech, missed, pri) {
+	return missed.map((t) => ({ id: t.id, w: pri[t.id], key: mech === "classic" ? -t.rec : pri[t.id] }));
+}
+
 // Expected pick of team `id` this season, or null if the mechanism does not
 // place it. `pri` is the priority of every team (priorityOf), which a caller
 // may alter for one team; `past` holds every team's earlier picks.
@@ -593,22 +688,15 @@ function expectedPick(mech, teams, pri, past, id) {
 	const missed = teams.filter((t) => t.missed);
 	if (mech === "old") {
 		if (!me.missed) return null;
-		// Chances follow the rank by record, worst first. The first four picks
-		// are drawn and the rest go in reverse order of record.
-		const pool = missed
-			.slice()
-			.sort((a, b) => a.rec - b.rec)
-			.map((t, i) => ({ id: t.id, w: NBA_BALLS[i] ?? NBA_BALLS.at(-1), key: -t.rec }));
-		return raffleThenOrder(pool, id, 4);
+		// The first four picks are drawn and the rest go in reverse order of record.
+		return raffleThenOrder(oldPool(missed), id, 4);
 	}
 	if (mech === "uniform") return me.missed ? (missed.length + 1) / 2 : null;
 	if (mech === "t321") return t321Picks(teams, past).get(id) ?? null;
 	if (mech === "classic" || mech === "waitlist") {
 		if (!me.missed) return null;
-		// The first four picks are drawn by tickets. The rest go in reverse order
-		// of record under Classic COLA and in order of tickets under Waitlist COLA.
-		const pool = missed.map((t) => ({ id: t.id, w: pri[t.id], key: mech === "classic" ? -t.rec : pri[t.id] }));
-		return raffleThenOrder(pool, id, 4);
+		// The first four picks are drawn by tickets.
+		return raffleThenOrder(ticketPool(mech, missed, pri), id, 4);
 	}
 	if (mech === "full") {
 		if (!me.missed) return null;
@@ -629,6 +717,35 @@ function expectedPick(mech, teams, pri, past, id) {
 	throw new Error(`unknown mechanism ${mech}`);
 }
 
+// Chance that team `id` receives the first pick this season, from the same
+// drawing as expectedPick() and with the same arguments, or null if the
+// mechanism does not place the team. With no drawing, the team at the front
+// of the order has the first pick, and a tie for the front is shared evenly.
+function firstPickChance(mech, teams, pri, past, id) {
+	const me = teams.find((t) => t.id === id);
+	const missed = teams.filter((t) => t.missed);
+	if (mech === "old") return me.missed ? firstOfRaffle(oldPool(missed), id) : null;
+	if (mech === "uniform") return me.missed ? 1 / missed.length : null;
+	if (mech === "t321") return t321Drawing(teams, past).first.get(id) ?? null;
+	if (mech === "classic" || mech === "waitlist") return me.missed ? firstOfRaffle(ticketPool(mech, missed, pri), id) : null;
+	if (mech === "full") {
+		if (!me.missed) return null;
+		// With no tickets in the pool, every order is equally likely, as in
+		// expectedPick().
+		const total = missed.reduce((s, t) => s + pri[t.id], 0);
+		return total > 0 ? pri[id] / total : 1 / missed.length;
+	}
+	if (mech === "simple") {
+		if (me.wonSeries) return null;
+		const { ahead, tied } = simpleRank(teams, pri, id, pri[id], me.rec);
+		return ahead === 0 ? 1 / (1 + tied) : 0;
+	}
+	if (mech === "countdown") return countdownDrawing(teams, pri).first.get(id) ?? null;
+	if (mech === "beckett") return beckettFirst(teams, pri, id);
+	if (mech === "capped") return cappedFirst(teams, pri, id);
+	throw new Error(`unknown mechanism ${mech}`);
+}
+
 // ---------------------------------------------------------------------------
 // The two help measures, one season at a time
 // ---------------------------------------------------------------------------
@@ -640,10 +757,12 @@ function missedByRecord(teams) {
 	return missed.length === 14 ? missed : null;
 }
 
-// The reward for losing from each starting position in `ranks` (1 is the worst
-// record among the 14 that missed the playoffs). An entry is null when the
+// The team at each starting position in `ranks` (1 is the worst record among
+// the 14 that missed the playoffs) drops alone to the worst record in the
+// league. For each, `value` (expectedPick or firstPickChance) is read before and
+// after the drop, and `change(before, after)` is returned, or null when the
 // mechanism does not place that team.
-function rewardsForLosing(mech, season, state, ranks) {
+function dropToWorst(mech, season, state, ranks, value, change) {
 	const missed = missedByRecord(season.teams);
 	if (!missed) return null;
 	const pri = priorityOf(mech, season.teams, state);
@@ -653,10 +772,21 @@ function rewardsForLosing(mech, season, state, ranks) {
 	return ranks.map((rank) => {
 		const team = missed[rank - 1];
 		const moved = season.teams.map((t) => (t.id === team.id ? { ...t, ...worse } : t));
-		const before = expectedPick(mech, season.teams, pri, state.past, team.id);
-		const after = expectedPick(mech, moved, priorityOf(mech, moved, state), state.past, team.id);
-		return before == null || after == null ? null : before - after;
+		const before = value(mech, season.teams, pri, state.past, team.id);
+		const after = value(mech, moved, priorityOf(mech, moved, state), state.past, team.id);
+		return before == null || after == null ? null : change(before, after);
 	});
+}
+
+// The reward for losing from each starting position: draft places gained.
+function rewardsForLosing(mech, season, state, ranks) {
+	return dropToWorst(mech, season, state, ranks, expectedPick, (before, after) => before - after);
+}
+
+// The change in the chance of the first pick from each starting position, in
+// percentage points.
+function firstPickGains(mech, season, state, ranks) {
+	return dropToWorst(mech, season, state, ranks, firstPickChance, (before, after) => 100 * (after - before));
 }
 
 function rewardForLosing(mech, season, state, rank = 5) {
@@ -719,8 +849,10 @@ module.exports = {
 	raffleThenOrder,
 	priorityOf,
 	expectedPick,
+	firstPickChance,
 	rewardsForLosing,
 	rewardForLosing,
+	firstPickGains,
 	helpForWaiting,
 	mean,
 	sd,

@@ -7,7 +7,8 @@ for the Word version. The files are named by content:
     carryover            Section 3.1, Simple COLA's wait for one invented team
     nba-comparison       Section 6.5, the simulated leagues beside the NBA
     real-standings       Section 6.5, the two help measures on real standings
-    reward-by-position   Section 7.1, the reward for losing by starting position
+    reward-by-position   Section 7.1, the reward for losing by starting position,
+                         in draft places and in first-pick chance
     longest-wait         Section 7.2, the longest wait in each league
     next-series-win      Section 7.3, the wait for the next series win in each league
     mechanism-map        Section 8.1, the ten mechanisms on the reward for losing
@@ -301,25 +302,59 @@ def ordinal(n):
 	return f"{n}{'th' if 10 <= n % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(n % 10, 'th')}"
 
 
+def spread(ys, gap):
+	"""Label heights at least `gap` apart, in their original order, each moved as little as the gap allows."""
+	order = sorted(range(len(ys)), key=lambda i: ys[i])
+	out = [float(y) for y in ys]
+	for _ in range(100):
+		moved = False
+		for a, b in zip(order, order[1:]):
+			short = gap - (out[b] - out[a])
+			if short > 1e-9:
+				out[a] -= short / 2
+				out[b] += short / 2
+				moved = True
+		if not moved:
+			break
+	return out
+
+
+# The three mechanisms the text follows, in color, and Classic and Capped COLA,
+# in gray with their own markers.
+REWARD_LINES = [("classic", "Classic COLA"), ("capped", "Capped COLA"), ("nba", "Old lottery"), ("t321", "3-2-1"), ("simplerule", "Simple COLA")]
+REWARD_MARKER = {**MARKER, "classic": "^", "capped": "v"}
+
+
 def fig_reward_by_position(results):
 	pos = results["positions"]
-	fig, ax = plt.subplots(figsize=(WIDTH, 2.7))
-	fig.subplots_adjust(left=0.1, right=0.99, top=0.97, bottom=0.18)
-	ax.axhline(0, color=INK_2, lw=0.8, zorder=2)
-	for tag, label in [("nba", "Old lottery"), ("t321", "3-2-1"), ("simplerule", "Simple COLA")]:
-		y = results["reward"][tag]
-		ax.plot(pos, y, color=COLOR[tag], lw=1.6, marker=MARKER[tag], ms=4.6, mec="white", mew=0.6, zorder=3)
-		ax.text(pos[-1] + 0.3, y[-1], label, ha="left", va="center", fontsize=8.5, color=INK)
-	ax.set_xlim(pos[0] - 0.5, pos[-1] + 1.9)
-	ax.set_ylim(-4.6, 11.2)
-	ax.set_xticks(pos, [ordinal(p) for p in pos])
-	ax.set_yticks(range(-4, 11, 2))
-	ax.yaxis.grid(True, color=GRID, lw=0.5, zorder=0)
-	ax.set_axisbelow(True)
-	ax.set_xlabel("Starting position, counted from the worst record among the 14 teams that missed the playoffs", labelpad=4)
-	ax.set_ylabel("Reward for losing, $R$ (draft places)", labelpad=4)
-	ax.text(pos[0] - 0.35, 10.9, "Above 0, dropping to the worst record gains a team places", ha="left", va="top", fontsize=8, color=INK_2, style="italic")
-	ax.text(pos[0] - 0.35, -4.35, "Below 0, it costs the team places", ha="left", va="bottom", fontsize=8, color=INK_2, style="italic")
+	fig, (top, low) = plt.subplots(2, 1, figsize=(WIDTH, 5.0), sharex=True)
+	fig.subplots_adjust(left=0.115, right=0.99, top=0.985, bottom=0.095, hspace=0.1)
+	panels = [
+		(top, results["reward"], (-4.6, 11.2), range(-4, 11, 2), "Reward for losing, $R$\n(draft places)", "Above 0, dropping to the worst record gains a team places", "Below 0, it costs the team places"),
+		(low, results["firstPick"], (-6.8, 15.6), range(-6, 16, 3), "Reward for losing, $R_1$\n(first-pick chance, points)", "Above 0, the drop raises the team's chance of the first pick", "Below 0, it lowers that chance"),
+	]
+	for ax, values, (y0, y1), ticks, ylabel, above, below in panels:
+		# The zero line stops at the last position, short of the names.
+		ax.hlines(0, pos[0] - 0.5, pos[-1] + 0.15, color=INK_2, lw=0.8, zorder=2)
+		ax.set_xlim(pos[0] - 0.5, pos[-1] + 2.2)
+		ax.set_ylim(y0, y1)
+		ax.set_yticks(list(ticks))
+		ax.yaxis.grid(True, color=GRID, lw=0.5, zorder=0)
+		ax.set_axisbelow(True)
+		ax.set_ylabel(ylabel, labelpad=4)
+		pad = 0.02 * (y1 - y0)
+		ax.text(pos[0] - 0.35, y1 - pad, above, ha="left", va="top", fontsize=8, color=INK_2, style="italic")
+		ax.text(pos[0] - 0.35, y0 + pad, below, ha="left", va="bottom", fontsize=8, color=INK_2, style="italic")
+		for tag, _ in REWARD_LINES:
+			ax.plot(pos, values[tag], color=COLOR.get(tag, OTHER), lw=1.6, marker=REWARD_MARKER[tag], ms=4.6, mec="white", mew=0.6, zorder=4 if tag in COLOR else 3)
+		# Names at the line ends, kept 12 points apart so none overlap. A white
+		# backing keeps the zero line from running through a name.
+		(_, a), (_, b) = ax.transData.transform([(0, 0), (0, 1)])
+		gap = 12 * fig.dpi / (72 * (b - a))
+		for (_, label), y in zip(REWARD_LINES, spread([values[tag][-1] for tag, _ in REWARD_LINES], gap)):
+			ax.text(pos[-1] + 0.3, y, label, ha="left", va="center", fontsize=8.5, color=INK, bbox=dict(fc="white", ec="none", pad=0.6), zorder=5)
+	low.set_xticks(pos, [ordinal(p) for p in pos])
+	low.set_xlabel("Starting position, counted from the worst record among the 14 teams that missed the playoffs", labelpad=4)
 	save(fig, "reward-by-position")
 
 
