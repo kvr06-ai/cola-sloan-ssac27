@@ -417,6 +417,11 @@ async function captureSeasonRecord(
 //     McCarty number = drought x wins; survivor-style elimination-pool draw
 //     (5-team pools, tickets 6..2 worst..best). Eligible = seriesWon === 0.
 //     Source: docs/js/cola-engine.js computeCountdownCOLA / countdownTrial.
+//     With fewer than five teams left, the best team left keeps 2 tickets:
+//     5..2 with four, 4..2 with three, 3..2 with two. Highley's post of
+//     2026-03-19: "When there are fewer than five teams remaining, the least
+//     vulnerable team gets 2 tickets, then 3, and so on." cola-engine.js kept
+//     6..3, 6..4 and 6..5 there; corrected here on 2026-11-26.
 //   Beckett: drought = years since a #1 pick OR top-6 seed OR playoff series
 //     win; eligible = drought >= 2; entries = drought x wins; top-4 raffled by
 //     entries, rest by entries DESC. Uncapped (cap pending Highley).
@@ -442,7 +447,8 @@ function countdownTrial(rankedTids: number[]): Record<number, number> {
 			break;
 		}
 		const poolSize = Math.min(5, remaining.length);
-		const tickets = COUNTDOWN_POOL_TICKETS.slice(0, poolSize);
+		// Fewer than five left: drop the largest counts, so the best still holds 2.
+		const tickets = COUNTDOWN_POOL_TICKETS.slice(COUNTDOWN_POOL_TICKETS.length - poolSize);
 		const ticketTotal = tickets.reduce((a, b) => a + b, 0);
 		const roll = Math.random() * ticketTotal;
 		let cumulative = 0;

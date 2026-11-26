@@ -70,7 +70,8 @@ const SERIES_FACTORS = [0.75, 0.5, 0.25, 0];
 const PICK_FACTORS = [0, 0.25, 0.5, 0.75];
 // 3-2-1's chances by role (measures.js T321_CHANCES, Table 1 of the paper).
 const T321_CHANCES = { bottom3: 2, nonPlayIn: 3, seed910: 2, seed8: 1 };
-// Countdown COLA's chances from the lowest score up (measures.js).
+// Countdown COLA's chances from the lowest score up; with fewer than five teams
+// left, the last entries of the list, so the highest holds 2 (measures.js).
 const COUNTDOWN_CHANCES = [6, 5, 4, 3, 2];
 
 const MECHS = [
@@ -192,18 +193,19 @@ function countdownDistribution() {
 		const pickChance = new Array(n + 1).fill(0);
 		for (let placed = Math.max(0, position - (width - 1)); placed < n; placed++) {
 			const size = Math.min(width, n - placed);
+			const offset = width - size;
 			let total = 0;
-			for (let k = 0; k < size; k++) total += COUNTDOWN_CHANCES[k];
+			for (let k = 0; k < size; k++) total += COUNTDOWN_CHANCES[offset + k];
 			const next = new Array(width).fill(0);
 			let lower = 0;
 			for (let r = 0; r < size; r++) {
 				const p = below[r];
 				if (p > 0) {
-					pickChance[n - placed] += (p * COUNTDOWN_CHANCES[r]) / total;
+					pickChance[n - placed] += (p * COUNTDOWN_CHANCES[offset + r]) / total;
 					if (r > 0) next[r - 1] += (p * lower) / total;
-					next[r] += (p * (total - lower - COUNTDOWN_CHANCES[r])) / total;
+					next[r] += (p * (total - lower - COUNTDOWN_CHANCES[offset + r])) / total;
 				}
-				lower += COUNTDOWN_CHANCES[r];
+				lower += COUNTDOWN_CHANCES[offset + r];
 			}
 			below = next;
 		}

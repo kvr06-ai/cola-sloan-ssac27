@@ -88,7 +88,11 @@ const EAST = ["ATL", "BOS", "BKN", "CHA", "CHI", "CLE", "DET", "IND", "MIA", "MI
 const T321_CHANCES = { bottom3: 2, nonPlayIn: 3, seed910: 2, seed8: 1 };
 
 // Countdown COLA draws each pick from the five lowest scores left, with these
-// chances from the lowest score up (the driver's COUNTDOWN_POOL_TICKETS).
+// chances from the lowest score up (the driver's COUNTDOWN_POOL_TICKETS). With
+// fewer than five teams left, the list loses its first entries, so the highest
+// score left always holds 2: 5, 4, 3, 2 with four teams, 4, 3, 2 with three, and
+// 3, 2 with two. Highley's post of 2026-03-19: "When there are fewer than five
+// teams remaining, the least vulnerable team gets 2 tickets, then 3, and so on."
 const COUNTDOWN_CHANCES = [6, 5, 4, 3, 2];
 
 // One step of priority: a season of waiting, or the 1,000 tickets a team gains
@@ -380,7 +384,8 @@ function t321Picks(teams, past) {
 // pool, the teams without a series win, as { picks, first }. A team's score is
 // its wait times its wins. The order is filled from the last pick to the
 // first, and each step draws one team from the five
-// lowest scores left, with chances 6, 5, 4, 3, 2 from the lowest up. Ties on
+// lowest scores left, with chances 6, 5, 4, 3, 2 from the lowest up, or the
+// last entries of that list when fewer than five are left. Ties on
 // score go to the longer wait, then to more wins, as in the driver.
 //
 // Put the teams in score order, lowest first. A team joins the five lowest
@@ -407,19 +412,20 @@ function countdownDrawing(teams, wait) {
 		let chance = 0;
 		for (let placed = Math.max(0, position - (width - 1)); placed < n; placed++) {
 			const size = Math.min(width, n - placed);
+			const offset = width - size; // fewer than five left: the highest still holds 2
 			let total = 0;
-			for (let k = 0; k < size; k++) total += COUNTDOWN_CHANCES[k];
+			for (let k = 0; k < size; k++) total += COUNTDOWN_CHANCES[offset + k];
 			const next = new Array(width).fill(0);
 			let lower = 0; // chances held by the teams below this one
 			for (let r = 0; r < size; r++) {
 				const p = below[r];
 				if (p > 0) {
-					expected += ((p * COUNTDOWN_CHANCES[r]) / total) * (n - placed);
-					if (n - placed === 1) chance += (p * COUNTDOWN_CHANCES[r]) / total;
+					expected += ((p * COUNTDOWN_CHANCES[offset + r]) / total) * (n - placed);
+					if (n - placed === 1) chance += (p * COUNTDOWN_CHANCES[offset + r]) / total;
 					if (r > 0) next[r - 1] += (p * lower) / total;
-					next[r] += (p * (total - lower - COUNTDOWN_CHANCES[r])) / total;
+					next[r] += (p * (total - lower - COUNTDOWN_CHANCES[offset + r])) / total;
 				}
-				lower += COUNTDOWN_CHANCES[r];
+				lower += COUNTDOWN_CHANCES[offset + r];
 			}
 			below = next;
 		}
