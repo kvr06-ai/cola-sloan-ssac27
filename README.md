@@ -107,9 +107,8 @@ below from `testbed/harness/`.
 | Command | What it prints | In the paper |
 |:--|:--|:--|
 | `node abstract_table.js --table1` | The abstract's table and the summary numbers | Abstract, Section 1 |
-| `node simple_losing_check.js` | A test of the proof on every simulated season of Simple COLA, and what one more loss costs a team | Section 4 |
-| `node simple_losing_check.js --cutoff` | The same, plus whether the team picking third could gain over two drafts by losing enough games to pick fourth | Section 5.2 |
-| `node limits_check.js` | What a team gains by landing just inside the group of teams that picks first, and how teams fare after a top-three pick | Sections 5.1 and 5.3 |
+| `node swap_check.js` | What a team gains and loses under Simple COLA by losing one game on purpose to a rival that has waited longer | Section 4.2 |
+| `node limits_check.js` | What a team gains by landing just inside the group of teams that picks first, and how teams fare after a top-three pick | Section 5.1 |
 | `node design_check.js` | How the simulations were set up, and how the simulated leagues compare with the real NBA | Section 6, Figures 2 and 3 |
 | `node results_check.js` | All ten mechanisms on every measure, and how each differs from 3-2-1 | Sections 7 and 8.1, Table 2, Figures 4 to 7 |
 | `node draft2026_check.js` | The 2026 draft under each mechanism, from the real 2025-26 standings and playoff results | Section 8.2, Figure 8 |

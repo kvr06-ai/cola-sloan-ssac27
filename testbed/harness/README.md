@@ -10,13 +10,14 @@ paper that reports numbers.
     measures.js                    the paper's measures, shared by the scripts below
     pick_dist.js                   exact pick chances for a lottery that draws its first picks
     abstract_table.js              the abstract's table
-    simple_losing_check.js         Section 4 and, with --cutoff, Section 5.2
+    swap_check.js                  Section 4.2
     limits_check.js                Section 5
     design_check.js                Section 6
     results_check.js               Sections 7 and 8.1
     draft2026_check.js             Section 8.2, the 2026 draft under each mechanism
     make_figures.py                Figures 1 to 8, from the three scripts above (needs Python 3
                                    and matplotlib; set in Caladea when it is installed)
+    simple_losing_check.js         checks the Simple COLA run against its rule
     verify_classic.js              checks the Classic COLA run against its rules
     t321_adopted_check.js          checks the 3-2-1 run against its rules
     verify_capped.js               checks the Capped COLA run against its rules
