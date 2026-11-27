@@ -1,10 +1,10 @@
 # Practical Incentive-Compatible Drafts: Carry-Over Lottery Allocation
 
-This repository holds the paper, code, and data for our submission to the MIT
-Sloan Sports Analytics Conference 2027 (SSAC27), in the Basketball track. The
-paper proposes Carry-Over Lottery Allocation (COLA), a new way to set the order
-of the National Basketball Association (NBA) draft. The paper is a working
-draft.
+This repository holds the code and data for our submission to the MIT Sloan
+Sports Analytics Conference 2027 (SSAC27), in the Basketball track. The paper
+proposes Carry-Over Lottery Allocation (COLA), a new way to set the order of the
+National Basketball Association (NBA) draft. The paper is not in this
+repository.
 
 ## The problem
 
@@ -78,10 +78,6 @@ costs.
 
 ## What is in this repository
 
-    paper/                 the paper's source (main.tex, references.bib), the
-                           built paper (main.pdf), and the figures
-    abstract-submission/   the abstract as submitted to SSAC27 and accepted,
-                           its source, and the script that counts its words
     testbed/harness/       the code that runs each mechanism in the simulator,
                            the simulation results, the NBA data, and the
                            scripts behind every number we computed
@@ -106,7 +102,7 @@ below from `testbed/harness/`.
 
 | Command | What it prints | In the paper |
 |:--|:--|:--|
-| `node abstract_table.js --table1` | The abstract's table and the summary numbers | Abstract, Section 1 |
+| `node abstract_table.js --table1` | The table and summary numbers of the abstract submitted to SSAC in September | The September abstract only |
 | `node swap_check.js` | What a team gains and loses under Simple COLA by losing one game on purpose to a rival that has waited longer | Section 4.2 |
 | `node limits_check.js` | What a team gains by landing just inside the group of teams that picks first, and how teams fare after a top-three pick | Section 5.1 |
 | `node design_check.js` | How the simulations were set up, and how the simulated leagues compare with the real NBA | Section 6, Figures 2 and 3 |
@@ -147,24 +143,11 @@ statistics website. `testbed/harness/README.md` describes both file formats and
 how to run the simulations again. A full rerun needs the simulator and took
 about 11 hours on our machine.
 
-## Building the paper
-
-The paper is written in LaTeX, a system for typesetting documents, and
-`paper/main.pdf` is the built copy. To build it again, install
-[Tectonic](https://tectonic-typesetting.github.io/), a LaTeX engine that
-downloads the packages it needs. Then run these commands from the top folder of
-the repository.
-
-    tectonic paper/main.tex
-    tectonic abstract-submission/ssac27-abstract.tex
-
 ## License
 
 The code and result files in this repository are released under the MIT
-License (see `LICENSE`). Three things sit outside it:
+License (see `LICENSE`). Two things sit outside it:
 
-- `paper/` and `abstract-submission/` hold the manuscript and the abstract,
-  which remain the authors' and are not licensed for reuse.
 - `original-study/` holds the code and data of the earlier study, by its own
   authors. It is included for reference and keeps its original terms.
 - The simulator, ZenGM Basketball-GM, is not part of this repository. It is
