@@ -237,7 +237,7 @@ def fig_carryover():
 # ---------------------------------------------------------------------------
 
 # design_check.js part 3 lists its four rows in this order.
-REAL_ROWS = [("R", "nba", "Old lottery"), ("R", "t321", "3-2-1"), ("R", "simplerule", "Simple COLA"), ("H", "simplerule", "Simple COLA")]
+REAL_ROWS = [("R", "nba", "Old Lottery"), ("R", "t321", "3-2-1"), ("R", "simplerule", "Simple COLA"), ("H", "simplerule", "Simple COLA")]
 
 
 def fig_real_standings(design):
@@ -321,7 +321,7 @@ def spread(ys, gap):
 
 # The three mechanisms the text follows, in color, and Classic and Capped COLA,
 # in gray with their own markers.
-REWARD_LINES = [("classic", "Classic COLA"), ("capped", "Capped COLA"), ("nba", "Old lottery"), ("t321", "3-2-1"), ("simplerule", "Simple COLA")]
+REWARD_LINES = [("classic", "Classic COLA"), ("capped", "Capped COLA"), ("nba", "Old Lottery"), ("t321", "3-2-1"), ("simplerule", "Simple COLA")]
 REWARD_MARKER = {**MARKER, "classic": "^", "capped": "v"}
 
 
@@ -495,7 +495,7 @@ def fig_nba_comparison(design):
 		fig.text(col_nba, middle, shown_nba, ha="right", va="center", fontsize=8.5)
 		fig.text(col_sim, middle, shown_sim, ha="right", va="center", fontsize=8.5)
 	handles = [
-		Line2D([0], [0], ls="none", marker="o", ms=dot + 1, color=COLOR["nba"], label="One simulated league, run under the old lottery"),
+		Line2D([0], [0], ls="none", marker="o", ms=dot + 1, color=COLOR["nba"], label="One simulated league, run under the Old Lottery"),
 		Line2D([0], [0], ls="none", marker="D", ms=6, color=INK, label=f"The NBA, {c['first']} to {c['last']}"),
 	]
 	fig.legend(handles=handles, loc="lower left", bbox_to_anchor=(0.0, 0.0), ncol=2, frameon=False, handletextpad=0.4, columnspacing=1.8)
@@ -600,8 +600,8 @@ def fig_mechanism_map(results):
 # The columns of chances. Classic, Waitlist and Full-lottery COLA draw their
 # first pick on the same tickets, so they share one column.
 DRAFT_COLUMNS = [
-	("old", "Old\nlottery"),
-	("uniform", "Equal-odds\nlottery"),
+	("old", "Old\nLottery"),
+	("uniform", "Equal-Odds\nLottery"),
 	("t321", "3-2-1"),
 	("full", "Classic,\nWaitlist and\nFull-lottery\nCOLA"),
 	("countdown", "Countdown\nCOLA"),

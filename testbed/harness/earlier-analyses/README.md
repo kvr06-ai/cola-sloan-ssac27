@@ -29,7 +29,7 @@ Their inputs are not in the repository. The runners below write them under
 | File | What it does |
 |:--|:--|
 | `paper_tables.js` | The earlier draft's tables: two rankings and help gradients |
-| `gap_decomposition.js` | Where the old lottery's reward for losing comes from |
+| `gap_decomposition.js` | Where the Old Lottery's reward for losing comes from |
 | `tank_counterfactual.js` | Picks bought by losing, one team's record moved at a time. `runs/frontier/counterfactual.txt` is its printed output on the nine-mechanism run |
 | `tank_crosscheck.js` | A sampled check of the script above |
 | `tank_engine.js` | A run in which one team sits its best players |

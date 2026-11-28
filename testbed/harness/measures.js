@@ -48,7 +48,7 @@
  * exactly for all ten mechanisms (expectedPick() below), so they carry no
  * sampling error:
  *   "old"        the 2019 to 2026 lottery     raffleThenOrder() enumerates its four drawn picks
- *   "uniform"    equal-odds lottery           every pool team expects pick 7.5
+ *   "uniform"    Equal-Odds Lottery           every pool team expects pick 7.5
  *   "t321"       3-2-1 as adopted             t321Picks() sums over every state of its drawing
  *   "classic"    Classic COLA                 raffleThenOrder(), tickets then record
  *   "waitlist"   Waitlist COLA                raffleThenOrder(), tickets then tickets
@@ -670,7 +670,7 @@ function priorityOf(mech, teams, state) {
 	return {};
 }
 
-// The old lottery's pool. Chances follow the rank by record, worst first, and
+// The Old Lottery's pool. Chances follow the rank by record, worst first, and
 // the order after the drawing is reverse order of record.
 function oldPool(missed) {
 	return missed

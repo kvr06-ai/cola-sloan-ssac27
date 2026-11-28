@@ -42,8 +42,8 @@ Each file in `runs/frontier/` holds one mechanism's 30 leagues of 25 seasons.
 
 | File | Mechanism in the paper |
 |:--|:--|
-| `nba.json` | Old lottery, the NBA's from 2019 to 2026 |
-| `uniform.json` | Equal-odds lottery |
+| `nba.json` | Old Lottery, the NBA's from 2019 to 2026 |
+| `uniform.json` | Equal-Odds Lottery |
 | `t321.json` | 3-2-1 as adopted |
 | `classic.json` | Classic COLA |
 | `waitlist.json` | Waitlist COLA |

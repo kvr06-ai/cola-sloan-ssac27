@@ -3,14 +3,14 @@
  * Section 5's numbers, from the 25-season run (30 leagues x 25 seasons each).
  *
  * Reads runs/frontier/{nba,t321,full,simplerule,capped}.json and prints, for
- * the old lottery, the adopted 3-2-1, Full-lottery COLA, Simple COLA and
+ * the Old Lottery, the adopted 3-2-1, Full-lottery COLA, Simple COLA and
  * Capped COLA:
  *
  * 1. The pool line. Every mechanism's pool ends somewhere, and a team just
  *    inside it picks earlier than a team just outside. For each mechanism this
  *    prints the pick of the team on the pool side and the first pick on the
  *    other side.
- *      old lottery   line = the last playoff place. Team = the best record
+ *      Old Lottery   line = the last playoff place. Team = the best record
  *                    among the 14 that missed the playoffs, at its exact
  *                    expected pick (pick_dist.js). Other side = pick 15.
  *      3-2-1         line = the seven-eight play-in game. Team = the loser,
@@ -55,7 +55,7 @@ const M = require("./measures.js");
 
 const ROOT = process.argv[2] ?? "runs/frontier";
 const MECHS = [
-	["nba", "Old lottery"],
+	["nba", "Old Lottery"],
 	["t321", "3-2-1"],
 	["full", "Full-lottery COLA"],
 	["simplerule", "Simple COLA"],

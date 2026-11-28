@@ -41,8 +41,8 @@ const ROOT = args[0] ?? "runs/frontier";
 
 // [run file, name in measures.js, name in the paper]
 const MECHS = [
-	["nba", "old", "Old lottery"],
-	["uniform", "uniform", "Equal-odds lottery"],
+	["nba", "old", "Old Lottery"],
+	["uniform", "uniform", "Equal-Odds Lottery"],
 	["t321", "t321", "3-2-1"],
 	["classic", "classic", "Classic COLA"],
 	["waitlist", "waitlist", "Waitlist COLA"],

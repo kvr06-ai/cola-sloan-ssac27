@@ -25,7 +25,7 @@
  *    time. Each of the 22 seasons from 2004-05, the first with 30 teams, is
  *    scored on its own final standings, with every team's wait and earlier
  *    picks taken from the real seasons since 1999-00. No season is replayed.
- *    The old lottery's 2019 odds are applied to every season. Beside each
+ *    The Old Lottery's 2019 odds are applied to every season. Beside each
  *    real-standings mean and its 95% interval over the 22 seasons are the
  *    simulated values over all 25 seasons of each league and over seasons 6 to
  *    25, which have the same five seasons of history behind them as 2004-05
@@ -52,8 +52,8 @@ const ROOT = args[0] ?? "runs/frontier";
 const REAL = args[1] ?? "data/nba-data.json";
 
 const MECHS = [
-	["nba", "Old lottery"],
-	["uniform", "Equal-odds lottery"],
+	["nba", "Old Lottery"],
+	["uniform", "Equal-Odds Lottery"],
 	["t321", "3-2-1"],
 	["classic", "Classic COLA"],
 	["waitlist", "Waitlist COLA"],
@@ -285,7 +285,7 @@ console.log(`\nThe NBA's longest wait is held by: ${holders}.`);
 // ---------------------------------------------------------------------------
 
 const ROWS = [
-	["Help for a worse record, old lottery", "nba", (s, st) => M.rewardForLosing("old", s, st)],
+	["Help for a worse record, Old Lottery", "nba", (s, st) => M.rewardForLosing("old", s, st)],
 	["Help for a worse record, 3-2-1", "t321", (s, st) => M.rewardForLosing("t321", s, st)],
 	["Help for a worse record, Simple COLA", "simplerule", (s, st) => M.rewardForLosing("simple", s, st)],
 	["Help for a longer wait, Simple COLA", "simplerule", (s, st) => M.helpForWaiting("simple", s, st)],

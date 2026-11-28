@@ -75,8 +75,8 @@ const T321_CHANCES = { bottom3: 2, nonPlayIn: 3, seed910: 2, seed8: 1 };
 const COUNTDOWN_CHANCES = [6, 5, 4, 3, 2];
 
 const MECHS = [
-	["old", "Old lottery"],
-	["uniform", "Equal-odds lottery"],
+	["old", "Old Lottery"],
+	["uniform", "Equal-Odds Lottery"],
 	["t321", "3-2-1"],
 	["classic", "Classic COLA"],
 	["waitlist", "Waitlist COLA"],
@@ -130,7 +130,7 @@ const share = (weights) => {
 
 const chance = {};
 
-// The old lottery: the 2019 odds by rank, shared equally within a tie.
+// The Old Lottery: the 2019 odds by rank, shared equally within a tie.
 {
 	const w = {};
 	for (let i = 0; i < missed.length; ) {
