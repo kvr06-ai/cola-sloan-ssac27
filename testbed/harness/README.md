@@ -1,7 +1,7 @@
 # The simulations and the analysis scripts
 
 This folder holds everything behind the paper's numbers: the driver that runs
-the nine draft mechanisms inside the simulator, the result files of those runs,
+the ten draft mechanisms inside the simulator, the result files of those runs,
 the NBA seasons used for comparison, and one script for each section of the
 paper that reports numbers.
 
@@ -114,7 +114,7 @@ and has its own license.
 One number, the seed, fixes every chance event in a league, so a given seed and
 mechanism reproduce a league. On our machine, six leagues of 25 seasons took
 about 37 minutes in one process. That makes about 75 minutes for one mechanism
-at three processes and about 11 hours for all nine.
+at three processes and about 12 hours for the whole run.
 
 A fresh clone loses the executable bit on the shell scripts when it comes
 through Overleaf, so run `chmod +x *.sh` first if a script will not start.
