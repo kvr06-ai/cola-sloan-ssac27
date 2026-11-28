@@ -3,12 +3,16 @@
 #
 #   ./frontier_run.sh [seasons] [reps] [chunk] [conc]
 #
+# Defaults: 25 seasons, 30 leagues (reps), 6 leagues per chunk, and 3 chunks
+# (processes) at once; a machine with more cores and memory can raise conc.
+#
 # Requested by the first author for the SSAC27 abstract: a longer horizon at
 # fewer leagues (30 leagues x 25 seasons per mechanism, about the season count
 # of the 48 x 15 runs) so that the long-term-parity criterion, the longest
 # drought any team has between playoff-series wins, resolves inside the run.
-# Same memory-safe chunked runner as earlier-analyses/e14_run.sh. Nine configs, in the order the
-# results are needed:
+# Same memory-safe chunked runner as earlier-analyses/e14_run.sh. Eleven configs,
+# the paper's ten mechanisms and simple (an earlier form of Simple COLA, not in
+# the paper), in the order the results are needed:
 #   classic    Classic COLA, 14-team pool (top-4 by index, 5-14 by record). Re-run
 #              2026-11-11 on the weighted path with tail "record", so it shares
 #              Waitlist's pool and index law. The engine-lottery run it replaces

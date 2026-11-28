@@ -9,7 +9,7 @@ team histories. It is one self-contained file with no external dependencies.
 The page shows the runs of an earlier draft, 48 leagues of 15 seasons per
 mechanism, and its numbers came from the scripts in
 `../testbed/harness/earlier-analyses/`. It will be rebuilt from the
-nine-mechanism run behind the paper.
+ten-mechanism run behind the paper.
 
 ## Publishing
 

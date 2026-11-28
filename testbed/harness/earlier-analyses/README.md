@@ -12,6 +12,9 @@ resolve:
 
 ## Analyses of the nine-mechanism run
 
+The nine-mechanism run is `runs/frontier/` before Capped COLA joined it on 17
+November 2026.
+
 | File | What it does |
 |:--|:--|
 | `frontier_analysis.js` | An earlier four-criteria comparison. `runs/frontier/analysis.txt` and `analysis_recut.txt` are its printed output |
@@ -50,4 +53,5 @@ Their inputs are not in the repository. The runners below write them under
 `ASSUMPTIONS.md`, `ASSUMPTIONS_FOR_HIGHLEY.md` and `DIAL_MAPPING.md` record the
 modeling choices of the earlier work, and items FE-1 to FE-7 of
 `ASSUMPTIONS.md` cover the nine-mechanism run. File paths inside these notes
-are relative to `testbed/harness`.
+are relative to `testbed/harness`. Paths under `paper/` point to the paper
+source of an earlier project, which is not in this repository.

@@ -108,7 +108,7 @@ below from `testbed/harness/`.
 | `node design_check.js` | How the simulations were set up, and how the simulated leagues compare with the real NBA | Section 6, Figures 2 and 3 |
 | `node results_check.js` | All ten mechanisms on every measure, and how each differs from 3-2-1 | Sections 7 and 8.1, Table 2, Figures 4 to 7 |
 | `node draft2026_check.js` | The 2026 draft under each mechanism, from the real 2025-26 standings and playoff results | Section 8.2, Figure 8 |
-| `python3 make_figures.py` | Draws the figures into `paper/figures/` | Figures 1 to 8 |
+| `python3 make_figures.py` | Draws the figures into `paper/figures/`, which it creates | Figures 1 to 8 |
 
 Three more scripts check that the stored simulations followed the written
 rules of three mechanisms, 3-2-1, Classic COLA and Capped COLA. Classic COLA is
@@ -137,11 +137,12 @@ compare any two of them league by league.
 `testbed/harness/runs/frontier/` holds the result file of each mechanism, with
 30 leagues of 25 seasons in each. `testbed/harness/data/nba-data.json` holds
 the NBA's standings, playoff results, and first-round picks from 1999-00 to
-2025-26. They were compiled from
+2025-26, with 2025-26 as it stood after the first round of the 2026 playoffs.
+They were compiled from
 [Basketball Reference](https://www.basketball-reference.com/), a public
 statistics website. `testbed/harness/README.md` describes both file formats and
-how to run the simulations again. A full rerun needs the simulator and took
-about 11 hours on our machine.
+how to run the simulations again. A full rerun needs the simulator and takes
+about 12 hours on our machine, with three processes at a time.
 
 ## License
 

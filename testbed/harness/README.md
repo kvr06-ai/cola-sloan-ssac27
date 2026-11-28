@@ -24,8 +24,8 @@ paper that reports numbers.
     colaFullEngineDriver.test.ts   the driver, which runs one mechanism inside the simulator
     deploy.sh                      copies the driver into the simulator's source tree
     frontier_run.sh                launches the ten-mechanism run
-    frontier_watchdog.sh           keeps a long run within memory and disk
-    rerun_guarded.sh               runs frontier_run.sh under a memory guard
+    frontier_watchdog.sh           keeps a long run within memory and disk (macOS)
+    rerun_guarded.sh               runs frontier_run.sh under a memory guard (macOS)
     data/nba-data.json             NBA standings, playoff results and first-round picks,
                                    1999-00 to 2025-26
     runs/frontier/                 result files of the ten-mechanism run
@@ -74,6 +74,33 @@ with these fields.
 `analysis.txt`, `analysis_recut.txt` and `counterfactual.txt` in the same
 folder are printed outputs of earlier analyses of these runs.
 
+## The NBA data
+
+`data/nba-data.json` holds the NBA's regular seasons and playoffs from 1999-00
+to 2025-26, compiled from Basketball Reference. Its `seasons` list gives each
+season's label (`season`, as `1999-00`), the year it ended (`year`) and its
+`teams`, with these fields for each team.
+
+| Field | Meaning |
+|:--|:--|
+| `id`, `name` | Team abbreviation, and the team's name that season |
+| `wins`, `losses` | Regular-season record |
+| `madePlayoffs` | Whether the team reached the playoffs, directly or through the play-in |
+| `playoffResult` | The round the team lost in, `first_round`, `second_round`, `conf_finals` or `finals`, or `champion`; null for a team that missed the playoffs |
+| `seriesWon` | Playoff series won, 0 to 4 |
+| `draftPick` | The team's best first-round pick in the draft after the season, by the team that made it; null if it made none |
+| `playInParticipant` | Whether the team played in the play-in, held from 2019-20 on |
+| `playInAdvanced` | Whether the team reached the playoffs through the play-in |
+| `playoffSeed` | In 2025-26 only: the team's playoff seed in its conference, 1 to 8, or null |
+
+The 2025-26 season is recorded as it stood after the first round of the 2026
+playoffs, before the draft lottery. A team still playing after that round shows
+one series won and a null `playoffResult`, and no team has a `draftPick`. For
+picks 15 to 30, `draftPick` follows Basketball Reference's draft pages, which
+list the original holder of a pick traded on draft night. The file also gives
+each franchise's current name under `teams`, and its moves and renames since
+1999-00 under `relocations`.
+
 ## How the mechanisms are run
 
 Section 3 of the paper defines the ten mechanisms, and the driver is the exact
@@ -104,17 +131,27 @@ and has its own license.
    <https://github.com/kvr06-ai/zengm>, a fork of
    <https://github.com/zengm-games/zengm>.
 2. Install its packages as its README describes (`pnpm install`). It asks for
-   Node.js 24.
+   Node.js 24 and pnpm 11.
 3. Run `./deploy.sh` to copy the driver into the simulator's source tree.
 4. Run `./frontier_run.sh`. It writes each mechanism's leagues to
    `runs/frontier/` in chunks of six and skips any chunk already there.
    `./rerun_guarded.sh` does the same and stops the run if its processes pass
-   16 GB of memory in total.
+   16 GB of memory in total. It uses macOS commands, so on Linux run
+   `./frontier_run.sh` directly.
 
 One number, the seed, fixes every chance event in a league, so a given seed and
 mechanism reproduce a league. On our machine, six leagues of 25 seasons took
 about 37 minutes in one process. That makes about 75 minutes for one mechanism
 at three processes and about 12 hours for the whole run.
 
-A fresh clone loses the executable bit on the shell scripts when it comes
-through Overleaf, so run `chmod +x *.sh` first if a script will not start.
+The run uses three processes at a time by default, because our machine also
+runs other work that needs a lot of CPU and memory. A machine with more cores
+and memory can run more at once and finish sooner. The fourth argument of
+`./frontier_run.sh` sets the number, so `./frontier_run.sh 25 30 6 5` runs five
+at a time, and `./rerun_guarded.sh` takes it as its first argument. Our three
+processes peaked at 11.8 GB together, so with `./rerun_guarded.sh`, raise its
+memory ceiling, the second argument (16 GB by default), by about 4 GB for each
+process added.
+
+If a script will not start because it is not executable, run `chmod +x *.sh`
+first, or start it with `sh`, as in `sh ./frontier_run.sh`.
