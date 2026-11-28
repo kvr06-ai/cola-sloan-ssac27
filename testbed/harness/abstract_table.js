@@ -34,9 +34,9 @@ const ARGS = process.argv.slice(2);
 const flagsHas = (f) => ARGS.includes(f);
 const ROOT = ARGS.find((a) => !a.startsWith("--")) ?? "runs/frontier";
 const MECHS = [
-	["nba", "Current NBA lottery (2019 to 2026)"],
-	["t321", "New NBA lottery, 3-2-1 (from 2027)"],
-	["uniform", "Equal-odds lottery"],
+	["nba", "Old Lottery (2019 to 2026)"],
+	["t321", "3-2-1 Lottery (from 2027)"],
+	["uniform", "Equal-Odds Lottery"],
 	["classic", "Classic COLA"],
 	["waitlist", "Waitlist COLA"],
 	["simple", "Simple COLA, as first run (index)"],
@@ -219,7 +219,7 @@ if (flagsHas("--table1")) {
 		const sorted = np.slice().sort((a, b) => w[b.tid] - w[a.tid]); const t = sorted[4]; out.push(ep(t.tid, w[t.tid]) - ep(t.tid, w[sorted[0].tid] + 1000)); } return mean(out); }
 	const longerWait = { nba: () => 0, t321: () => 0, simplerule: simpleWaitHelp, full: fullWaitHelp };
 	function avgSpell(log, hit) { const now = {}, done = []; for (const e of log) for (const t of e.teams) { if (hit(t)) { if (now[t.tid] > 0) done.push(now[t.tid]); now[t.tid] = 0; } else now[t.tid] = (now[t.tid] ?? 0) + 1; } return mean(done); }
-	const T1 = [["nba", "Old NBA lottery"], ["t321", "New lottery, 3-2-1"], ["simplerule", "Simple COLA"], ["full", "Full-lottery COLA"]];
+	const T1 = [["nba", "Old Lottery"], ["t321", "3-2-1 Lottery"], ["simplerule", "Simple COLA"], ["full", "Full-lottery COLA"]];
 	const perLeague = {};
 	for (const [tag] of T1) {
 		if (!logs[tag]) { console.error(`table1: ${tag} missing`); continue; }
