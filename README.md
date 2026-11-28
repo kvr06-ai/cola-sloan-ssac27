@@ -167,10 +167,9 @@ on COLA is Highley, Duncan, and Volkov (2026),
 Its code and data are in `original-study/`, merged with their full commit
 history from <https://github.com/vilka-9999/carry_over_lotter_allocation_research>.
 
-Two interactive pages come from earlier work on COLA, before this paper. The
-[COLA Explorer](https://kvr06-ai.github.io/cola-manipulation-bound/) shows how
-26 years of NBA drafts would have gone under five versions of COLA. The
-[results page](https://kvr06-ai.github.io/cola-manipulation-bound/sweep/) shows
-the simulations of an earlier draft, with 48 leagues of 15 seasons for each
-mechanism, and a playground that runs three lotteries on team histories you
-enter. Its source is in `results-page/`.
+Two interactive pages came from earlier work on COLA, before this paper, and
+are no longer online. The COLA Explorer showed how 26 years of NBA drafts would
+have gone under five versions of COLA. The results page showed the simulations
+of an earlier draft, with 48 leagues of 15 seasons for each mechanism, and a
+playground that runs three lotteries on team histories you enter. Its source is
+in `results-page/`, and it still runs when opened in a browser.

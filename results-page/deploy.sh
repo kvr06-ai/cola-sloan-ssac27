@@ -1,7 +1,8 @@
 #!/bin/sh
 # Copy the results page into a checkout of the repository that GitHub Pages
-# serves it from (cola-manipulation-bound, folder docs/sweep/).
-# Live URL: https://kvr06-ai.github.io/cola-manipulation-bound/sweep/
+# served it from (cola-manipulation-bound, folder docs/sweep/). That repository
+# is private since 28 November 2026, so the page at
+# https://kvr06-ai.github.io/cola-manipulation-bound/sweep/ is no longer online.
 #
 #   ./deploy.sh [path/to/cola-manipulation-bound/docs/sweep/index.html]
 #
