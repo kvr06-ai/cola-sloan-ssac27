@@ -1,7 +1,7 @@
 #!/bin/sh
 # Frontier run: the named mechanisms on a 25-season horizon.
 #
-#   ./frontier_run.sh [seasons] [reps] [chunk] [conc]
+#   sh ./frontier_run.sh [seasons] [reps] [chunk] [conc]
 #
 # Defaults: 25 seasons, 30 leagues (reps), 6 leagues per chunk, and 3 chunks
 # (processes) at once; a machine with more cores and memory can raise conc.

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Watchdog for the frontier sweep. Acts on memory and disk without a human.
 #
-#   nohup ./frontier_watchdog.sh [lanes=3] [seasons=25] [reps=30] [chunk=6] >> runs/frontier/watchdog.log 2>&1 &
+#   nohup sh ./frontier_watchdog.sh [lanes=3] [seasons=25] [reps=30] [chunk=6] >> runs/frontier/watchdog.log 2>&1 &
 #
 # Every 60 seconds it samples swap in use, free memory and free disk. Policy:
 #   swap    above SWAP_MB and higher than the previous sample by RISE_MB or more:
@@ -40,7 +40,7 @@ done_count() { ls "$OUT"/*_s*.json 2>/dev/null | wc -l | tr -d ' '; }
 runner_alive() { pgrep -f "frontier_run.sh" >/dev/null 2>&1; }
 
 stop_run() {
-  pkill -f "caffeinate -is ./frontier_run.sh" 2>/dev/null
+  pkill -f "caffeinate -is sh ./frontier_run.sh" 2>/dev/null
   pkill -f "frontier_run.sh" 2>/dev/null
   pkill -f "vitest --run --project basketball src/test/colaFullEngineDriver.test.ts" 2>/dev/null
   sleep 5
@@ -50,7 +50,7 @@ stop_run() {
 }
 start_run() {
   cd "$DIR" || exit 1
-  nohup caffeinate -is ./frontier_run.sh "$SEASONS" "$REPS" "$CHUNK" "$LANES" >> "$OUT/console.log" 2>&1 &
+  nohup caffeinate -is sh ./frontier_run.sh "$SEASONS" "$REPS" "$CHUNK" "$LANES" >> "$OUT/console.log" 2>&1 &
   sleep 3
   log "started runner at $LANES lane(s), pid $(pgrep -f 'sh ./frontier_run.sh' | head -1)"
 }

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Parallel draft-to-outcome channel probe runner.
 #
-#   ./probe_run.sh [seasons] [reps]
+#   sh ./probe_run.sh [seasons] [reps]
 #
 # Launches the `random`-variant driver across seed chunks, one vitest process
 # per chunk (memory peaks staggered), and writes per-chunk JSON to runs/probe/.
@@ -9,7 +9,7 @@
 #
 # Defaults: 15 seasons, 12 replicates (4 chunks x 3 seeds). Detaches nothing;
 # run it under nohup/caffeinate yourself for long jobs:
-#   caffeinate -is ./probe_run.sh 15 12
+#   caffeinate -is sh ./probe_run.sh 15 12
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"

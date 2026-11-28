@@ -1,7 +1,7 @@
 #!/bin/sh
 # Memory-safe tightening run.
 #
-#   ./tighten_run.sh [seasons] [reps] [chunk] [conc]
+#   sh ./tighten_run.sh [seasons] [reps] [chunk] [conc]
 #
 # Each config's REPS replicates are split into CHUNK-replicate processes (the
 # proven-stable ~3GB size), launched CONC at a time and resumable per chunk

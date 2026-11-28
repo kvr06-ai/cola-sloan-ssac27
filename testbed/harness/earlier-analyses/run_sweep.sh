@@ -1,7 +1,7 @@
 #!/bin/sh
 # Detached, sleep-proof, resumable full-engine COLA sweep launcher.
 #
-#   ./run_sweep.sh [name] [concurrency] [chunk-size]
+#   sh ./run_sweep.sh [name] [concurrency] [chunk-size]
 #
 # Runs the full 50-config x 50-replicate x 30-season sweep through the parallel,
 # resumable runner in sweep.js. Detaches from the terminal (nohup) so it survives
@@ -41,5 +41,5 @@ echo "Sweep launched."
 echo "  PID:         $PID  (name=$NAME, concurrency=$CONC, chunk=$CHUNK)"
 echo "  watch:       tail -f $OUT/sweep.log"
 echo "  results:     $OUT/sweep.csv   (rebuilt as units finish)"
-echo "  resume:      ./earlier-analyses/run_sweep.sh $NAME $CONC $CHUNK   (after a crash/sleep)"
+echo "  resume:      sh ./earlier-analyses/run_sweep.sh $NAME $CONC $CHUNK   (after a crash/sleep)"
 echo "  stop:        pkill -f 'sweep.js --parallel'"

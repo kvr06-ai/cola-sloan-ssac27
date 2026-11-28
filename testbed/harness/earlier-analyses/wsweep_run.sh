@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lottery-weighting (W) sweep runner.
 #
-#   ./wsweep_run.sh [seasons] [reps] [concurrency]
+#   sh ./wsweep_run.sh [seasons] [reps] [concurrency]
 #
 # One vitest process per config (all reps in that process), launched in waves of
 # `concurrency` to bound memory, with a short stagger to desync peaks. Resumable:
@@ -9,7 +9,7 @@
 # fills in only what is missing. Analyze with wsweep_analysis.js.
 #
 # Defaults: 15 seasons, 12 replicates, 3-way. Run under caffeinate for long jobs:
-#   caffeinate -is ./wsweep_run.sh 15 12 3
+#   caffeinate -is sh ./wsweep_run.sh 15 12 3
 
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
 FORK="$DIR/zengm-fork"

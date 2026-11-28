@@ -2,7 +2,7 @@
 # Sim 3, behavioral arm: a real tank inside the full engine, run against its own
 # control.
 #
-#   ./tank_run.sh [seasons] [tankSeasonIndex] [rank] [reps] [chunk] [conc]
+#   sh ./tank_run.sh [seasons] [tankSeasonIndex] [rank] [reps] [chunk] [conc]
 #
 # Six runs, three mechanisms times two arms. In the tank arm the team sitting
 # `rank` places off the bottom of the standings at the season's midpoint sits its

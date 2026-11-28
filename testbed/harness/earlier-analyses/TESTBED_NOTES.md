@@ -20,12 +20,12 @@ What changed from the migrated harness:
 
 Layout and workflow:
 - `*.test.ts` here are editable MASTERS. They import `../worker/...`, so they run
-  only from inside `zengm-fork/src/test/`. Edit a master, then `./deploy.sh` to
+  only from inside `zengm-fork/src/test/`. Edit a master, then `sh ./deploy.sh` to
   sync it into the fork before running.
 - One-off engine check (3-season scaffold):
   `cd zengm-fork && COLA_SPIKE=1 COLA_DRIVER_SEASONS=3 ./node_modules/.bin/vitest --run --project basketball src/test/colaFullEngineDriver.test.ts`
 - Draft-to-outcome channel probe (random draft order, 12 leagues x 15 seasons) + analysis:
-  `./deploy.sh && caffeinate -is ./probe_run.sh 15 12 && node channel_probe.js runs/probe/probe_c*.json --lag 3`
+  `sh ./deploy.sh && caffeinate -is sh ./probe_run.sh 15 12 && node channel_probe.js runs/probe/probe_c*.json --lag 3`
   Result (channel verified alive): folded into `../cola-basketball-gm-testbed.html` §3.
 
 ---

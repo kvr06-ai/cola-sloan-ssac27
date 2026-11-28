@@ -132,12 +132,12 @@ and has its own license.
    <https://github.com/zengm-games/zengm>.
 2. Install its packages as its README describes (`pnpm install`). It asks for
    Node.js 24 and pnpm 11.
-3. Run `./deploy.sh` to copy the driver into the simulator's source tree.
-4. Run `./frontier_run.sh`. It writes each mechanism's leagues to
+3. Run `sh ./deploy.sh` to copy the driver into the simulator's source tree.
+4. Run `sh ./frontier_run.sh`. It writes each mechanism's leagues to
    `runs/frontier/` in chunks of six and skips any chunk already there.
-   `./rerun_guarded.sh` does the same and stops the run if its processes pass
+   `sh ./rerun_guarded.sh` does the same and stops the run if its processes pass
    16 GB of memory in total. It uses macOS commands, so on Linux run
-   `./frontier_run.sh` directly.
+   `sh ./frontier_run.sh` directly.
 
 One number, the seed, fixes every chance event in a league, so a given seed and
 mechanism reproduce a league. On our machine, six leagues of 25 seasons took
@@ -147,11 +147,11 @@ at three processes and about 12 hours for the whole run.
 The run uses three processes at a time by default, because our machine also
 runs other work that needs a lot of CPU and memory. A machine with more cores
 and memory can run more at once and finish sooner. The fourth argument of
-`./frontier_run.sh` sets the number, so `./frontier_run.sh 25 30 6 5` runs five
-at a time, and `./rerun_guarded.sh` takes it as its first argument. Our three
-processes peaked at 11.8 GB together, so with `./rerun_guarded.sh`, raise its
+`frontier_run.sh` sets the number, so `sh ./frontier_run.sh 25 30 6 5` runs five
+at a time, and `rerun_guarded.sh` takes it as its first argument. Our three
+processes peaked at 11.8 GB together, so with `rerun_guarded.sh`, raise its
 memory ceiling, the second argument (16 GB by default), by about 4 GB for each
 process added.
 
-If a script will not start because it is not executable, run `chmod +x *.sh`
-first, or start it with `sh`, as in `sh ./frontier_run.sh`.
+The shell scripts in this repository are not executable, so start each one with
+`sh`, as above.

@@ -15,5 +15,5 @@ mechanism, and its numbers came from the scripts in
 
 The page was published from the `docs/sweep/` folder of the
 `cola-manipulation-bound` repository, which is now private, so the page's link
-to that repository no longer opens. `./deploy.sh` copies `index.html` into a
+to that repository no longer opens. `sh ./deploy.sh` copies `index.html` into a
 checkout of that repository, whose path it takes as an optional argument.

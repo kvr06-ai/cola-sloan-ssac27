@@ -4,10 +4,10 @@
 # The *.test.ts files in this directory are the editable MASTERS. They import
 # `../worker/...`, so they only resolve (and only get picked up by vitest's
 # "basketball" project) from inside zengm-fork/src/test/. Edit the master here,
-# then run ./deploy.sh to sync it into the fork before running.
+# then run sh ./deploy.sh to sync it into the fork before running.
 #
-#   ./deploy.sh            # deploy every *.test.ts master
-#   ./deploy.sh colaChannelProbe   # deploy one (prefix match)
+#   sh ./deploy.sh         # deploy every *.test.ts master
+#   sh ./deploy.sh colaChannelProbe   # deploy one (prefix match)
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 FORK="$DIR/zengm-fork"

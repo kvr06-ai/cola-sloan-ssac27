@@ -1,7 +1,7 @@
 #!/bin/sh
 # Record-based reference mechanisms (the own-metric comparison Highley asked for):
 #
-#   ./ref_run.sh [seasons] [reps] [chunk] [conc]
+#   sh ./ref_run.sh [seasons] [reps] [chunk] [conc]
 #
 # Same memory-safe chunked runner as e14_run.sh. Three configs:
 #   nba    post-2019 NBA lottery (14-team pool, official ball counts, top-4 draw,
